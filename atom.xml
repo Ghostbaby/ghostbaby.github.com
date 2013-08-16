@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-16T14:51:14+08:00</updated>
+  <updated>2013-08-16T14:53:07+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -12,5 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[puppet svn 更新发布测试]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/"/>
+    <updated>2013-08-16T14:52:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi</id>
+    <content type="html"><![CDATA[<p>【导读】</p>
+
+<p>puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)，</p>
+
+<p>里面有很多模板，大家有兴趣可以仔细看下：<a href="http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0">http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0</a></p>
+
+<p>有介绍，毕竟有部分同学还不知道hooks是干吗用的，了解svn的钩子后，</p>
+
+<p>就会明白上面的需求只需要在commit代码的时候，执行post-commit这个钩子，就可以</p>
+
+<p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
+
+<p>[基础]</p>
+
+<p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
+
+<p>然还有puppet了，熟悉操作puppet也是不可少的。关于puppet 中文资料，可以参阅本站</p>
+
+<p>栏目。</p>
+
+<p>[安装试验环境】</p>
+
+<p>本文以centos 5.4实例环境，其中 web-02.test.com为svn主机，并且做为web主机，</p>
+
+<p>svn仓库目录为/var/svn_puppet ,apache的主目录为/var/www/html/svn_puppet.</p>
+
+<p>其中backuplb的为puppetmaster主机，假设两台机器都已安装好了puppet,</p>
+
+<p>整体实现流程，客户端svn commit后触 发post-commit钩子，</p>
+
+<p>post-commit 钩子执行puppet d &mdash;test命令，实现自动更新。</p>
+
+<p>【试验效果】</p>
+
+<p>我们期望的效果，是我们在客户端后提交svn更新后，我们就可以通过web来查看，省略了</p>
+
+<p>发布这一过程。svn 钩子用起来还是比较简单，sky在调用puppet的时候遇到几个小问题，</p>
+
+<p>但还是解决了，具体可以接下来看。</p>
+
+<p>[安装过程]</p>
+
+<p>在web-02上操作：</p>
+
+<p>1.安装http，以及相应的svn模块</p>
+
+<p>[root@web-02 svn_puppet]#yum -y install  subversion mod_dav_svn mod_auth_mysql  http</p>
+
+<p>2.配置apache，我们使用apache管理svn</p>
+
+<ol>
+<li>启动apache.</li>
+</ol>
+
+
+<p>[root@web-02 svn_puppet]# /etc/init.d/httpd start5.测试：使用svn客户端或者IE应该就访问 <a href="http://ip/repos/svn_puppet/">http://ip/repos/svn_puppet/</a> #当然要输入刚创建的puppet用户名和密码</p>
+]]></content>
+  </entry>
   
 </feed>
