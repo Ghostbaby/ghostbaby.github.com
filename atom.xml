@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-16T14:09:47+08:00</updated>
+  <updated>2013-08-16T14:24:13+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -12,5 +12,14 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Puppet svn Testing]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/16/puppet-svn-testing/"/>
+    <updated>2013-08-16T14:21:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/16/puppet-svn-testing</id>
+    <content type="html"><![CDATA[<p>this is a test~!</p>
+]]></content>
+  </entry>
   
 </feed>
