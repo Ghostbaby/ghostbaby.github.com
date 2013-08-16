@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://Ghostbaby.github.io/sitemap.xml 
