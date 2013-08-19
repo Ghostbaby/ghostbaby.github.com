@@ -39,8 +39,28 @@
         <lastmod>2013-08-19T14:26:49+08:00</lastmod>
     </url>
     <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/19/openstack-critical-nova/</loc>
+        <lastmod>2013-08-19T14:29:19+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/openstack-network-flatdhcp-can-not-ping-host/
+        </loc>
+        <lastmod>2013-08-19T14:29:58+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/19/mysql-error-1289-hy000/</loc>
+        <lastmod>2013-08-19T14:31:30+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/shell-plus-pi-chu-jiao-ben-kua-ping-tai-ri-zhi-shai-xuan-cha-ru-shu-ju-ku/
+        </loc>
+        <lastmod>2013-08-19T14:33:30+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-19T14:26:49+08:00</lastmod>
+        <lastmod>2013-08-19T14:33:30+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -48,6 +68,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-19T14:26:49+08:00</lastmod>
+        <lastmod>2013-08-19T14:33:30+08:00</lastmod>
     </url>
 </urlset>

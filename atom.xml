@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T14:27:06+08:00</updated>
+  <updated>2013-08-19T14:33:35+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,262 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[shell +批出脚本 跨平台 日志筛选 插入数据库]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/shell-plus-pi-chu-jiao-ben-kua-ping-tai-ri-zhi-shai-xuan-cha-ru-shu-ju-ku/"/>
+    <updated>2013-08-19T14:31:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/shell-plus-pi-chu-jiao-ben-kua-ping-tai-ri-zhi-shai-xuan-cha-ru-shu-ju-ku</id>
+    <content type="html"><![CDATA[<p>最近平台某个功能无法实现了，在中间件里面查看日志，发现有报错日志，将脚本单独提出来执行，发现数据的精度超出字段的定义，数据库为mysql，没有数据库表字典无法确定该字段含义，且修改数据库有风险，所以选择折中方案。</p>
+
+<pre><code>中间件运行在windows平台下，数据库在linux下，为了锻炼批处理和shell的能力，选择一个比较复杂的方案：
+1.在中间件服务器上面运行批处理，判断文件的日期，将特定日期的日志复制到共享文件夹
+2.在linux服务器上面运行shell脚本，每隔10S从共享文件夹中获取数据，并且截取字符串就行二次拼接，将语句就行存储，同时往数据库里面插入数据。
+日志文件如下：
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>2013-05-02 13:12:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:12:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:13:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:13:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:14:17: CADODatabase::ExecuteSQL Fail,_strSql:call TF_PhotoIndex_ADD( 2382430263,80,0,'2013-5-2 13:13:50',1948.386880,671.940920,1,2,1,22,'289723281_604_0_24.jpg' );
+</span><span class='line'>2013-05-02 13:14:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:14:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:15:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:15:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:16:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:16:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
+</span><span class='line'>2013-05-02 13:17:28: ExcuteStoByConn , _pDB-&gt;IsEOF()</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code> 下面为具体代码：
+     批处理echo.bat
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@echo off
+</span><span class='line'>setlocal
+</span><span class='line'>cls
+</span><span class='line'>color f0
+</span><span class='line'>mode con: cols=20 lines=5
+</span><span class='line'>title Plugin
+</span><span class='line'>@echo off&&setlocal enabledelayedexpansion
+</span><span class='line'>:en
+</span><span class='line'>for /f "delims=" %%i in ('dir /a-d /b *.log') do (
+</span><span class='line'>for /f "tokens=1 delims=:" %%t in ('time /T') do set houre=%%t
+</span><span class='line'>set timefile=DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!.log
+</span><span class='line'>set filename=%%i
+</span><span class='line'>if "!filename!"=="!timefile!" ( 
+</span><span class='line'>set size=%%~zi
+</span><span class='line'>copy %%i z:\DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!-%time:~3,2%-%time:~6,2%.log )else echo NO
+</span><span class='line'>)
+</span><span class='line'>ping -n 20 127.0.0.1&gt;nul
+</span><span class='line'>goto en</span></code></pre></td></tr></table></div></figure>
+
+
+<p>linux下挂载共享文件夹</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mount //10.10.3.215/log_bak /mnt/log_bak/ -o username=administrator,password=****************</span></code></pre></td></tr></table></div></figure>
+
+
+<p>记得需要安装文件系统包</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>683 sudo apt-get install nfs-common
+</span><span class='line'>737 sudo apt-get install smbfs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>linux下循环运行脚本</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root@ubuntu:~/22# more ADD_tf_photo_index.sh 
+</span><span class='line'>#!/bin/sh
+</span><span class='line'>
+</span><span class='line'>while true
+</span><span class='line'>
+</span><span class='line'>do
+</span><span class='line'>
+</span><span class='line'>rm -rf /root/22/*.log
+</span><span class='line'>
+</span><span class='line'>mv /mnt/log_bak/*.log /root/22/
+</span><span class='line'>
+</span><span class='line'>cat /root/22/*.log|grep TF_PhotoIndex_ADD|awk -F '(' '{printf $2 "\n"}'&gt;&gt;/root/22/1.txt
+</span><span class='line'>
+</span><span class='line'>while read line
+</span><span class='line'>do
+</span><span class='line'>echo $line|awk -F ',' 'BEGIN{OFS=","}{$5=0;$6=0}END{print $0 "\n"}'&gt;&gt;/root/22/some
+</span><span class='line'>done &lt; /root/22/1.txt
+</span><span class='line'>
+</span><span class='line'>rm -rf 1.txt
+</span><span class='line'>
+</span><span class='line'>sed '/^ *$/d' /root/22/some &gt;&gt;two
+</span><span class='line'>
+</span><span class='line'>echo "use txserver;"&gt;&gt;sql
+</span><span class='line'>echo "use txserver;"&gt;&gt;sql0
+</span><span class='line'>
+</span><span class='line'>while read line_two
+</span><span class='line'>do
+</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql
+</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql0
+</span><span class='line'>done &lt; /root/22/two
+</span><span class='line'>
+</span><span class='line'>mysql -h10.10.3.6 -uroot -p********* &lt;/root/22/sql0
+</span><span class='line'>rm -rf some two sql0
+</span><span class='line'>sleep 10s
+</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql ERROR 1289 (HY000)]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/mysql-error-1289-hy000/"/>
+    <updated>2013-08-19T14:30:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/mysql-error-1289-hy000</id>
+    <content type="html"><![CDATA[<p>在安装mysql 5.1.68的时候，导入数据的时候报一下错误：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ERROR 1289 (HY000): The 'partitioning' feature is disabled; you need MySQL built with '--with-partition' to have it working</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同时该业务库还是需要支持GBK的，所以在源码安装configure的时候需要加上编码和分区表的选项，我在网上看帖子也有用</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>--with-plugins=max</span></code></pre></td></tr></table></div></figure>
+
+
+<p>自己装的时候没有用，用的一下选项</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./configure --prefix=/usr/local/mysql  --datadir=/videodata/mysqldata/data --with-partition --with-extra-charsets=all  --with-charset=gbk --with-charset=utf8</span></code></pre></td></tr></table></div></figure>
+
+
+<p>会报一下警告，但是MAKE之后报错的脚本已经插到库里面了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>configure: WARNING: Unrecognized options:</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Openstack]Network FlatDHCP can not ping host]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/openstack-network-flatdhcp-can-not-ping-host/"/>
+    <updated>2013-08-19T14:29:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/openstack-network-flatdhcp-can-not-ping-host</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>12.10: adjust /etc/rc.local to add a firewall rule for use with FlatDHCPManager:
+</span><span class='line'>
+</span><span class='line'>adjust /etc/rc.local to have (before the call to exit):
+</span><span class='line'>
+</span><span class='line'>/sbin/iptables -A POSTROUTING -t mangle -p udp --dport 68 -j CHECKSUM --checksum-fill
+</span><span class='line'>make /etc/rc.local executable:
+</span><span class='line'>
+</span><span class='line'>$ sudo chmod 755 /etc/rc.local
+</span><span class='line'>
+</span><span class='line'>Note: run the iptables command manually before trying to start guests</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Openstack]CRITICAL nova [-]]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/openstack-critical-nova/"/>
+    <updated>2013-08-19T14:28:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/openstack-critical-nova</id>
+    <content type="html"><![CDATA[<p>/var/log/nova/nova-computer.log</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Cannot get interface MTU on 'br100': No such device</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在nova.conf中添加如下节点，让实例自动启动</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>--start_guests_on_host_boot=true
+</span><span class='line'>--resume_guests_state_on_host_boot=true</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[svn 添加新用户脚本]]></title>
