@@ -29,8 +29,18 @@
         <lastmod>2013-08-19T14:21:22+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/%5B%28proxmox%29%5D-zhong-fu-shan-chu-zhi-hou-%2Cke-long-jiao-ben/
+        </loc>
+        <lastmod>2013-08-19T14:26:00+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/19/svn-tian-jia-xin-yong-hu-jiao-ben/</loc>
+        <lastmod>2013-08-19T14:26:49+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-19T14:21:55+08:00</lastmod>
+        <lastmod>2013-08-19T14:26:49+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -38,6 +48,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-19T14:21:55+08:00</lastmod>
+        <lastmod>2013-08-19T14:26:49+08:00</lastmod>
     </url>
 </urlset>
