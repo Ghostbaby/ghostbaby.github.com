@@ -63,23 +63,40 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
 
-<h1>!/bin/bash</h1>
+<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/bash</span>
+</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
+</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/server9/qemu-server/&quot;</span>
+</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
+</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
+</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.qcow2&quot;</span>
+</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.qcow2&quot;</span>
+</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;52:54:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
+</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span>  <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
+</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
-conf_dir=&ldquo;/etc/pve/nodes/server9/qemu-server/&rdquo;
-source_vm_id=$1
-dest_vm_id=$2
-dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.qcow2&rdquo;
-source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.qcow2&rdquo;
-random_mac_addr=&ldquo;52:54:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
-
-<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
-cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
-sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
-sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf
-cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;
-cp -r  $image_dir$source_vm_id $image_dir$dest_vm_id
-mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file</p>
 
 <p>稍微解释下功能实现原理：</p>
 
@@ -114,59 +131,108 @@ mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file</p>
 
 <p>这个是平台配置文件里面的基本内容</p>
 
-<p>sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
-sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf</p>
+<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>这两句是替换上面配置文件里面的VMID号，和MAC地址</p>
 
 <p>最新版，添加修改NAME</p>
 
-<h1>!/bin/bash</h1>
+<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/bash</span>
+</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
+</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/server9/qemu-server/&quot;</span>
+</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
+</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
+</span><span class='line'><span class="nx">vm_name</span><span class="o">=</span><span class="nx">$3</span>
+</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.qcow2&quot;</span>
+</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.qcow2&quot;</span>
+</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;52:60:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/name: \S\+/name: $vm_name/&quot;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
+</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span>  <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
+</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
-conf_dir=&ldquo;/etc/pve/nodes/server9/qemu-server/&rdquo;
-source_vm_id=$1
-dest_vm_id=$2
-vm_name=$3
-dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.qcow2&rdquo;
-source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.qcow2&rdquo;
-random_mac_addr=&ldquo;52:60:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
 
-<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
-cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
-sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
-sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf
-sed -i -e &ldquo;s/name: \S+/name: $vm_name/&rdquo; $tmp_conf
-cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;
-cp -r  $image_dir$source_vm_id $image_dir$dest_vm_id
-mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file</p>
+<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">vim</span> <span class="nx">clone_vmdk</span><span class="p">.</span><span class="nx">sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/sh</span>
+</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
+</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/dtt/qemu-server/&quot;</span>
+</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
+</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
+</span><span class='line'><span class="nx">vm_name</span><span class="o">=</span><span class="nx">$3</span>
+</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.vmdk&quot;</span>
+</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.vmdk&quot;</span>
+</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;2A:AB:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/e1000=\S\+,/e1000=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/name: \S\+/name: $vm_name/&quot;</span> <span class="nx">$tmp_conf</span>
+</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">[</span> <span class="o">!</span> <span class="o">-</span><span class="nx">d</span> <span class="s2">&quot;$image_dir$dest_vm_id&quot;</span> <span class="p">];</span><span class="nx">then</span>
+</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span> <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
+</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="nx">echo</span> <span class="s2">&quot;The directory already exists:&quot;</span><span class="nx">$image_dir$dest_vm_id</span>
+</span><span class='line'><span class="nx">fi</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>vim clone_vmdk.sh</p>
-
-<h1>!/bin/sh</h1>
-
-<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
-conf_dir=&ldquo;/etc/pve/nodes/dtt/qemu-server/&rdquo;
-source_vm_id=$1
-dest_vm_id=$2
-vm_name=$3
-dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.vmdk&rdquo;
-source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.vmdk&rdquo;
-random_mac_addr=&ldquo;2A:AB:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
-
-<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
-cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
-sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
-sed -i -e &ldquo;s/e1000=\S+,/e1000=$random_mac_addr,/&rdquo; $tmp_conf
-sed -i -e &ldquo;s/name: \S+/name: $vm_name/&rdquo; $tmp_conf
-cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;</p>
-
-<p>if [ ! -d &ldquo;$image_dir$dest_vm_id&rdquo; ];then
-cp -r $image_dir$source_vm_id $image_dir$dest_vm_id
-mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file
-else
-echo &ldquo;The directory already exists:&rdquo;$image_dir$dest_vm_id
-fi</p>
 
   
   
