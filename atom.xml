@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T12:18:15+08:00</updated>
+  <updated>2013-08-19T12:19:22+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -29,7 +29,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
 
-<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -72,7 +72,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
     3.至于脚本语法我就不解释了。
 </code></pre>
 
-<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -97,7 +97,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>这个是平台配置文件里面的基本内容</p>
 
-<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
 </span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
@@ -108,7 +108,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>最新版，添加修改NAME</p>
 
-<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -149,7 +149,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 
 
-<figure class='code'><figcaption><span>foo</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
