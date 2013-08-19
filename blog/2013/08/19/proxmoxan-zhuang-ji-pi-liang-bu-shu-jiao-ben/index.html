@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>GhostBaby`s Area</title>
+  <title>PROXMOX安装 及批量部署脚本 - GhostBaby`s Area</title>
   <meta name="author" content="GhostBaby">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://Ghostbaby.github.io">
+  <link rel="canonical" href="http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben">
   <link href="/Ghostbaby/favicon.png" rel="icon">
   <link href="/Ghostbaby/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/Ghostbaby/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -63,15 +63,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/Ghostbaby/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
+      <h1 class="entry-title">PROXMOX安装 及批量部署脚本</h1>
     
     
       <p class="meta">
@@ -94,7 +91,7 @@
   </header>
 
 
-  <div class="entry-content"><p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
+<div class="entry-content"><p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
 
 <p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
 
@@ -198,22 +195,16 @@ else
 echo &ldquo;The directory already exists:&rdquo;$image_dir$dest_vm_id
 fi</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/Ghostbaby/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/">Puppet Svn 更新发布测试</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GhostBaby</span></span>
+
+      
 
 
 
@@ -225,171 +216,32 @@ fi</p>
   
 
 
-<time datetime="2013-08-16T14:52:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2013</time>
-        
-      </p>
+<time datetime="2013-08-19T08:35:00+08:00" pubdate data-updated="true">Aug 19<span>th</span>, 2013</time>
+      
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>【导读】</p>
-
-<p>puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)，</p>
-
-<p>里面有很多模板，大家有兴趣可以仔细看下：<a href="http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0">http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0</a></p>
-
-<p>有介绍，毕竟有部分同学还不知道hooks是干吗用的，了解svn的钩子后，</p>
-
-<p>就会明白上面的需求只需要在commit代码的时候，执行post-commit这个钩子，就可以</p>
-
-<p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
-
-<p>[基础]</p>
-
-<p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
-
-<p>然还有puppet了，熟悉操作puppet也是不可少的。关于puppet 中文资料，可以参阅本站</p>
-
-<p>栏目。</p>
-
-<p>[安装试验环境】</p>
-
-<p>本文以centos 5.4实例环境，其中 web-02.test.com为svn主机，并且做为web主机，</p>
-
-<p>svn仓库目录为/var/svn_puppet ,apache的主目录为/var/www/html/svn_puppet.</p>
-
-<p>其中backuplb的为puppetmaster主机，假设两台机器都已安装好了puppet,</p>
-
-<p>整体实现流程，客户端svn commit后触 发post-commit钩子，</p>
-
-<p>post-commit 钩子执行puppet d &mdash;test命令，实现自动更新。</p>
-
-<p>【试验效果】</p>
-
-<p>我们期望的效果，是我们在客户端后提交svn更新后，我们就可以通过web来查看，省略了</p>
-
-<p>发布这一过程。svn 钩子用起来还是比较简单，sky在调用puppet的时候遇到几个小问题，</p>
-
-<p>但还是解决了，具体可以接下来看。</p>
-
-<p>[安装过程]</p>
-
-<p>在web-02上操作：</p>
-
-<p>1.安装http，以及相应的svn模块</p>
-
-<p>[root@web-02 svn_puppet]#yum -y install  subversion mod_dav_svn mod_auth_mysql  http</p>
-
-<p>2.配置apache，我们使用apache管理svn</p>
-
-<ol>
-<li>启动apache.</li>
-</ol>
-
-
-<p>[root@web-02 svn_puppet]# /etc/init.d/httpd start5.测试：使用svn客户端或者IE应该就访问 <a href="http://ip/repos/svn_puppet/">http://ip/repos/svn_puppet/</a> #当然要输入刚创建的puppet用户名和密码</p>
-
-<p>[配置过程]
-1. 我们可以复制模板post-commit .tmpl为post-commit，并修改相应脚本，先使用shell脚本来测试
-[root@web-02 tmp]# cp /var/svn_puppet/hooks/post-commit.tmpl /var/svn_puppet/hooks/post-commit</p>
-
-<p>[root@web-02 tmp]# cat /var/svn_puppet/hooks/post-commit
-复制代码#!/bin/sh</p>
-
-<p>REPOS=&ldquo;$1&rdquo; ##svn仓库地址</p>
-
-<p>REV=&ldquo;$2&rdquo; ##svn的版本号</p>
-
-<p>time=`date +%Y-%m-%d-%H-%M</p>
-
-<p>export LANG=en_US.UTF-8</p>
-
-<p>export LC_CTYPE=en_US.UTF-8</p>
-
-<p>export PATH=&ldquo;/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin&rdquo; ##根据实际修改</p>
-
-<p>if (/usr/bin/svnlook log -r $REV /var/svn_puppet/ |grep &ldquo;sky_deploy&rdquo;)</p>
-
-<p>then</p>
-
-<p>echo &ldquo;start deploy $time &rdquo; >> /tmp/test_svnautocommit.txt</p>
-
-<p>/usr/bin/svn export &mdash;username puppet &mdash;password testpassword</p>
-
-<p>&mdash;no-auth-cache <a href="http://192.168.3.234/repos/svn_puppet/">http://192.168.3.234/repos/svn_puppet/</a> /var/www/html/svn_puppet/ &mdash;force</p>
-
-<p>fi
-复制代码</p>
-
-<h2>脚本说明，这段脚本是在提交svn的时候，comment的里有sky_deploy，那么就自动发布到/var/www/html/svn_puppet。</h2>
-
-<p>在这里，我们知道，apache的默认主目录不是/var/www/html/svn_puppet，那么需要修改，另外这个钩子的程序
-是apache用户来运行的，需要修改相应的权限。
-[root@web-02 tmp]# chown apache:apache /var/svn_puppet/hooks/post-commit</p>
-
-<p>[root@web-02 tmp]# chmod 755 !$ ##说明!$所代表的是/var/svn_puppet/hooks/post-commit,不多说了。</p>
-
-<p>[root@web-02 tmp]# vim /etc/httpd/conf/httpd.conf</p>
-
-<p>DocumentRoot &ldquo;/var/www/html/svn_puppet/&rdquo; ##修改这行，保存退出，重启httpd服务。</p>
-
-<p>[root@web-02 tmp]# /etc/init.d/httpd restart
-复制代码
-接下来，我们使用svn 客户端来测试,可以看到下面是没有test18.html
-[root@web-02 tmp]# cd /var/www/html/svn_puppet/</p>
-
-<p>[root@web-02 svn_puppet]# ls -l
-复制代码总计 48</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 02:47 index.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 10 11-18 13:27 test10.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 20 11-18 14:13 test11.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 14:13 test12.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 9 11-18 14:13 test14.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 17 11-18 14:21 test15.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 31 11-18 11:19 test2.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 13 11-18 12:00 test3.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 22 11-18 12:04 test4.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 20 11-18 12:30 test5.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 24 11-18 13:10 test8.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 13:23 test9.html
-复制代码</p>
-
-<p>使用svn 客户端，点击，新建文件夹，右击svn check,再新建test18.txt,写上内容，
-test by sky
-www.mysqlops.com
-test by sky
-然后重命名为test18.html，右击test18.html,点击 svn add,再点击svn commit，
-再写comment的时候，填上sky_deploy,这样可以触发svn钩子的操作，svn的操作相关，
-没有贴图了。没有svn基础的同学，可以看看基础文档，进阶点可以使用命令行来操作。
-我们使用IE来访问：</p>
-
-<p>测试下来，没有问题，接下来，其实就是调用puppet，只需要修改下post-commit脚本，
-我是写了个类名svn::update，使用define函数来实现。</p>
+      <div class="sharing">
+  
+  <a href="/Ghostbaby//twitter.com/share" class="twitter-share-button" data-url="http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/" data-via="" data-counturl="http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/Ghostbaby/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/" title="Previous Post: puppet svn 更新发布测试">&laquo; puppet svn 更新发布测试</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/Ghostbaby/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -413,6 +265,7 @@ test by sky
 
   
 </aside>
+
 
     </div>
   </div>

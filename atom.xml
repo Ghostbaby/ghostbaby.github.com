@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-16T15:28:24+08:00</updated>
+  <updated>2013-08-19T08:38:31+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,117 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[PROXMOX安装 及批量部署脚本]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/"/>
+    <updated>2013-08-19T08:35:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben</id>
+    <content type="html"><![CDATA[<p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
+
+<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
+
+<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
+
+<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
+PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
+
+<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
+
+<h1>!/bin/bash</h1>
+
+<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
+conf_dir=&ldquo;/etc/pve/nodes/server9/qemu-server/&rdquo;
+source_vm_id=$1
+dest_vm_id=$2
+dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.qcow2&rdquo;
+source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.qcow2&rdquo;
+random_mac_addr=&ldquo;52:54:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
+
+<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
+cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
+sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
+sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf
+cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;
+cp -r  $image_dir$source_vm_id $image_dir$dest_vm_id
+mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file</p>
+
+<p>稍微解释下功能实现原理：</p>
+
+<pre><code>   1.虚拟机的配置文件分两种，第一种是纯粹的平台识别标志和一些目录指向，第二种就是数据文件，虚拟机数据存放的地方。目录如下/etc/pve/nodes/server9/qemu-server/，这个是配置数据文件存放目录；/var/lib/vz/images/，这是配置文件目录。这里多说点，做过集群的所有节点上都会存一份所有节点虚拟机的配置文件，也就是说节点控制台是可以看到其他节点的虚拟机基本信息，但是不能做控制，在/etc/pve/nodes下你会看见集群下所有节点的目录；数据目录下之存节点下的虚拟机数据文件。
+   2.复制原理，将配置文件下一些基本信息修改成新创建虚拟机的，然后将数据文件复制到新虚拟机配置文件制定的目录。这样平台上的信息就修改完毕了，然后就是修改虚拟机里面系统的配置了，一些主机名啊，IP啊什么的，这些也是可以通过初始化脚本实现的，时间问题目前没有脚本，晚些时候再贴出来。
+
+    3.至于脚本语法我就不解释了。
+</code></pre>
+
+<p>root@server9:~# more /etc/pve/nodes/server9/qemu-server/160.conf
+bootdisk: virtio0
+cores: 2
+ide2: ISO-Storage:iso/CentOS-6.2-x86_64-bin-DVD1.iso,media=cdrom
+memory: 4096
+name: hbase-i1
+net0: virtio=F6:43:53:C5:AC:83,bridge=vmbr0
+ostype: l26
+sockets: 2
+virtio0: local:160/vm-160-disk-1.qcow2,cache=writeback</p>
+
+<p>这个是平台配置文件里面的基本内容</p>
+
+<p>sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
+sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf</p>
+
+<p>这两句是替换上面配置文件里面的VMID号，和MAC地址</p>
+
+<p>最新版，添加修改NAME</p>
+
+<h1>!/bin/bash</h1>
+
+<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
+conf_dir=&ldquo;/etc/pve/nodes/server9/qemu-server/&rdquo;
+source_vm_id=$1
+dest_vm_id=$2
+vm_name=$3
+dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.qcow2&rdquo;
+source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.qcow2&rdquo;
+random_mac_addr=&ldquo;52:60:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
+
+<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
+cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
+sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
+sed -i -e &ldquo;s/virtio=\S+,/virtio=$random_mac_addr,/&rdquo; $tmp_conf
+sed -i -e &ldquo;s/name: \S+/name: $vm_name/&rdquo; $tmp_conf
+cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;
+cp -r  $image_dir$source_vm_id $image_dir$dest_vm_id
+mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file</p>
+
+<p>vim clone_vmdk.sh</p>
+
+<h1>!/bin/sh</h1>
+
+<p>image_dir=&ldquo;/var/lib/vz/images/&rdquo;
+conf_dir=&ldquo;/etc/pve/nodes/dtt/qemu-server/&rdquo;
+source_vm_id=$1
+dest_vm_id=$2
+vm_name=$3
+dest_vm_file=&ldquo;/vm-$dest_vm_id-disk-1.vmdk&rdquo;
+source_vm_file=&ldquo;/vm-$source_vm_id-disk-1.vmdk&rdquo;
+random_mac_addr=&ldquo;2A:AB:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum |sed &rsquo;s/^(..)(..)(..)(..).*$/\1:\2:\3:\4/&lsquo;)&rdquo;</p>
+
+<p>tmp_conf=&ldquo;/tmp/&rdquo;$dest_vm_id&#8221;.txt&#8221;
+cat $conf_dir$source_vm_id&#8221;.conf&#8221; > $tmp_conf
+sed -i -e &rsquo;s/&lsquo;${source_vm_id}&rsquo;/&lsquo;${dest_vm_id}&rsquo;/g&#8217; $tmp_conf
+sed -i -e &ldquo;s/e1000=\S+,/e1000=$random_mac_addr,/&rdquo; $tmp_conf
+sed -i -e &ldquo;s/name: \S+/name: $vm_name/&rdquo; $tmp_conf
+cat $tmp_conf > $conf_dir$dest_vm_id&#8221;.conf&#8221;</p>
+
+<p>if [ ! -d &ldquo;$image_dir$dest_vm_id&rdquo; ];then
+cp -r $image_dir$source_vm_id $image_dir$dest_vm_id
+mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file
+else
+echo &ldquo;The directory already exists:&rdquo;$image_dir$dest_vm_id
+fi</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[puppet svn 更新发布测试]]></title>
