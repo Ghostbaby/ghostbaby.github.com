@@ -17,8 +17,14 @@
         <lastmod>2013-08-19T14:14:11+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/
+        </loc>
+        <lastmod>2013-08-19T14:18:08+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-19T14:14:11+08:00</lastmod>
+        <lastmod>2013-08-19T14:18:08+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -26,6 +32,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-19T14:14:11+08:00</lastmod>
+        <lastmod>2013-08-19T14:18:08+08:00</lastmod>
     </url>
 </urlset>
