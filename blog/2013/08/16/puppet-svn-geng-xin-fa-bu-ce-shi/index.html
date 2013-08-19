@@ -96,7 +96,10 @@
 
 <p>1.安装http，以及相应的svn模块</p>
 
-<p>[root@web-02 svn_puppet]#yum -y install  subversion mod_dav_svn mod_auth_mysql  http</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">svn_puppet</span><span class="p">]</span><span class="err">#</span><span class="nx">yum</span> <span class="o">-</span><span class="nx">y</span> <span class="nx">install</span>  <span class="nx">subversion</span> <span class="nx">mod_dav_svn</span> <span class="nx">mod_auth_mysql</span>  <span class="nx">http</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>2.配置apache，我们使用apache管理svn</p>
 
@@ -105,90 +108,174 @@
 </ol>
 
 
-<p>[root@web-02 svn_puppet]# /etc/init.d/httpd start5.测试：使用svn客户端或者IE应该就访问 <a href="http://ip/repos/svn_puppet/">http://ip/repos/svn_puppet/</a> #当然要输入刚创建的puppet用户名和密码</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">svn_puppet</span><span class="p">]</span><span class="err">#</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">init</span><span class="p">.</span><span class="nx">d</span><span class="o">/</span><span class="nx">httpd</span> <span class="nx">start5</span><span class="p">.</span><span class="err">测试：使用</span><span class="nx">svn</span><span class="err">客户端或者</span><span class="nx">IE</span><span class="err">应该就访问</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//ip/repos/svn_puppet/ #当然要输入刚创建的puppet用户名和密码</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>[配置过程]
-1. 我们可以复制模板post-commit .tmpl为post-commit，并修改相应脚本，先使用shell脚本来测试
-[root@web-02 tmp]# cp /var/svn_puppet/hooks/post-commit.tmpl /var/svn_puppet/hooks/post-commit</p>
+1. 我们可以复制模板post-commit .tmpl为post-commit，并修改相应脚本，先使用shell脚本来测试</p>
 
-<p>[root@web-02 tmp]# cat /var/svn_puppet/hooks/post-commit
-复制代码#!/bin/sh</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">cp</span> <span class="o">/</span><span class="kd">var</span><span class="err">/svn_puppet/hooks/post-commit.tmpl /var/svn_puppet/hooks/post-commit </span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">cat</span> <span class="o">/</span><span class="kd">var</span><span class="err">/svn_puppet/hooks/post-commit</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">REPOS</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span> <span class="err">##</span><span class="nx">svn</span><span class="err">仓库地址</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">REV</span><span class="o">=</span><span class="s2">&quot;$2&quot;</span> <span class="err">##</span><span class="nx">svn</span><span class="err">的版本号</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">time</span><span class="o">=</span><span class="err">`</span><span class="nx">date</span> <span class="o">+%</span><span class="nx">Y</span><span class="o">-%</span><span class="nx">m</span><span class="o">-%</span><span class="nx">d</span><span class="o">-%</span><span class="nx">H</span><span class="o">-%</span><span class="nx">M</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="nx">LANG</span><span class="o">=</span><span class="nx">en_US</span><span class="p">.</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="nx">LC_CTYPE</span><span class="o">=</span><span class="nx">en_US</span><span class="p">.</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="nx">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin&quot;</span> <span class="err">##根据实际修改</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="err">/usr/bin/svnlook log -r $REV /var/svn_puppet/ |grep &quot;sky_deploy&quot;)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">then</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">echo</span> <span class="s2">&quot;start deploy $time &quot;</span> <span class="o">&gt;&gt;</span> <span class="err">/tmp/test_svnautocommit.txt</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">bin</span><span class="o">/</span><span class="nx">svn</span> <span class="kr">export</span> <span class="o">--</span><span class="nx">username</span> <span class="nx">puppet</span> <span class="o">--</span><span class="nx">password</span> <span class="nx">testpassword</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">--</span><span class="nx">no</span><span class="o">-</span><span class="nx">auth</span><span class="o">-</span><span class="nx">cache</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//192.168.3.234/repos/svn_puppet/ /var/www/html/svn_puppet/ --force</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">fi</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>REPOS=&ldquo;$1&rdquo; ##svn仓库地址</p>
-
-<p>REV=&ldquo;$2&rdquo; ##svn的版本号</p>
-
-<p>time=`date +%Y-%m-%d-%H-%M</p>
-
-<p>export LANG=en_US.UTF-8</p>
-
-<p>export LC_CTYPE=en_US.UTF-8</p>
-
-<p>export PATH=&ldquo;/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin&rdquo; ##根据实际修改</p>
-
-<p>if (/usr/bin/svnlook log -r $REV /var/svn_puppet/ |grep &ldquo;sky_deploy&rdquo;)</p>
-
-<p>then</p>
-
-<p>echo &ldquo;start deploy $time &rdquo; >> /tmp/test_svnautocommit.txt</p>
-
-<p>/usr/bin/svn export &mdash;username puppet &mdash;password testpassword</p>
-
-<p>&mdash;no-auth-cache <a href="http://192.168.3.234/repos/svn_puppet/">http://192.168.3.234/repos/svn_puppet/</a> /var/www/html/svn_puppet/ &mdash;force</p>
-
-<p>fi
-复制代码</p>
 
 <h2>脚本说明，这段脚本是在提交svn的时候，comment的里有sky_deploy，那么就自动发布到/var/www/html/svn_puppet。</h2>
 
 <p>在这里，我们知道，apache的默认主目录不是/var/www/html/svn_puppet，那么需要修改，另外这个钩子的程序
-是apache用户来运行的，需要修改相应的权限。
-[root@web-02 tmp]# chown apache:apache /var/svn_puppet/hooks/post-commit</p>
+是apache用户来运行的，需要修改相应的权限。</p>
 
-<p>[root@web-02 tmp]# chmod 755 !$ ##说明!$所代表的是/var/svn_puppet/hooks/post-commit,不多说了。</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">chown</span> <span class="nx">apache</span><span class="o">:</span><span class="nx">apache</span> <span class="o">/</span><span class="kd">var</span><span class="err">/svn_puppet/hooks/post-commit</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">chmod</span> <span class="mi">755</span> <span class="o">!</span><span class="nx">$</span> <span class="err">##说明</span><span class="o">!</span><span class="nx">$</span><span class="err">所代表的是</span><span class="o">/</span><span class="kd">var</span><span class="err">/svn_puppet/hooks/post-commit,不多说了。</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">vim</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">httpd</span><span class="o">/</span><span class="nx">conf</span><span class="o">/</span><span class="nx">httpd</span><span class="p">.</span><span class="nx">conf</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">DocumentRoot</span> <span class="s2">&quot;/var/www/html/svn_puppet/&quot;</span> <span class="err">##修改这行，保存退出，重启</span><span class="nx">httpd</span><span class="err">服务。</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">init</span><span class="p">.</span><span class="nx">d</span><span class="o">/</span><span class="nx">httpd</span> <span class="nx">restart</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>[root@web-02 tmp]# vim /etc/httpd/conf/httpd.conf</p>
 
-<p>DocumentRoot &ldquo;/var/www/html/svn_puppet/&rdquo; ##修改这行，保存退出，重启httpd服务。</p>
+<p>接下来，我们使用svn 客户端来测试,可以看到下面是没有test18.html</p>
 
-<p>[root@web-02 tmp]# /etc/init.d/httpd restart
-复制代码
-接下来，我们使用svn 客户端来测试,可以看到下面是没有test18.html
-[root@web-02 tmp]# cd /var/www/html/svn_puppet/</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span> <span class="nx">cd</span> <span class="o">/</span><span class="kd">var</span><span class="err">/www/html/svn_puppet/</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">svn_puppet</span><span class="p">]</span><span class="err">#</span> <span class="nx">ls</span> <span class="o">-</span><span class="nx">l</span>
+</span><span class='line'><span class="err">总计</span> <span class="mi">48</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">19</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">02</span><span class="o">:</span><span class="mi">47</span> <span class="nx">index</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">10</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">13</span><span class="o">:</span><span class="mi">27</span> <span class="nx">test10</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">20</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">14</span><span class="o">:</span><span class="mi">13</span> <span class="nx">test11</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">19</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">14</span><span class="o">:</span><span class="mi">13</span> <span class="nx">test12</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">9</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">14</span><span class="o">:</span><span class="mi">13</span> <span class="nx">test14</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">17</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">14</span><span class="o">:</span><span class="mi">21</span> <span class="nx">test15</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">31</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">11</span><span class="o">:</span><span class="mi">19</span> <span class="nx">test2</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">13</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">12</span><span class="o">:</span><span class="mi">00</span> <span class="nx">test3</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">22</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">12</span><span class="o">:</span><span class="mi">04</span> <span class="nx">test4</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">20</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">12</span><span class="o">:</span><span class="mi">30</span> <span class="nx">test5</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">24</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">13</span><span class="o">:</span><span class="mi">10</span> <span class="nx">test8</span><span class="p">.</span><span class="nx">html</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span><span class="nx">rw</span><span class="o">-</span><span class="nx">r</span><span class="o">--</span><span class="nx">r</span><span class="o">--</span> <span class="mi">1</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">19</span> <span class="mi">11</span><span class="o">-</span><span class="mi">18</span> <span class="mi">13</span><span class="o">:</span><span class="mi">23</span> <span class="nx">test9</span><span class="p">.</span><span class="nx">html</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>[root@web-02 svn_puppet]# ls -l
-复制代码总计 48</p>
 
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 02:47 index.html</p>
+<p>使用svn 客户端，点击，新建文件夹，右击svn check,再新建test18.txt,写上内容，</p>
 
-<p>-rw-r&mdash;r&mdash; 1 apache apache 10 11-18 13:27 test10.html</p>
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">test</span> <span class="nx">by</span> <span class="nx">sky</span>
+</span><span class='line'><span class="nx">www</span><span class="p">.</span><span class="nx">mysqlops</span><span class="p">.</span><span class="nx">com</span>
+</span><span class='line'><span class="nx">test</span> <span class="nx">by</span> <span class="nx">sky</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>-rw-r&mdash;r&mdash; 1 apache apache 20 11-18 14:13 test11.html</p>
 
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 14:13 test12.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 9 11-18 14:13 test14.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 17 11-18 14:21 test15.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 31 11-18 11:19 test2.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 13 11-18 12:00 test3.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 22 11-18 12:04 test4.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 20 11-18 12:30 test5.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 24 11-18 13:10 test8.html</p>
-
-<p>-rw-r&mdash;r&mdash; 1 apache apache 19 11-18 13:23 test9.html
-复制代码</p>
-
-<p>使用svn 客户端，点击，新建文件夹，右击svn check,再新建test18.txt,写上内容，
-test by sky
-www.mysqlops.com
-test by sky
-然后重命名为test18.html，右击test18.html,点击 svn add,再点击svn commit，
+<p>然后重命名为test18.html，右击test18.html,点击 svn add,再点击svn commit，
 再写comment的时候，填上sky_deploy,这样可以触发svn钩子的操作，svn的操作相关，
 没有贴图了。没有svn基础的同学，可以看看基础文档，进阶点可以使用命令行来操作。
 我们使用IE来访问：</p>
