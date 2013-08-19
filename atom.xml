@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T12:36:42+08:00</updated>
+  <updated>2013-08-19T12:38:43+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -224,7 +224,8 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
 
-<p>[基础]</p>
+<p>&lt;!-more-!>
+[基础]</p>
 
 <p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
 
