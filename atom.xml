@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T16:07:31+08:00</updated>
+  <updated>2013-08-19T16:47:41+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,25 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[rpmdb: unable to join the environment解决办法]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/rpmdb-unable-to-join-the-environmentjie-jue-ban-fa/"/>
+    <updated>2013-08-19T16:47:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/rpmdb-unable-to-join-the-environmentjie-jue-ban-fa</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /var/lib/rpm/
+</span><span class='line'>mkdir db_bak
+</span><span class='line'>mv db.* db_bak(最后看到几个__db.00*文件，我也给移走了，果然见效）
+</span><span class='line'>rpm --rebuilddb     重建rpm数据库
+</span><span class='line'>yum clean all</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[openstack安装rabbitmq-server消息队列时出现错误]]></title>
