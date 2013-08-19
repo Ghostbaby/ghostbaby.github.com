@@ -59,8 +59,26 @@
         <lastmod>2013-08-19T14:33:30+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/powercli-xu-ni-ji-jian-dan-zhuang-tai-bao-gao/
+        </loc>
+        <lastmod>2013-08-19T15:33:13+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/powershell-huo-qu-xu-ni-ji-zhuang-tai/
+        </loc>
+        <lastmod>2013-08-19T15:33:59+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/19/linuxxia-ru-he-mo-ni-an-jian-shu-ru-he-mo-ni-shu-biao/
+        </loc>
+        <lastmod>2013-08-19T15:36:52+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-19T14:33:30+08:00</lastmod>
+        <lastmod>2013-08-19T15:36:52+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -68,6 +86,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-19T14:33:30+08:00</lastmod>
+        <lastmod>2013-08-19T15:36:52+08:00</lastmod>
     </url>
 </urlset>

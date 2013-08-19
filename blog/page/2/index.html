@@ -7,7 +7,10 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="【导读】 puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)， 里面有很多模板，大家有兴趣可以仔细看下：http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6% &hellip;">
+	<meta name="description" content="此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置 1、下载Nginx shelllink1
+2
+3
+cd /usr/local/src/ wget -S http://nginx.org/download/nginx-1.2.6.tar.gz 2、创建用户 &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -28,6 +31,182 @@
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/">用Nginx负载均衡Openstack对象存储swift</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T14:15:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置</p>
+
+<p>1、下载Nginx</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cd</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">wget</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.2.6.tar.gz</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2、创建用户</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">useradd</span> <span class="o">-</span><span class="nx">c</span> <span class="s2">&quot;Nginx User&quot;</span> <span class="o">-</span><span class="nx">s</span> <span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">nologin</span> <span class="o">-</span><span class="nx">r</span> <span class="o">-</span><span class="nx">d</span> <span class="o">/</span><span class="kd">var</span><span class="err">/lib/nginx nginx </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3、安装Nginx</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="p">.</span><span class="nx">tar</span><span class="p">.</span><span class="nx">gz</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">cd</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/">python用cx_Oracle模块连接数据库</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T13:45:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>在的时候可能会报这些错误</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ImportError</span><span class="o">:</span> <span class="nx">libclntsh</span><span class="p">.</span><span class="nx">so</span><span class="p">.</span><span class="mf">11.1</span><span class="o">:</span> <span class="nx">cannot</span> <span class="nx">open</span> <span class="nx">shared</span> <span class="nx">object</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">such</span> <span class="nx">file</span> <span class="nx">or</span> <span class="nx">directory</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么需要在LD_LIBRARY_PATH中指定那些库的所在，典型是在下面</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nx">$ORACLE_HOME</span><span class="o">/</span><span class="nx">lib</span><span class="o">:</span><span class="err">/usr/lib:/usr/local/lib</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在的时候可能会报这些错误</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cx_Oracle</span><span class="p">.</span><span class="nx">InterfaceError</span><span class="o">:</span> <span class="nx">Unable</span> <span class="nx">to</span> <span class="nx">acquire</span> <span class="nx">Oracle</span> <span class="nx">environment</span> <span class="nx">handle</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下载\instantclient_10_2</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T08:35:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
+
+<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
+
+<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
+
+<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
+PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
+
+<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>

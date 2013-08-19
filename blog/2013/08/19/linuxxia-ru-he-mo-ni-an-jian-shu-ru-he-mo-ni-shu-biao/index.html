@@ -1,0 +1,780 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>linux下如何模拟按键输入和模拟鼠标 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="1.查看/dev/input/eventX是什么类型的事件， cat /proc/bus/input/devices 设备有着自己特殊的按键键码，我需要将一些标准的按键，比如0－9，X－Z等模拟成标准按键，比如KEY_0,KEY-Z等，所以需要用到按键模拟，具体方法就是操作/dev/input/ &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">Linux下如何模拟按键输入和模拟鼠标</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T15:34:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>1.查看/dev/input/eventX是什么类型的事件， cat /proc/bus/input/devices</p>
+
+<p>设备有着自己特殊的按键键码，我需要将一些标准的按键，比如0－9，X－Z等模拟成标准按键，比如KEY_0,KEY-Z等，所以需要用到按键模拟，具体方法就是操作/dev/input/event1文件，向它写入个input_event结构体就可以模拟按键的输入了。</p>
+
+<pre><code>  linux/input.h中有定义，这个文件还定义了标准按键的编码等
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>struct input_event {
+</span><span class='line'>
+</span><span class='line'>struct timeval time; //按键时间
+</span><span class='line'>
+</span><span class='line'>__u16 type; //类型，在下面有定义
+</span><span class='line'>
+</span><span class='line'>__u16 code; //要模拟成什么按键
+</span><span class='line'>
+</span><span class='line'>__s32 value;//是按下还是释放
+</span><span class='line'>
+</span><span class='line'>};</span></code></pre></td></tr></table></div></figure>
+
+
+<!--more-->
+
+
+<p>code：</p>
+
+<pre><code> 事件的代码.如果事件的类型代码是EV_KEY,该代码code为设备键盘代码.代码植0~127为键盘上的按键代码,0x110~0x116 为鼠标上按键代码,其中0x110(BTN_ LEFT)为鼠标左键,0x111(BTN_RIGHT)为鼠标右键,0x112(BTN_ MIDDLE)为鼠标中键.其它代码含义请参看include/linux/input.h文件. 如果事件的类型代码是EV_REL,code值表示轨迹的类型.如指示鼠标的X轴方向REL_X(代码为0x00),指示鼠标的Y轴方向REL_Y(代码为0x01),指示鼠标中轮子方向REL_WHEEL(代码为0x08).
+</code></pre>
+
+<p>type:</p>
+
+<p>EV_KEY,键盘</p>
+
+<p>EV_REL,相对坐标</p>
+
+<p>EV_ABS,绝对坐标</p>
+
+<p>value：</p>
+
+<pre><code>  事件的值.如果事件的类型代码是EV_KEY,当按键按下时值为1,松开时值为0;如果事件的类型代码是EV_ REL,value的正数值和负数值分别代表两个不同方向的值.
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/*
+</span><span class='line'>
+</span><span class='line'>* Event types
+</span><span class='line'>
+</span><span class='line'>*/
+</span><span class='line'>
+</span><span class='line'>#define EV_SYN 0x00
+</span><span class='line'>
+</span><span class='line'>#define EV_KEY 0x01 //按键
+</span><span class='line'>
+</span><span class='line'>#define EV_REL 0x02 //相对坐标(轨迹球)
+</span><span class='line'>
+</span><span class='line'>#define EV_ABS 0x03 //绝对坐标
+</span><span class='line'>
+</span><span class='line'>#define EV_MSC 0x04 //其他
+</span><span class='line'>
+</span><span class='line'>#define EV_SW 0x05
+</span><span class='line'>
+</span><span class='line'>#define EV_LED 0x11 //LED
+</span><span class='line'>
+</span><span class='line'>#define EV_SND 0x12//声音
+</span><span class='line'>
+</span><span class='line'>#define EV_REP 0x14//repeat
+</span><span class='line'>
+</span><span class='line'>#define EV_FF 0x15 
+</span><span class='line'>
+</span><span class='line'>#define EV_PWR 0x16
+</span><span class='line'>
+</span><span class='line'>#define EV_FF_STATUS 0x17
+</span><span class='line'>
+</span><span class='line'>#define EV_MAX 0x1f
+</span><span class='line'>
+</span><span class='line'>#define EV_CNT (EV_MAX+1)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是原理部分，下面是一段程序代码，主要功能是系统进入登陆界面之后，在服务器本地执行登陆，通过组合键，实现一些服务器断网之后的操作。</p>
+
+<p>计划任务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>crontab -e
+</span><span class='line'>*/1 * * * * bash Cycle.sh</span></code></pre></td></tr></table></div></figure>
+
+
+<p>程序功能介绍：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>4  --------------》编译之后的程序，主要用来执行键盘输入的动作
+</span><span class='line'>4.c--------------》C的源码文件
+</span><span class='line'>setup.sh---------》将字符串转换成4能够识别的整数
+</span><span class='line'>Cycle.sh---------》计划任务的文件，也是保存服务器密码的地方，需要加密</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>filename：4.c
+</span><span class='line'>#include &lt;string.h&gt;
+</span><span class='line'>#include &lt;stdio.h&gt;
+</span><span class='line'>#include &lt;sys/types.h&gt;
+</span><span class='line'>#include &lt;sys/stat.h&gt;
+</span><span class='line'>#include &lt;fcntl.h&gt;
+</span><span class='line'>#include &lt;linux/input.h&gt;
+</span><span class='line'>#include &lt;linux/uinput.h&gt;
+</span><span class='line'>#include &lt;stdio.h&gt;
+</span><span class='line'>#include &lt;sys/time.h&gt;
+</span><span class='line'>#include &lt;sys/types.h&gt;
+</span><span class='line'>#include &lt;unistd.h&gt;
+</span><span class='line'>
+</span><span class='line'>void input_car(int fd,int cha){
+</span><span class='line'>        struct input_event event;
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = cha;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>         memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.code = cha;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>void simulate_ctrl_space(int fd)
+</span><span class='line'>{
+</span><span class='line'>
+</span><span class='line'>        struct input_event event;
+</span><span class='line'>
+</span><span class='line'>     //先发送一个 CTRL 按下去的事件。
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = KEY_LEFTCTRL;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>     //先发送一个 SPACE 按下去的事件。
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = KEY_A;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>        
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = KEY_D;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>    
+</span><span class='line'>     //发送一个 释放 SPACE 的事件 
+</span><span class='line'>        memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY; 
+</span><span class='line'>        event.code = KEY_D;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>        memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.code = KEY_A;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>     //发送一个 释放 CTRL 的事件
+</span><span class='line'>        memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.code = KEY_LEFTCTRL;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>void simulate(int fd)
+</span><span class='line'>{
+</span><span class='line'>
+</span><span class='line'>        struct input_event event;
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = KEY_LEFTSHIFT;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>     //先发送一个 SPACE 按下去的事件。
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.value = 1;
+</span><span class='line'>        event.code = KEY_EQUAL;
+</span><span class='line'>        gettimeofday(&event.time,0);
+</span><span class='line'>        write(fd,&event,sizeof(event)) ;
+</span><span class='line'>        
+</span><span class='line'>         memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.code = KEY_EQUAL;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>         memset(&event, 0, sizeof(event));
+</span><span class='line'>        gettimeofday(&event.time, NULL);
+</span><span class='line'>        event.type = EV_KEY;
+</span><span class='line'>        event.code = KEY_LEFTSHIFT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        event.type = EV_SYN;
+</span><span class='line'>        event.code = SYN_REPORT;
+</span><span class='line'>        event.value = 0;
+</span><span class='line'>        write(fd, &event, sizeof(event));        
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>int main(int argc,char *argv[])
+</span><span class='line'>{
+</span><span class='line'>    int fd_ts;
+</span><span class='line'>    int va;
+</span><span class='line'>    fd_ts = open("/dev/input/event1", O_RDWR);
+</span><span class='line'>    if(fd_ts&lt;=0){
+</span><span class='line'>        printf("error open mouse\n");
+</span><span class='line'>        return -2;
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    va = atoi(argv[1]);
+</span><span class='line'>    printf("%d\n",va);
+</span><span class='line'>    if (va == 1000){
+</span><span class='line'>        sleep(5);
+</span><span class='line'>    }
+</span><span class='line'>    if (va == 700){
+</span><span class='line'>        simulate_ctrl_space(fd_ts);
+</span><span class='line'>        close(fd_ts);
+</span><span class='line'>    }
+</span><span class='line'>    if (va == 800){
+</span><span class='line'>        simulate(fd_ts);
+</span><span class='line'>        close(fd_ts);
+</span><span class='line'>    }
+</span><span class='line'>    printf("%d\n",va);
+</span><span class='line'>    input_car(fd_ts,va);
+</span><span class='line'>    close(fd_ts);
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>filename： Cycle.sh
+</span><span class='line'>#!/bin/bash
+</span><span class='line'>A=$(cat /proc/uptime|awk '{print $1}'|awk -F. '{print $1}')
+</span><span class='line'>B=150
+</span><span class='line'>D=60
+</span><span class='line'>echo $A
+</span><span class='line'>C=$(ps axu |grep java)
+</span><span class='line'>if (((${A}&gt;${D})&&(${A}&lt;${B})))
+</span><span class='line'>then
+</span><span class='line'>if ((! -n$(ps aux |grep java|awk '{print $13}'))) 
+</span><span class='line'>then
+</span><span class='line'>bash setup.sh r o o t enter
+</span><span class='line'>sleep 2
+</span><span class='line'>bash setup.sh * * * * * * * * enter sleep s c r e e n enter sleep space
+</span><span class='line'>bash setup.sh c d space a enter
+</span><span class='line'>bash setup.sh j a v a space - j a r space b enter sleep
+</span><span class='line'>bash setup.sh ctrl*a*b
+</span><span class='line'>bash setup.sh s c r e e n enter sleep space
+</span><span class='line'>bash setup.sh c d space a enter
+</span><span class='line'>bash setup.sh j a v a space - j a r space b enter sleep
+</span><span class='line'>bash setup.sh ctrl*a*b
+</span><span class='line'>bash setup.sh ctrl*a*b
+</span><span class='line'>else
+</span><span class='line'>echo "OK"
+</span><span class='line'>fi
+</span><span class='line'>else
+</span><span class='line'>echo "time is goning~"
+</span><span class='line'>fi</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>filename：setup.sh
+</span><span class='line'>#!/bin/bash
+</span><span class='line'>
+</span><span class='line'>KEY=KEY
+</span><span class='line'>for i in $*;do
+</span><span class='line'>value=$i
+</span><span class='line'>CTRL=ctrl
+</span><span class='line'>#echo $value &gt;/root/setup.log
+</span><span class='line'>if [ "$value" == "sleep" ];then
+</span><span class='line'>/root/4 1000
+</span><span class='line'>fi
+</span><span class='line'>if [ "$value" == "+" ];then 
+</span><span class='line'>/root/4 800
+</span><span class='line'>fi
+</span><span class='line'>if [ "$value" == "-" ];then 
+</span><span class='line'>/root/4 12
+</span><span class='line'>fi
+</span><span class='line'>if ((! -n $(echo $value|grep "*")))
+</span><span class='line'>then
+</span><span class='line'>#if [  ! -n  $(echo ${value}|grep +) ];then
+</span><span class='line'>#/root/4 ctrlad
+</span><span class='line'>#if [ "$value" == "ctrl" ];then
+</span><span class='line'>#echo "OK"
+</span><span class='line'>#value="leftctrl"
+</span><span class='line'>#UPPERCASE=$(echo $value | tr '[a-z]' '[A-Z]')
+</span><span class='line'>#key_i="${KEY}_${UPPERCASE}"
+</span><span class='line'>#num=$(cat /usr/include/linux/input.h |grep "${key_i}\&gt;"|awk '{print $3}')
+</span><span class='line'>#echo $num
+</span><span class='line'>#/root/4 $num
+</span><span class='line'>#echo $key_i
+</span><span class='line'>#else
+</span><span class='line'>UPPERCASE=$(echo $value | tr '[a-z]' '[A-Z]') 
+</span><span class='line'>key_i="${KEY}_${UPPERCASE}"
+</span><span class='line'>num1=$(cat /usr/include/linux/input.h |grep "${key_i}\&gt;"|awk '{print $3}')
+</span><span class='line'>echo $num1
+</span><span class='line'>/root/4 $num1
+</span><span class='line'>echo $key_i
+</span><span class='line'>#fi
+</span><span class='line'>else 
+</span><span class='line'>/root/4 700
+</span><span class='line'>fi
+</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
+
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>
