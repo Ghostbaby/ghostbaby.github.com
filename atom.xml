@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T13:48:25+08:00</updated>
+  <updated>2013-08-19T14:14:19+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -41,7 +41,8 @@
 
 <p>下载\instantclient_10_2</p>
 
-<p>&lt;&mdash; more &mdash;></p>
+<!-- more -->
+
 
 <p>然后把里面的动态链接库都复制到C:\Python27\Lib\site-packages下</p>
 
