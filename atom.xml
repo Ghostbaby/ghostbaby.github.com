@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T15:36:56+08:00</updated>
+  <updated>2013-08-19T16:07:31+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,270 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[openstack安装rabbitmq-server消息队列时出现错误]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu/"/>
+    <updated>2013-08-19T16:06:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
+</span><span class='line'>Processing triggers for man-db ...
+</span><span class='line'>Processing triggers for ureadahead ...
+</span><span class='line'>Setting up rabbitmq-server (2.5.0-1ubuntu2) ...
+</span><span class='line'>Starting rabbitmq-server: FAILED - check /var/log/rabbitmq/startup_{log, _err}
+</span><span class='line'>rabbitmq-server.
+</span><span class='line'>invoke-rc.d: inits_cript rabbitmq-server, action "start" failed.
+</span><span class='line'>dpkg: error processing rabbitmq-server (--configure):
+</span><span class='line'>subprocess installed post-installation s_cript returned error exit status 1
+</span><span class='line'>Errors were encountered while processing:
+</span><span class='line'>rabbitmq-server
+</span><span class='line'>E: Sub-process /usr/bin/dpkg returned an error code (1)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>openstack安装rabbitmq-server消息队列时出现以下错误：</p>
+
+<p>因为安装完成后，在启动rabbitmq-server时会检测hostname和hosts记录的对应关系
+解决方法：
+查看hostname</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># hostname 
+</span><span class='line'>ubuntu6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>配置hosts文件</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># cat /etc/hosts |grep ubuntu6
+</span><span class='line'>127.0.0.1 ubuntu6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>重启服务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/init.d/rabbitmq-server start</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[nova-rootwrap require configuration file as argument]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/19/nova-rootwrap-require-configuration-file-as-argument/"/>
+    <updated>2013-08-19T16:04:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/19/nova-rootwrap-require-configuration-file-as-argument</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>nova root wrapper requires a configuration file as argument but devstack doesn't feed it. This error was reported in the log of nova-volume and nova-network service.
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>===========================nova-network log==========================
+</span><span class='line'>2012-06-28 17:17:49 DEBUG nova.utils [-] ['sudo', '/usr/local/bin/nova-rootwrap', 'iptables-save', '-t', 'filter'] failed. Retrying. from (pi
+</span><span class='line'>d=9143) execute /opt/stack/nova/nova/utils.py:197
+</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Running cmd (subprocess): sudo /usr/local/bin/nova-rootwrap iptables-save -t filter from (pid=9143)
+</span><span class='line'>execute /opt/stack/nova/nova/utils.py:168
+</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Result was 97 from (pid=9143) execute /opt/stack/nova/nova/utils.py:184
+</span><span class='line'>Traceback (most recent call last):
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 336, in fire_timers
+</span><span class='line'>    timer()
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/timer.py", line 56, in __call__
+</span><span class='line'>    cb(*args, **kw)
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
+</span><span class='line'>    result = function(*args, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 110, in run_server
+</span><span class='line'>    server.start()
+</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 182, in start
+</span><span class='line'>    self.manager.init_host()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
+</span><span class='line'>    self.l3driver.initialize()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
+</span><span class='line'>    linux_net.init_host()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
+</span><span class='line'>    add_snat_rule(ip_range)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
+</span><span class='line'>    iptables_manager.apply()
+</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 672, in inner
+</span><span class='line'>    retval = f(*args, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
+</span><span class='line'>    attempts=5)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
+</span><span class='line'>    return utils.execute(*cmd, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 191, in execute
+</span><span class='line'>    cmd=' '.join(cmd))
+</span><span class='line'>ProcessExecutionError: Unexpected error while running command.
+</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>Exit code: 97
+</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 CRITICAL nova [-] Unexpected error while running command.
+</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>Exit code: 97
+</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Traceback (most recent call last):
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/bin/nova-network", line 48, in &lt;module&gt;
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova _launcher.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 149, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova service.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 166, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self._exit_event.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/event.py", line 116, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return hubs.get_hub().switch()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 177, in switch
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self.greenlet.switch()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova result = function(*args, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 110, in run_server
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova server.start()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 182, in start
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.manager.init_host()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.l3driver.initialize()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova linux_net.init_host()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova add_snat_rule(ip_range)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova iptables_manager.apply()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 672, in inner
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova retval = f(*args, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova attempts=5)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return utils.execute(*cmd, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 191, in execute
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova cmd=' '.join(cmd))
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova ProcessExecutionError: Unexpected error while running command.
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Exit code: 97
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova
+</span><span class='line'>============================================================</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的错误日志是从帖子上抓取的，实际的日志报错都是一样的。上面的问题主要是在nova-rootwrap的权限和默认目录路径上，下面要对rootwrap.conf进行配置\</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>nova.conf
+</span><span class='line'>
+</span><span class='line'>The root_helper parameter is deprecated in favor of the rootwrap_config parameter:
+</span><span class='line'>
+</span><span class='line'>rootwrap_config=/etc/nova/rootwrap.conf
+</span><span class='line'>
+</span><span class='line'>If you still want to use root_helper, it now needs to include the configuration file:
+</span><span class='line'>
+</span><span class='line'>root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[linux下如何模拟按键输入和模拟鼠标]]></title>
