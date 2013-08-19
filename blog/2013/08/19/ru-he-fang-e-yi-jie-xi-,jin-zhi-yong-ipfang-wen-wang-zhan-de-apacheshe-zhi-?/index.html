@@ -1,0 +1,169 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>如何防恶意解析，禁止用IP访问网站的Apache设置？ | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患： 由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。 域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？ &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">如何防恶意解析，禁止用IP访问网站的Apache设置？</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T14:19:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
+
+<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
+
+<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
+
+<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
+
+<!-- more -->
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NameVirtualHost 121.*.*.* 
+</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
+</span><span class='line'>ServerName 121.*.*.* 
+</span><span class='line'>&lt;Location /&gt; 
+</span><span class='line'>Order Allow,Deny 
+</span><span class='line'>Deny from all 
+</span><span class='line'>&lt;/Location&gt; 
+</span><span class='line'>&lt;/VirtualHost&gt; 
+</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
+</span><span class='line'>DocumentRoot /var/www/nowamagic/ 
+</span><span class='line'>ServerName www.nowamagic.net 
+</span><span class='line'>&lt;/VirtualHost&gt; 
+</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
+</span><span class='line'>DocumentRoot /var/www/nowamagic/ 
+</span><span class='line'>ServerName nowamagic.net 
+</span><span class='line'>&lt;/VirtualHost&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第一部分代码是实现拒绝直接通过 121.<em>.</em>.<em> 这个IP的任何访问请求，这时如果你用 121.</em>.<em>.</em> 访问，会提示拒绝访问。</p>
+
+<p>第二部分代码就是允许通过 <a href="http://www.nowamagic.net/">http://www.nowamagic.net/</a> 这个域名访问，主目录指向 /var/www/nowamagic/ （这里服务器OS是 CentOS）。</p>
+
+<p>第三部分代码是允许不带 www 的域名访问，应该能和上面的合并一起写吧。</p>
+
+<p>在这里记录下，方便以后信手拈来。</p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

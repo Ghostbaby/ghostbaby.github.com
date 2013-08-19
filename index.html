@@ -7,10 +7,7 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置 1、下载Nginx shelllink1
-2
-3
-cd /usr/local/src/ wget -S http://nginx.org/download/nginx-1.2.6.tar.gz 2、创建用户 &hellip;">
+	<meta name="description" content="一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患： 由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。 域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？ &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -31,6 +28,51 @@ cd /usr/local/src/ wget -S http://nginx.org/download/nginx-1.2.6.tar.gz 2、创�
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-%2Cjin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-%3F/">如何防恶意解析，禁止用IP访问网站的Apache设置？</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T14:19:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
+
+<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
+
+<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
+
+<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -86,204 +128,6 @@ cd /usr/local/src/ wget -S http://nginx.org/download/nginx-1.2.6.tar.gz 2、创�
 </span></code></pre></td></tr></table></div></figure>
 
 
-
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="o">/</span><span class="nx">configure</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">user</span><span class="o">=</span><span class="nx">nginx</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">group</span><span class="o">=</span><span class="nx">nginx</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">prefix</span><span class="o">=</span><span class="err">/usr/share \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">sbin</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/usr/sbin/nginx \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">conf</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/etc/nginx/nginx.conf \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">error</span><span class="o">-</span><span class="nx">log</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/nginx/error.log \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">http</span><span class="o">-</span><span class="nx">log</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/nginx/access.log \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">pid</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/run/nginx.pid \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">lock</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/lock/subsys/nginx \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_stub_status_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">without</span><span class="o">-</span><span class="nx">poll_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_gzip_static_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_realip_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_ssl_module</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nx">make</span>
-</span><span class='line'><span class="nx">make</span> <span class="nx">install</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4、修改配置文件/etc/nginx/nginx.conf</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cat</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">nginx</span><span class="o">/</span><span class="nx">nginx</span><span class="p">.</span><span class="nx">conf</span> <span class="o">|</span> <span class="nx">grep</span> <span class="o">-</span><span class="nx">v</span> <span class="o">^</span><span class="nx">$</span> <span class="o">|</span> <span class="nx">grep</span> <span class="o">-</span><span class="nx">v</span> <span class="p">.</span><span class="o">*</span><span class="err">#</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">worker_processes</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">events</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">worker_connections</span> <span class="mi">1024</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">http</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">include</span> <span class="nx">mime</span><span class="p">.</span><span class="nx">types</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">default_type</span> <span class="nx">application</span><span class="o">/</span><span class="nx">octet</span><span class="o">-</span><span class="nx">stream</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">sendfile</span> <span class="nx">on</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">keepalive_timeout</span> <span class="mi">65</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">client_max_body_size</span> <span class="mi">6024</span><span class="nx">M</span><span class="p">;</span> <span class="err">#限制用户上传大小</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">proxy_ignore_client_abort</span> <span class="nx">on</span><span class="p">;</span> <span class="err">#解决</span><span class="mi">499</span><span class="err">错误，意思是代理服务器不要主动关闭客户端连接</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">upstream</span> <span class="nx">swift</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="mf">192.168</span><span class="p">.</span><span class="mf">100.7</span><span class="o">:</span><span class="mi">8080</span><span class="p">;</span> <span class="err">#此次</span><span class="nx">ip</span><span class="err">为</span><span class="nx">proxy</span><span class="err">的</span><span class="nx">swift</span> <span class="nx">ip</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="mf">192.168</span><span class="p">.</span><span class="mf">100.8</span><span class="o">:</span><span class="mi">8080</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">listen</span> <span class="mi">8080</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server_name</span> <span class="nx">swift</span><span class="p">;</span> <span class="err">#主机名称</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">location</span> <span class="o">/</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">proxy_pass</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//swift/; #upstream 一致</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">error_page</span> <span class="mi">500</span> <span class="mi">502</span> <span class="mi">503</span> <span class="mi">504</span> <span class="o">/</span><span class="mi">50</span><span class="nx">x</span><span class="p">.</span><span class="nx">html</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">location</span> <span class="o">=</span> <span class="err">/50x.html {</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">root</span> <span class="nx">html</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>5、启动Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">/usr/sbin/nginx</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">netstat</span> <span class="o">-</span><span class="nx">ltunp</span> <span class="o">|</span> <span class="nx">grep</span> <span class="mi">8080</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>备注：记得只需要在endpoint里指向nginx服务器地址信息，其它proxy节点不需要指定。</p>
 
   
   
