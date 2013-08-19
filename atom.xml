@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T13:13:52+08:00</updated>
+  <updated>2013-08-19T13:24:15+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -447,6 +447,164 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <p>测试下来，没有问题，接下来，其实就是调用puppet，只需要修改下post-commit脚本，
 我是写了个类名svn::update，使用define函数来实现。</p>
+
+<p>在backuplb上操作：
+1.编写个类，其实就是调用刚才的那个脚本，直接贴代码了，</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">backuplb</span> <span class="nx">modules</span><span class="p">]</span><span class="err">#</span> <span class="nx">cat</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">puppet</span><span class="o">/</span><span class="nx">modules</span><span class="o">/</span><span class="nx">svn</span><span class="o">/</span><span class="nx">manifests</span><span class="o">/</span><span class="nx">init</span><span class="p">.</span><span class="nx">pp</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">##</span><span class="nx">written</span> <span class="nx">by</span> <span class="nx">sky</span> <span class="mi">2011</span><span class="o">=</span><span class="mi">11</span><span class="o">-</span><span class="mi">21</span>
+</span><span class='line'><span class="err">##</span><span class="nx">www</span><span class="p">.</span><span class="nx">mysqlops</span><span class="p">.</span><span class="nx">com</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">svn</span><span class="o">::</span><span class="nx">update</span> <span class="p">{</span>
+</span><span class='line'><span class="kr">package</span> <span class="p">{</span> <span class="s2">&quot;svn&quot;</span><span class="o">:</span>
+</span><span class='line'><span class="nx">name</span> <span class="o">=&gt;</span> <span class="s2">&quot;subversion&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nx">ensure</span> <span class="o">=&gt;</span> <span class="s2">&quot;present&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">define</span> <span class="nx">svn_update</span> <span class="p">(</span><span class="nx">$username</span><span class="p">,</span><span class="nx">$password</span><span class="p">,</span><span class="nx">$url</span><span class="p">,</span><span class="nx">$des</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="nx">exec</span> <span class="p">{</span> <span class="s2">&quot;update_repo&quot;</span><span class="o">:</span>
+</span><span class='line'><span class="nx">command</span> <span class="o">=&gt;</span> <span class="s2">&quot;/usr/bin/svn export --username $username --password $password $url $des --force&quot;</span> <span class="p">,</span>
+</span><span class='line'><span class="nx">require</span> <span class="o">=&gt;</span> <span class="nx">Package</span><span class="p">[</span><span class="s2">&quot;svn&quot;</span><span class="p">],</span>
+</span><span class='line'><span class="nx">logoutput</span> <span class="o">=&gt;</span> <span class="nx">on_failure</span><span class="p">,</span>
+</span><span class='line'><span class="nx">user</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nx">group</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">svn_update</span> <span class="p">{</span> <span class="nx">svn_puppet</span><span class="o">:</span>
+</span><span class='line'><span class="nx">username</span> <span class="o">=&gt;</span> <span class="s2">&quot;puppet&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nx">password</span> <span class="o">=&gt;</span> <span class="s2">&quot;testpassword&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nx">url</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://192.168.3.234/repos/svn_puppet/&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nx">des</span> <span class="o">=&gt;</span> <span class="s2">&quot;/var/www/html/svn_puppet&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>代码说明：sky使用的是apache的用户和组，请根据实际修改，
+代码中省略了些对用户还有组的操作。如果你看过之前puppet对用户和组的管理文章，
+相信这对你来说不是个问题，过程省略，我们在修改下nodes.pp，添加</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">backuplb</span> <span class="nx">modules</span><span class="p">]</span><span class="err">#</span> <span class="nx">cat</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">puppet</span><span class="o">/</span><span class="nx">manifests</span><span class="o">/</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">pp</span>
+</span><span class='line'><span class="nx">node</span> <span class="s2">&quot;web-02.test.com&quot;</span> <span class="p">{</span>
+</span><span class='line'><span class="nx">include</span> <span class="nx">svn</span><span class="o">:</span><span class="nx">update</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>[代码测试]
+我们在客户端进行代码测试：</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">tmp</span><span class="p">]</span><span class="err">#</span><span class="nx">puppetd</span> <span class="o">--</span><span class="nx">test</span>
+</span><span class='line'><span class="nx">notice</span><span class="o">:</span> <span class="nx">Ignoring</span> <span class="o">--</span><span class="nx">listen</span> <span class="nx">on</span> <span class="nx">onetime</span> <span class="nx">run</span>
+</span><span class='line'><span class="nx">info</span><span class="o">:</span> <span class="nx">Caching</span> <span class="nx">catalog</span> <span class="k">for</span> <span class="nx">web</span><span class="o">-</span><span class="mi">02</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">com</span>
+</span><span class='line'><span class="nx">info</span><span class="o">:</span> <span class="nx">Applying</span> <span class="nx">configuration</span> <span class="nx">version</span> <span class="s1">&#39;1321858927&#39;</span>
+</span><span class='line'><span class="nx">notice</span><span class="o">:</span> <span class="err">/Stage[main]/Svn::Update/Svn::Update::Svn_update[svn_puppet]/Exec[update_repo]/returns: executed successfully</span>
+</span><span class='line'><span class="nx">notice</span><span class="o">:</span> <span class="nx">Finished</span> <span class="nx">catalog</span> <span class="nx">run</span> <span class="k">in</span> <span class="mf">0.83</span> <span class="nx">seconds</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">html</span><span class="p">]</span><span class="err">#</span> <span class="nx">ls</span> <span class="o">-</span><span class="nx">l</span>
+</span><span class='line'><span class="err">总计</span> <span class="mi">8</span>
+</span><span class='line'><span class="nx">drwxr</span><span class="o">-</span><span class="nx">xr</span><span class="o">-</span><span class="nx">x</span> <span class="mi">2</span> <span class="nx">apache</span> <span class="nx">apache</span> <span class="mi">4096</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">15</span><span class="o">:</span><span class="mi">12</span> <span class="nx">svn_puppet</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>手动执行脚本没有问题，OK，之前写说过了svn使用的是apache的用户，我们知道puppet是需要连接到
+puppetmaster,是要验证ssl证书的，很明显，我们要解决apache的用户访问/var/lib/puppet/ssl 这个目录问题。
+如不行，你切换到apache用户，运行puppetd &mdash;test ,会报如下错误：</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Could</span> <span class="nx">not</span> <span class="nx">request</span> <span class="nx">certificate</span><span class="o">:</span> <span class="nx">Retrieved</span> <span class="nx">certificate</span> <span class="nx">does</span> <span class="nx">not</span> <span class="nx">match</span> <span class="kr">private</span> <span class="nx">key</span><span class="p">;</span> <span class="nx">please</span> <span class="nx">remove</span> <span class="nx">certificate</span> <span class="nx">from</span> <span class="nx">server</span> <span class="nx">and</span> <span class="nx">regenerate</span> <span class="nx">it</span> <span class="kd">with</span> <span class="nx">the</span> <span class="nx">current</span> <span class="nx">key</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在这里sky是使用的sudo 来解决，
+1.编辑/etc/sudoers，注意修改两个地方：
+[root@web-02 hooks]# visudo  -f /etc/sudoers</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">%</span><span class="nx">apache</span> <span class="nx">ALL</span> <span class="o">=</span><span class="p">(</span><span class="nx">ALL</span><span class="p">)</span> <span class="nx">NOPASSWD</span><span class="o">:</span><span class="err">/usr/sbin/puppetd ##添加这一行，另外修改下面这一行，不需要tty </span>
+</span><span class='line'><span class="err">#</span><span class="nx">Defaults</span> <span class="nx">requiretty</span> <span class="err">##在前面添加#号，注掉</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.修改 post-commit脚本</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">[</span><span class="nx">root</span><span class="err">@</span><span class="nx">web</span><span class="o">-</span><span class="mi">02</span> <span class="nx">hooks</span><span class="p">]</span><span class="err">#</span> <span class="nx">cat</span> <span class="o">/</span><span class="kd">var</span><span class="err">/svn_puppet/hooks/post-commit </span>
+</span><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/sh</span>
+</span><span class='line'><span class="nx">REPOS</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'><span class="nx">REV</span><span class="o">=</span><span class="s2">&quot;$2&quot;</span>
+</span><span class='line'><span class="err">#</span><span class="kr">export</span> <span class="nx">LANG</span><span class="o">=</span><span class="nx">zh_CN</span><span class="p">.</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span><span class='line'><span class="kr">export</span> <span class="nx">LANG</span><span class="o">=</span><span class="nx">en_US</span><span class="p">.</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span><span class='line'><span class="kr">export</span> <span class="nx">LC_CTYPE</span><span class="o">=</span><span class="nx">en_US</span><span class="p">.</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span><span class='line'><span class="kr">export</span> <span class="nx">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin&quot;</span>
+</span><span class='line'><span class="nx">sudo</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">puppetd</span> <span class="o">--</span><span class="nx">test</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3.在客户端测试，这时候，不需要添加什么，只要提交，就会执行更新操作，如果要有条件的话，
+可以在上面添加一些参数，进行if,else之类的语句，至于如何改进，你懂的。
+提交完成后，可以查看日志tail -f /var/log/message
+当然直接的，你可以看下文件是否有变化，这个/var/www/html/svn_puppet目录</p>
+
+<p>[总结]
+puppet 运维管理，本次是用来测试puppet svn配合的，来实现自动更新，个人觉得，这个比shell脚本还要复杂了
+些，因为是测试，你可以使用svn checkout,或者svn update应该都可以，为啥要使用svn export,因为svn export下
+来没有.svn的文件，还有svn 仓库和web是在一台机器，如果是远程机器，能否实现，告诉你，肯定是可以的，在这
+里只是抛砖引玉，本次puppet 运维自动化之puppet svn自动更新就到此结束，再此说明下，本次只是sky的测试，并未用到生产线上，如用到
+生产线上，请慎重。</p>
 ]]></content>
   </entry>
   
