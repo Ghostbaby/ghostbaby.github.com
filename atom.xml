@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-19T12:19:22+08:00</updated>
+  <updated>2013-08-19T12:31:21+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -28,6 +28,9 @@
 PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
 
 <p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
+
+<!-- more -->
+
 
 <figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
