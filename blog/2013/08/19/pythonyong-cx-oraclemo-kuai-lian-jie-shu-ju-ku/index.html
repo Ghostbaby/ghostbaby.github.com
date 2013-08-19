@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>GhostBaby`s Area</title>
+	<title>python用cx_Oracle模块连接数据库 | GhostBaby`s Area</title>
 	<meta name="author" content="GhostBaby">
 
 	
@@ -28,12 +28,9 @@ ImportError: libclntsh.so.11.1: cannot open shared object file: No such file or 
   <li><a href="/blog/archives">Archives</a></li>
 </ul></nav>
 </header>
-	<div id="content" class="inner">
-
-
-	<article class="post"><header>
+	<div id="content" class="inner"><article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/">python用cx_Oracle模块连接数据库</a></h1>
+  <h1 class="title">python用cx_Oracle模块连接数据库</h1>
   
   
 
@@ -141,6 +138,19 @@ ImportError: libclntsh.so.11.1: cannot open shared object file: No such file or 
 </span></code></pre></td></tr></table></div></figure>
 
 
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
   
   
   <footer class="meta">
@@ -152,114 +162,7 @@ ImportError: libclntsh.so.11.1: cannot open shared object file: No such file or 
   </footer>
   
 </div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T08:35:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
-
-<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
-
-<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
-
-<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
-PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
-
-<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/">Puppet Svn 更新发布测试</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-16T14:52:00+08:00">
-			<span class="day">16</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>【导读】</p>
-
-<p>puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)，</p>
-
-<p>里面有很多模板，大家有兴趣可以仔细看下：<a href="http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0">http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0</a></p>
-
-<p>有介绍，毕竟有部分同学还不知道hooks是干吗用的，了解svn的钩子后，</p>
-
-<p>就会明白上面的需求只需要在commit代码的时候，执行post-commit这个钩子，就可以</p>
-
-<p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
-
-<p>[基础]</p>
-
-<p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
-
-<p>然还有puppet了，熟悉操作puppet也是不可少的。关于puppet 中文资料，可以参阅本站</p>
-
-<p>栏目。</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-</div>
+</article></div>
 	<footer id="footer" class="inner"><div class="social alignright">
 	
 	
