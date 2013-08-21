@@ -7,16 +7,28 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content=" 1
+	<meta name="description" content="jstat:是JDK自带的虚拟机统计监测工具
+在命令行中执行jstat 1
 2
 3
 4
 5
-cd /var/lib/rpm/
-mkdir db_bak
-mv db.* db_bak(最后看到几个__db.00*文件，我也给移走了，果然见效）
-rpm --rebuilddb 重建rpm数据库
-yum clean all ">
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+Usage: jstat -help|-options jstat -&lt;option&gt; [-t] [-h&lt &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -37,6 +49,355 @@ yum clean all ">
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/javaxu-ni-ji-de-tong-ji-jian-ce-gong-ju-jstat/">Java虚拟机的统计监测工具:jstat</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T10:05:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>jstat:是JDK自带的虚拟机统计监测工具
+在命令行中执行jstat</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Usage: jstat -help|-options
+</span><span class='line'>       jstat -&lt;option&gt; [-t] [-h&lt;lines&gt;] &lt;vmid&gt; [&lt;interval&gt; [&lt;count&gt;]]
+</span><span class='line'>
+</span><span class='line'>Definitions:
+</span><span class='line'>  &lt;option&gt;      An option reported by the -options option
+</span><span class='line'>  &lt;vmid&gt;        Virtual Machine Identifier. A vmid takes the following form:
+</span><span class='line'>                     &lt;lvmid&gt;[@&lt;hostname&gt;[:&lt;port&gt;]]
+</span><span class='line'>                Where &lt;lvmid&gt; is the local vm identifier for the target
+</span><span class='line'>                Java virtual machine, typically a process id; &lt;hostname&gt; is
+</span><span class='line'>                the name of the host running the target Java virtual machine;
+</span><span class='line'>                and &lt;port&gt; is the port number for the rmiregistry on the
+</span><span class='line'>                target host. See the jvmstat documentation for a more complete
+</span><span class='line'>                description of the Virtual Machine Identifier.
+</span><span class='line'>  &lt;lines&gt;       Number of samples between header lines.
+</span><span class='line'>  &lt;interval&gt;    Sampling interval. The following forms are allowed:
+</span><span class='line'>                    &lt;n&gt;["ms"|"s"]
+</span><span class='line'>                Where &lt;n&gt; is an integer and the suffix specifies the units as
+</span><span class='line'>                milliseconds("ms") or seconds("s"). The default units are "ms".
+</span><span class='line'>  &lt;count&gt;       Number of samples to take before terminating.
+</span><span class='line'>  -J&lt;flag&gt;      Pass &lt;flag&gt; directly to the runtime system.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过不的option可以查看JVM当前的各种信息,比如:类, 内存等
+参数主要有:</p>
+
+<p>class: 类装载器统计
+compiler: HotSpot JVM实时编译统计
+gc: 垃圾回收堆统计
+gccapacity: 内存统计
+gccause: 垃圾回收统计信息，包括回收事件
+gcnew: 对象创建情况
+gcnewcapacity: 对象创建内存情况
+gcold: 老年代和永久代统计
+gcoldcapacity: 老年代统计
+gcpermcapacity: 永久代统计
+gcutil: 垃圾收集的统计
+printcompilation: HotSpot编译器的方法统计</p>
+
+<p>执行: jstat -class 2000 结果如下
+加载类的个数  加载类的大小  卸载类的个数  卸载类的大小  加载和卸载所占用的时间
+Loaded      Bytes       Unloaded    Bytes       Time
+23624       29798.8     1346        1225.8      218.34</p>
+
+<p>执行: jstat -compiler 2000 结果如下</p>
+
+<p>编译的个数     编译失败的个数       无效的编译个数       编译所用时间  最后一次编译失败的类型       最后一次编译失败的方法
+Compiled    Failed          Invalid         Time        FailedType          FailedMethod
+1629        1           0           0.86        1               org/springframework/asm/ClassReader accept</p>
+
+<p>执行: jstat -gc 2000 结果如下</p>
+
+<p>Survivor 0的大小(KB) Survivor 1的大小(KB) Survivor 0使用大小 Survivor 1使用大小 Eden大小 Eden使用大小 Old大小 Old使用大小 Permanent大小 Permanent使用大小 Young generation GC次数 Young generation GC时间 Full GC次数 Full GC时间 所有GC时间
+S0C S1C S0U S1U EC EU OC OU PC PU YGC YGCT FGC FGCT GCT
+14016.0 14016.0 2932.5 0.0 112192.0 96465.9 280212.0 227679.0 116480.0 116338.6 418 37.823 34 59.928 97.751</p>
+
+<p>执行: jstat -gccapacity 2000 结果如下</p>
+
+<p>新生代最小 新生代最大 当前新生代(NGC=S0C+S1C+EC) Survivor 0大小 Survivor 1大小 Eden大小 老年代最小 老年代最大 老年代当前大小 老年代当前容量 永久代最小 永久代最大 当前永久代大小 永久代容量 Young GC次数 Full GC次数
+NGCMN NGCMX NGC S0C S1C EC OGCMN OGCMX OGC OC PGCMN PGCMX PGC PC YGC FGC
+13632.0 174720.0 140224.0 14016.0 14016.0 112192.0 27328.0 349568.0 280212.0 280212.0 12288.0 262144.0 116480.0 116480.0 419 34</p>
+
+<p>执行: jstat -gccause 2000 结果如下</p>
+
+<p>Survivor 0使用率 Survivor 1使用率 Eden使用率 Old使用率 Permanent使用率 YoungGC次数 YoungGC时间 FullGC次数 FullGC时间 GC总时间 上一次GC原因 当前GC原因
+S0 S1 E O P YGC YGCT FGC FGCT GCT LGCC GCC
+0.00 21.85 20.68 81.25 99.88 419 37.836 34 59.928 97.764 unknown GCCause No GC</p>
+
+<p>执行: jstat -printcompilation 2000 结果如下</p>
+
+<p>编译次数 方法的字节码的字节数 编译类型 编译方法
+Compiled Size Type Method
+13575 17 1 org/eclipse/swt/widgets/Caret hasFocus</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/jvm-sheng-cheng-javacorehe-heapdumpwen-jian/">Jvm 生成javacore和heapdump文件</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T10:03:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>（1）如果使用Oracle JVM也就是标准的SUN JVM（SUN已被oracle收购）
+当内存溢出时生成heapdump文件配置如下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-Xloggc:${目录}/temp_gc.log           （GC日志文件）
+</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
+</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果要即时动态生成heapdump文件可以使用jmap命令，jdk6.0已取消了-XX:+HeapDumpOnCtrlBreak配置参数通过ctrl+break的方式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（2）HP JVM</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-Xverbosegc:file=${目录}/temp_gc.log  （GC日志文件）
+</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
+</span><span class='line'>-XX:+HeapDumpOnCtrlBreak              （可以通过ctrl+break组合键动态生成heapdump文件）
+</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（3）IBM JVM</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>非windows操作系统环境中
+</span><span class='line'>-XverboseGClog: ${目录}/temp_gc.log   （GC日志文件）
+</span><span class='line'>-Xdump:heap:events=user,file=${目录}/pid%uid%pid.phd
+</span><span class='line'>表示可以根据需要通过kill -3 &lt;pid&gt;产生DUMP文件，%uid和%pid为变量</span></code></pre></td></tr></table></div></figure>
+
+
+<p>windows操作系统环境中</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>启动wsadmin,进入wsadmin环境
+</span><span class='line'>wsadmin&gt; set jvm [$AdminControl completeObjectName type=JVM,process=server1,*]
+</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm generateHeapDump
+</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm dumpThreads</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这句要特地说明，如果你的应用负载很高，堆栈已经要满了，千万不用。生成DUMP文件类似于目前堆栈的镜像，会占用很多资源。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>01.jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>temp_heapdump_1360_2.hprof  生成类似的文件，基本跟你目前堆栈使用大小持平。文件生成之后，就开始用 IBM HeapAnalyzer  进行分析。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/ibm-heapanalyzer/">IBM HeapAnalyzer</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T10:00:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=4106270763&uk=3224714883</span></code></pre></td></tr></table></div></figure>
+
+
+<p>HeapAnalyzer 是 IBM 的一个用来分析 Java 程序的内存堆使用情况的图形化工具。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/tong-guo-deng-lu-ipji-lu-linuxsuo-you-yong-hu-deng-lu-suo-cao-zuo-de-ri-zhi/">通过登陆IP记录Linux所有用户登录所操作的日志</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T09:58:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>/etc/profile 在末尾添加如下代码</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>history
+</span><span class='line'>USER=`whoami`
+</span><span class='line'>USER_IP=`who -u am i 2&gt;/dev/null| awk '{print $NF}'|sed -e 's/[()]//g'`
+</span><span class='line'>if [ "$USER_IP" = "" ]; then
+</span><span class='line'>USER_IP=`hostname`
+</span><span class='line'>fi
+</span><span class='line'>if [ ! -d /tmp/history ]; then
+</span><span class='line'>mkdir /tmp/history
+</span><span class='line'>chmod 777 /tmp/history
+</span><span class='line'>fi
+</span><span class='line'>if [ ! -d /tmp/history/${LOGNAME} ]; then
+</span><span class='line'>mkdir /tmp/history/${LOGNAME}
+</span><span class='line'>chmod 300 /tmp/history/${LOGNAME}
+</span><span class='line'>fi
+</span><span class='line'>export HISTSIZE=4096
+</span><span class='line'>DT=`date +"%Y-%m-%d_%H:%M:%S"`
+</span><span class='line'>export HISTFILE="/tmp/history/${LOGNAME}/${USER}@${USER_IP}_history.$DT"
+</span><span class='line'>chmod 600 /tmp/history/${LOGNAME}/*history* 2&gt;/dev/null</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过上面的脚本代码可以看出来，在系统的/tmp下就新建了个history目录（这个目录可以自定义），在目录中记录了所有的登陆过系统的用户和IP地址，这也是监测系统安全的方法之一。在进行一系列的操作之后，我们进入/tmp/history目录查看历史记录。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -655,378 +1016,6 @@ yum clean all ">
 </span><span class='line'>    NetAvg = $_.Group | where {$_.MetricId -eq "net.usage.average" -and $_.Instance -eq ""} | Select -ExpandProperty Value
 </span><span class='line'>  }
 </span><span class='line'>  } |Export-Csv D:\vmreport.csv -NoTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/shell-plus-pi-chu-jiao-ben-kua-ping-tai-ri-zhi-shai-xuan-cha-ru-shu-ju-ku/">Shell +批出脚本 跨平台 日志筛选 插入数据库</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:31:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>最近平台某个功能无法实现了，在中间件里面查看日志，发现有报错日志，将脚本单独提出来执行，发现数据的精度超出字段的定义，数据库为mysql，没有数据库表字典无法确定该字段含义，且修改数据库有风险，所以选择折中方案。</p>
-
-<pre><code>中间件运行在windows平台下，数据库在linux下，为了锻炼批处理和shell的能力，选择一个比较复杂的方案：
-1.在中间件服务器上面运行批处理，判断文件的日期，将特定日期的日志复制到共享文件夹
-2.在linux服务器上面运行shell脚本，每隔10S从共享文件夹中获取数据，并且截取字符串就行二次拼接，将语句就行存储，同时往数据库里面插入数据。
-日志文件如下：
-</code></pre>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>2013-05-02 13:12:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:12:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:13:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:13:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:14:17: CADODatabase::ExecuteSQL Fail,_strSql:call TF_PhotoIndex_ADD( 2382430263,80,0,'2013-5-2 13:13:50',1948.386880,671.940920,1,2,1,22,'289723281_604_0_24.jpg' );
-</span><span class='line'>2013-05-02 13:14:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:14:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:15:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:15:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:16:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:16:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:17:28: ExcuteStoByConn , _pDB-&gt;IsEOF()</span></code></pre></td></tr></table></div></figure>
-
-
-<pre><code> 下面为具体代码：
-     批处理echo.bat
-</code></pre>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@echo off
-</span><span class='line'>setlocal
-</span><span class='line'>cls
-</span><span class='line'>color f0
-</span><span class='line'>mode con: cols=20 lines=5
-</span><span class='line'>title Plugin
-</span><span class='line'>@echo off&&setlocal enabledelayedexpansion
-</span><span class='line'>:en
-</span><span class='line'>for /f "delims=" %%i in ('dir /a-d /b *.log') do (
-</span><span class='line'>for /f "tokens=1 delims=:" %%t in ('time /T') do set houre=%%t
-</span><span class='line'>set timefile=DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!.log
-</span><span class='line'>set filename=%%i
-</span><span class='line'>if "!filename!"=="!timefile!" ( 
-</span><span class='line'>set size=%%~zi
-</span><span class='line'>copy %%i z:\DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!-%time:~3,2%-%time:~6,2%.log )else echo NO
-</span><span class='line'>)
-</span><span class='line'>ping -n 20 127.0.0.1&gt;nul
-</span><span class='line'>goto en</span></code></pre></td></tr></table></div></figure>
-
-
-<p>linux下挂载共享文件夹</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mount //10.10.3.215/log_bak /mnt/log_bak/ -o username=administrator,password=****************</span></code></pre></td></tr></table></div></figure>
-
-
-<p>记得需要安装文件系统包</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>683 sudo apt-get install nfs-common
-</span><span class='line'>737 sudo apt-get install smbfs</span></code></pre></td></tr></table></div></figure>
-
-
-<p>linux下循环运行脚本</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>root@ubuntu:~/22# more ADD_tf_photo_index.sh 
-</span><span class='line'>#!/bin/sh
-</span><span class='line'>
-</span><span class='line'>while true
-</span><span class='line'>
-</span><span class='line'>do
-</span><span class='line'>
-</span><span class='line'>rm -rf /root/22/*.log
-</span><span class='line'>
-</span><span class='line'>mv /mnt/log_bak/*.log /root/22/
-</span><span class='line'>
-</span><span class='line'>cat /root/22/*.log|grep TF_PhotoIndex_ADD|awk -F '(' '{printf $2 "\n"}'&gt;&gt;/root/22/1.txt
-</span><span class='line'>
-</span><span class='line'>while read line
-</span><span class='line'>do
-</span><span class='line'>echo $line|awk -F ',' 'BEGIN{OFS=","}{$5=0;$6=0}END{print $0 "\n"}'&gt;&gt;/root/22/some
-</span><span class='line'>done &lt; /root/22/1.txt
-</span><span class='line'>
-</span><span class='line'>rm -rf 1.txt
-</span><span class='line'>
-</span><span class='line'>sed '/^ *$/d' /root/22/some &gt;&gt;two
-</span><span class='line'>
-</span><span class='line'>echo "use txserver;"&gt;&gt;sql
-</span><span class='line'>echo "use txserver;"&gt;&gt;sql0
-</span><span class='line'>
-</span><span class='line'>while read line_two
-</span><span class='line'>do
-</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql
-</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql0
-</span><span class='line'>done &lt; /root/22/two
-</span><span class='line'>
-</span><span class='line'>mysql -h10.10.3.6 -uroot -p********* &lt;/root/22/sql0
-</span><span class='line'>rm -rf some two sql0
-</span><span class='line'>sleep 10s
-</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/mysql-error-1289-hy000/">Mysql ERROR 1289 (HY000)</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:30:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>在安装mysql 5.1.68的时候，导入数据的时候报一下错误：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ERROR 1289 (HY000): The 'partitioning' feature is disabled; you need MySQL built with '--with-partition' to have it working</span></code></pre></td></tr></table></div></figure>
-
-
-<p>同时该业务库还是需要支持GBK的，所以在源码安装configure的时候需要加上编码和分区表的选项，我在网上看帖子也有用</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>--with-plugins=max</span></code></pre></td></tr></table></div></figure>
-
-
-<p>自己装的时候没有用，用的一下选项</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./configure --prefix=/usr/local/mysql  --datadir=/videodata/mysqldata/data --with-partition --with-extra-charsets=all  --with-charset=gbk --with-charset=utf8</span></code></pre></td></tr></table></div></figure>
-
-
-<p>会报一下警告，但是MAKE之后报错的脚本已经插到库里面了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>configure: WARNING: Unrecognized options:</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/openstack-network-flatdhcp-can-not-ping-host/">[Openstack]Network FlatDHCP Can Not Ping Host</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:29:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>12.10: adjust /etc/rc.local to add a firewall rule for use with FlatDHCPManager:
-</span><span class='line'>
-</span><span class='line'>adjust /etc/rc.local to have (before the call to exit):
-</span><span class='line'>
-</span><span class='line'>/sbin/iptables -A POSTROUTING -t mangle -p udp --dport 68 -j CHECKSUM --checksum-fill
-</span><span class='line'>make /etc/rc.local executable:
-</span><span class='line'>
-</span><span class='line'>$ sudo chmod 755 /etc/rc.local
-</span><span class='line'>
-</span><span class='line'>Note: run the iptables command manually before trying to start guests</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/openstack-critical-nova/">[Openstack]CRITICAL Nova [-]</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:28:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>/var/log/nova/nova-computer.log</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Cannot get interface MTU on 'br100': No such device</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在nova.conf中添加如下节点，让实例自动启动</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>--start_guests_on_host_boot=true
-</span><span class='line'>--resume_guests_state_on_host_boot=true</span></code></pre></td></tr></table></div></figure>
 
 
   

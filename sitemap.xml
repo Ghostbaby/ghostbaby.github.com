@@ -95,8 +95,30 @@
         <lastmod>2013-08-19T16:47:37+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/21/tong-guo-deng-lu-ipji-lu-linuxsuo-you-yong-hu-deng-lu-suo-cao-zuo-de-ri-zhi/
+        </loc>
+        <lastmod>2013-08-21T09:59:02+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/21/ibm-heapanalyzer/</loc>
+        <lastmod>2013-08-21T10:02:47+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/21/jvm-sheng-cheng-javacorehe-heapdumpwen-jian/
+        </loc>
+        <lastmod>2013-08-21T10:05:14+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/21/javaxu-ni-ji-de-tong-ji-jian-ce-gong-ju-jstat/
+        </loc>
+        <lastmod>2013-08-21T10:23:01+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-19T16:47:37+08:00</lastmod>
+        <lastmod>2013-08-21T10:23:01+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -104,6 +126,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-19T16:47:37+08:00</lastmod>
+        <lastmod>2013-08-21T10:23:01+08:00</lastmod>
     </url>
 </urlset>
