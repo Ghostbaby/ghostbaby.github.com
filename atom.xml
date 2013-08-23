@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-21T10:23:08+08:00</updated>
+  <updated>2013-08-23T16:53:54+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,793 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Nginx+keepalive web集群]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/23/nginx-plus-keepalive-webji-qun/"/>
+    <updated>2013-08-23T16:45:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/23/nginx-plus-keepalive-webji-qun</id>
+    <content type="html"><![CDATA[<p>nginx安装</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
+</span><span class='line'>useradd -g www www
+</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
+</span><span class='line'>cd pcre-7.8/  
+</span><span class='line'>./configure  
+</span><span class='line'>make && make install 
+</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
+</span><span class='line'>cd nginx-0.7.51/  
+</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
+</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>编辑vim /usr/local/webserver/nginx/conf/nginx.conf</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>user www www;  
+</span><span class='line'>worker_processes 8;  
+</span><span class='line'>
+</span><span class='line'>pid /usr/local/webserver/nginx/logs/nginx.pid;  
+</span><span class='line'>worker_rlimit_nofile 65535;  
+</span><span class='line'>
+</span><span class='line'>events  
+</span><span class='line'>{  
+</span><span class='line'>use epoll;  
+</span><span class='line'>worker_connections 65535;  
+</span><span class='line'>}  
+</span><span class='line'>http{  
+</span><span class='line'>include       mime.types;  
+</span><span class='line'>default_type application/octet-stream;  
+</span><span class='line'>server_names_hash_bucket_size 128;  
+</span><span class='line'>client_header_buffer_size 32k;  
+</span><span class='line'>large_client_header_buffers 4 32k;  
+</span><span class='line'>client_max_body_size 8m;  
+</span><span class='line'>sendfile on;  
+</span><span class='line'>tcp_nopush     on;  
+</span><span class='line'>keepalive_timeout 60;  
+</span><span class='line'>tcp_nodelay on;  
+</span><span class='line'>fastcgi_connect_timeout 300;  
+</span><span class='line'>fastcgi_send_timeout 300;  
+</span><span class='line'>fastcgi_read_timeout 300;  
+</span><span class='line'>fastcgi_buffer_size 64k;  
+</span><span class='line'>fastcgi_buffers 4 64k;  
+</span><span class='line'>fastcgi_busy_buffers_size 128k;  
+</span><span class='line'>fastcgi_temp_file_write_size 128k;  
+</span><span class='line'>gzip on;  
+</span><span class='line'>gzip_min_length 1k;  
+</span><span class='line'>gzip_buffers     4 16k;  
+</span><span class='line'>gzip_http_version 1.0;  
+</span><span class='line'>gzip_comp_level 2;  
+</span><span class='line'>gzip_types       text/plain application/x-javascript text/css application/xml;  
+</span><span class='line'>gzip_vary on;  
+</span><span class='line'>
+</span><span class='line'>upstream backend  
+</span><span class='line'>{  
+</span><span class='line'>server 192.168.75.240:80;  
+</span><span class='line'>server 192.168.0.115:80;  
+</span><span class='line'>}  
+</span><span class='line'>server {  
+</span><span class='line'>listen 80;  
+</span><span class='line'>#server_name www.yuhongchun027.com;  
+</span><span class='line'>location / {  
+</span><span class='line'>root /var/www ;  
+</span><span class='line'>index index.jsp index.htm index.html;  
+</span><span class='line'>proxy_redirect off;  
+</span><span class='line'>proxy_set_header Host $host;  
+</span><span class='line'>proxy_set_header X-Real-IP $remote_addr;  
+</span><span class='line'>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+</span><span class='line'>proxy_pass http://backend;  
+</span><span class='line'>}  
+</span><span class='line'>
+</span><span class='line'>location /nginx {  
+</span><span class='line'>access_log on;  
+</span><span class='line'>auth_basic "NginxStatus";  
+</span><span class='line'>auth_basic_user_file /usr/local/nginx/htpasswd;  
+</span><span class='line'>}  
+</span><span class='line'>
+</span><span class='line'>log_format access '$remote_addr - $remote_user [$time_local] "$request" '  
+</span><span class='line'>'$status $body_bytes_sent "$http_referer" '  
+</span><span class='line'>'"$http_user_agent" $http_x_forwarded_for';  
+</span><span class='line'>access_log /var/log/access.log access;  
+</span><span class='line'>
+</span><span class='line'>}  
+</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
+
+
+<p>新建nginx启动文件，/etc/rc.d/init.d/nginx</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
+</span><span class='line'># nginx Startup script for the Nginx HTTP Server 
+</span><span class='line'># it is v.1.3.0 version. 
+</span><span class='line'># chkconfig: - 85 15 
+</span><span class='line'># description: Nginx is a high-performance web and proxy server. 
+</span><span class='line'>#              It has a lot of features, but it's not for everyone. 
+</span><span class='line'># processname: nginx 
+</span><span class='line'># pidfile: /var/run/nginx.pid 
+</span><span class='line'># config: /usr/local/webserver/nginx/conf/nginx.conf 
+</span><span class='line'>nginxd=/usr/local/webserver/nginx/sbin/nginx 
+</span><span class='line'>nginx_config=/usr/local/webserver/nginx/conf/nginx.conf 
+</span><span class='line'>nginx_pid=/usr/local/webserver/nginx/logs/nginx.pid 
+</span><span class='line'>RETVAL=0 
+</span><span class='line'>prog="nginx" 
+</span><span class='line'># Source function library. 
+</span><span class='line'>.  /etc/rc.d/init.d/functions 
+</span><span class='line'># Source networking configuration. 
+</span><span class='line'>.  /etc/sysconfig/network 
+</span><span class='line'># Check that networking is up. 
+</span><span class='line'>[ ${NETWORKING} = "no" ] && exit 0 
+</span><span class='line'>[ -x $nginxd ] || exit 0 
+</span><span class='line'># Start nginx daemons functions. 
+</span><span class='line'>start() { 
+</span><span class='line'>if [ -e $nginx_pid ];then 
+</span><span class='line'>   echo "nginx already running...." 
+</span><span class='line'>   exit 1 
+</span><span class='line'>fi 
+</span><span class='line'>   echo -n [        DISCUZ_CODE_3        ]quot;Starting $prog: " 
+</span><span class='line'>   daemon $nginxd -c ${nginx_config} 
+</span><span class='line'>   RETVAL=$? 
+</span><span class='line'>   echo 
+</span><span class='line'>   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx 
+</span><span class='line'>   return $RETVAL 
+</span><span class='line'>} 
+</span><span class='line'># Stop nginx daemons functions. 
+</span><span class='line'>stop() { 
+</span><span class='line'>        echo -n [        DISCUZ_CODE_3        ]quot;Stopping $prog: " 
+</span><span class='line'>        killproc $nginxd 
+</span><span class='line'>        RETVAL=$? 
+</span><span class='line'>        echo 
+</span><span class='line'>        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/nginx /usr/local/webserver/nginx/logs/nginx.pid 
+</span><span class='line'>} 
+</span><span class='line'>reload() { 
+</span><span class='line'>    echo -n [        DISCUZ_CODE_3        ]quot;Reloading $prog: " 
+</span><span class='line'>    #kill -HUP `cat ${nginx_pid}` 
+</span><span class='line'>    killproc $nginxd -HUP 
+</span><span class='line'>    RETVAL=$? 
+</span><span class='line'>    echo 
+</span><span class='line'>} 
+</span><span class='line'># See how we were called. 
+</span><span class='line'>case "$1" in 
+</span><span class='line'>start) 
+</span><span class='line'>        start 
+</span><span class='line'>        ;; 
+</span><span class='line'>stop) 
+</span><span class='line'>        stop 
+</span><span class='line'>        ;; 
+</span><span class='line'>reload) 
+</span><span class='line'>        reload 
+</span><span class='line'>        ;; 
+</span><span class='line'>restart) 
+</span><span class='line'>        stop 
+</span><span class='line'>        start 
+</span><span class='line'>        ;; 
+</span><span class='line'>
+</span><span class='line'>status) 
+</span><span class='line'>        status $prog 
+</span><span class='line'>        RETVAL=$? 
+</span><span class='line'>        ;; 
+</span><span class='line'>*) 
+</span><span class='line'>        echo [        DISCUZ_CODE_3        ]quot;Usage: $prog {start|stop|restart|reload|status|help}" 
+</span><span class='line'>        exit 1 
+</span><span class='line'>esac 
+</span><span class='line'>exit $RETVAL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>安装keepalived，并将其做成服务模式，方便以后调试。
+装popt先</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget http://www.keepalived.org/software/keepalived-1.1.15.tar.gz  
+</span><span class='line'>#tar zxvf keepalived-1.1.15.tar.gz  
+</span><span class='line'>#cd keepalived-1.1.15  
+</span><span class='line'>#./configure --prefix=/usr/local/keepalived  
+</span><span class='line'>#make   
+</span><span class='line'>#make install  
+</span><span class='line'>#cp /usr/local/keepalived/sbin/keepalived /usr/sbin/  
+</span><span class='line'>#cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/  
+</span><span class='line'>#cp /usr/local/keepalived/etc/rc.d/init.d/keepalived /etc/init.d/  
+</span><span class='line'>#mkdir /etc/keepalived  
+</span><span class='line'>#cd /etc/keepalived/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vim keepalived.conf<br/>
+master</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
+</span><span class='line'>global_defs {  
+</span><span class='line'>   notification_email {  
+</span><span class='line'>   13912979683@139.com
+</span><span class='line'>        }  
+</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
+</span><span class='line'>   smtp_server 127.0.0.1  
+</span><span class='line'>   smtp_connect_timeout 30  
+</span><span class='line'>   router_id LVS_DEVEL  
+</span><span class='line'>}  
+</span><span class='line'>vrrp_instance VI_1 {  
+</span><span class='line'>    state MASTER  
+</span><span class='line'>    interface eth1  
+</span><span class='line'>    virtual_router_id 60 
+</span><span class='line'>    mcast_src_ip 192.168.75.223     
+</span><span class='line'>    priority 100  
+</span><span class='line'>    advert_int 1  
+</span><span class='line'>    authentication {  
+</span><span class='line'>        auth_type PASS  
+</span><span class='line'>        auth_pass chtopnet  
+</span><span class='line'>    }  
+</span><span class='line'>    virtual_ipaddress {  
+</span><span class='line'>        192.168.75.242                     
+</span><span class='line'>    }  
+</span><span class='line'>}  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>bakup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
+</span><span class='line'>global_defs {  
+</span><span class='line'>   notification_email {  
+</span><span class='line'>   yuhongchun027@163.com  
+</span><span class='line'>        }  
+</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
+</span><span class='line'>   smtp_server 127.0.0.1  
+</span><span class='line'>   smtp_connect_timeout 30  
+</span><span class='line'>   router_id LVS_DEVEL  
+</span><span class='line'>}  
+</span><span class='line'>vrrp_instance VI_1 {  
+</span><span class='line'>    state BACKUP  
+</span><span class='line'>    interface eth1  
+</span><span class='line'>    virtual_router_id 50  
+</span><span class='line'>    mcast_src_ip 192.168.75.223              
+</span><span class='line'>    priority 100 
+</span><span class='line'>    advert_int 1  
+</span><span class='line'>    authentication {  
+</span><span class='line'>        auth_type PASS  
+</span><span class='line'>        auth_pass chtopnet  
+</span><span class='line'>    }  
+</span><span class='line'>    virtual_ipaddress {  
+</span><span class='line'>        192.168.75.242  
+</span><span class='line'>    }  
+</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后一个脚本是用来保证nginx无法恢复，关闭keepalive，切换到bakup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
+</span><span class='line'>while  : 
+</span><span class='line'>do 
+</span><span class='line'>nginxpid=`ps -C nginx --no-header | wc -l` 
+</span><span class='line'>if [ $nginxpid -eq 0 ];then 
+</span><span class='line'>  /usr/local/nginx/sbin/nginx 
+</span><span class='line'>  sleep 5 
+</span><span class='line'>  nginxpid=`ps -C nginx --no-header | wc -l` 
+</span><span class='line'>  echo $nginxpid 
+</span><span class='line'>    if [ $nginxpid -eq 0 ];then 
+</span><span class='line'>/etc/init.d/keepalived stop 
+</span><span class='line'>   fi 
+</span><span class='line'>fi 
+</span><span class='line'>sleep 5 
+</span><span class='line'>done </span></code></pre></td></tr></table></div></figure>
+
+
+<p> 我稍为解释一下，这是一个无限循环的脚本，放在主Nginx机器上（因为目前主要是由它提供服务），每隔5秒执行一次，用ps -C 命令来收集nginx的PID值到底是否为0，如果是0的话（即Nginx进程死掉了），尝试启动nginx进程；如果继续为0，即nginx启动失改，则关闭本机的Keeplaived进程，VIP地址则会由备机接管，当然了，整个网站就会由备机的Nginx来提供服务了，这样保证Nginx进程的高可用。</p>
+
+<pre><code> 正确写法为nohup/bin/bash /root/nginx_pid.sh &amp;,附带下注释:如果你正在运行一个进程，而且你觉得在退出帐户时该进程还不会结束，那么可以使用nohup命令。该命令可以在你退出root帐户之后继续运行相应的进程。nohup就是不挂起的意思( no hang up)。
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[VMware Visio精品图标库（PPT和Visio版）]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-%28ppthe-visioban-%29/"/>
+    <updated>2013-08-23T16:43:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-(ppthe-visioban-)</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=2316439492&uk=3224714883</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux下利用nc命令来监控检测服务器的端口使用情况]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang/"/>
+    <updated>2013-08-23T16:41:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang</id>
+    <content type="html"><![CDATA[<p>最近碰到一个项目，前端用apache htttpd进行发布（80端口），通过双机负载均衡转发到后端的两个tomcat进行处理（8081和8082端口），现在需要随时监控这三个端口的情况，一旦down掉需要能够立即告警处理。批量的系统监控比较好的是用nagios软件来实现，这样小项目专门装一个nagios软件，有点繁琐了。在网上查了一些资料，总结实验了一下，可以用简单的nc命令来实现。</p>
+
+<p>一、nc命令检测端口的用法</p>
+
+<h1>nc  -v  -w 10 %IP%   -z  %PORT%</h1>
+
+<p>-v  显示指令执行过程。
+-w  &lt;超时秒数>   设置等待连线的时间。
+-u  表示使用UDP协议
+-z  使用0输入/输出模式，只在扫描通信端口时使用。</p>
+
+<p>例1：扫描指定的8080端口</p>
+
+<h1>nc -v -w 10 -z 192.168.0.100 8080</h1>
+
+<p>Connection to 192.168.0.100 8080 port [tcp/http] succeeded!</p>
+
+<p>例2：扫描20到25的端口范围，并详细输出。</p>
+
+<h1>nc -v -w 2 -z 192.168.0.100 20-25</h1>
+
+<p>nc: connect to 192.168.0.100 port 20 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 21 (tcp) failed: Connection refused
+Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+nc: connect to 192.168.0.100 port 23 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100  port 24 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 25 (tcp) failed: Connection refused</p>
+
+<p>例3：扫描1到65535的端口范围，只输出打开的端口（去掉-v参数即可）</p>
+
+<h1>nc -w 1 -z 192.168.0.100 1-65535</h1>
+
+<p>Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+Connection to 192.168.0.100 80 port [tcp/http] succeeded!
+Connection to 192.168.0.100 2121 port [tcp/scientia-ssdb] succeeded!
+Connection to 192.168.0.100 4004 port [tcp/pxc-roid] succeeded!
+Connection to 192.168.0.100 8081 port [tcp/tproxy] succeeded!
+Connection to 192.168.0.100 11211 port [tcp/*] succeeded!</p>
+
+<p>二、批量检测服务器指定端口开放情况：</p>
+
+<p>1、假如我们要监控一堆指定的IP和端口，可新建一个文件（第1列服务器IP，第2列要监控的端口）。</p>
+
+<h1>vim /scripts/ip-ports.txt</h1>
+
+<p>192.168.0.100 80<br/>
+192.168.0.100 8081<br/>
+192.168.0.101 8082<br/>
+192.168.1.100 21</p>
+
+<p>2、我们可以写这样一个脚本来批量检测端口是否开放：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值显示ok，失败会返回1值显示fail</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok  
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+</code></pre>
+
+<p>  fi <br/>
+done</p>
+
+<p>3、执行脚本查看运行结果如下：</p>
+
+<h1>chmod a+x  /scripts/ncports.sh</h1>
+
+<h1>/scripts/ncports.sh</h1>
+
+<p>192.168.0.100 80：ok
+192.168.0.100 8081：ok
+192.168.0.101 8082：ok
+192.168.1.100 21：fail</p>
+
+<p>三、端口不通时设置告警：</p>
+
+<p>1、 邮件告警：</p>
+
+<p>(1) 先安装linux下面的邮件发送程序mutt（参见我另一篇文章《Linux下面如何用mutt命令发送邮件》</p>
+
+<p>(2) 修改上面的ncports.sh检测脚本，在显示失败fail的时候增加一行：</p>
+
+<pre><code>   ……………………
+  echo $line :fail
+  echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通" test@139.com
+  ……………………
+</code></pre>
+
+<p>(3) 如果上面的接收邮箱设置为移动139邮箱，并开启接收邮件短信告知，即可实现“短信告警”的功能。</p>
+
+<p>2、 windows消息弹窗告警：
+(1) 先打开接收消息弹窗windows客户机的“Messenger”服务，设置为“启动”
+(2) 利用smbclient命令来发送消息，net脚本文件如下：</p>
+
+<h1>vim /scripts/net.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>/scripts/net.sh</h1>
+
+<p>case &ldquo;$1&rdquo; in<br/>
+send)<br/>
+echo &ldquo;$3&rdquo;|smbclient -I &ldquo;$2&rdquo; -M <code>nmblookup -A "$2"|sed -e '1d' -e '3,/*/d'|cut -f2|cut -d' ' -f1</code><br/>
+;;<br/>
+*)<br/>
+echo &ldquo;Usage:net send &lt;IPaddr.> <message>&#8220;<br/>
+exit 1<br/>
+esac</p>
+
+<h1>chmod a+x /scripts/net.sh</h1>
+
+<p>(3) 发送消息弹窗命令测试：（发送给192.168.1.83这台win xp机子，发送内容不支持中文）</p>
+
+<h1>/scripts/net.sh  send  192.168.1.83     &ldquo;hello,nihao&rdquo;</h1>
+
+<p>3、端口不通时发送邮件并消息弹窗告警的脚本如下：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值，打不开会返回1值</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok   
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通"  test@139.com  
+/scripts/net send 192.168.1.83 "The $line fail"    
+</code></pre>
+
+<p>  fi <br/>
+done
+4、加入任务计划每2分钟执行一次</p>
+
+<h1>crontab -e</h1>
+
+<p>*/2 * * * *  /scripts/ncports.sh  > /dev/null 2>&amp;1</p>
+
+<h1>service crond restart</h1>
+
+<p>netcat 官网<a href="http://netcat.sourceforge.net/download.php">http://netcat.sourceforge.net/download.php</a></p>
+
+<p>软件可以从上面下载~</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[vm]vi无法启动]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/23/vm-viwu-fa-qi-dong/"/>
+    <updated>2013-08-23T16:40:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/23/vm-viwu-fa-qi-dong</id>
+    <content type="html"><![CDATA[<p>The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。</p>
+
+<p>登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误：</p>
+
+<p>Could not allocate space for object &lsquo;dbo.VPX_HOST_VM_CONFIG_OPTION&rsquo;.&lsquo;PK_VPX_HOST_VM_CONFIG_OPTION&rsquo; in database &lsquo;VIM_VCDB&rsquo; because the &lsquo;PRIMARY&rsquo; filegroup is full. Create disk space by deleting unneeded files, dropping objects in the filegroup, adding additional files to the filegroup, or setting autogrowth on for existing files in the filegroup.</p>
+
+<p>大致意思就是说filegroup满了。解决方法如下：</p>
+
+<p>1：下载安装sql server management studio express，连接到vc:  LINKZKSVCSRV\SQLEXP_VIM.</p>
+
+<p>2：在task中有个shrink，进行压缩</p>
+
+<p>3：然后在SQLEXP_VIM> Programmability > Stored Procedures > Right-Click dbo.cleanup_events_tasks_proc and click execute，自动执行清除日志动作。</p>
+
+<p>然后就ok了。其实建议大家在装vi的时候使用sql server不要使用express，有4G限制，另外在vSphere Client, click Administration > vCenter Server Settings > Database Retention Policy.设置相关日志保留周期，这样防止数据库一直增加。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[MySql 监控脚本]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/23/mysql-jian-kong-jiao-ben/"/>
+    <updated>2013-08-23T16:39:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/23/mysql-jian-kong-jiao-ben</id>
+    <content type="html"><![CDATA[<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash  
+</span><span class='line'>#created by oldboy QQ 49000448  
+</span><span class='line'>#date:20100918  
+</span><span class='line'>MYUSER=root  
+</span><span class='line'>MYPASS="oldboy" 
+</span><span class='line'>MYSOCK=/data/3306/mysql.sock  
+</span><span class='line'>MySQL_STARTUP="/data/3306/mysql" 
+</span><span class='line'>LOG_PATH=/tmp  
+</span><span class='line'>LOG_FILE=${LOG_PATH}/mysqllogs_`date +%F`.log  
+</span><span class='line'>MYSQL_PATH=/usr/local/mysql/bin  
+</span><span class='line'>MYSQL_CMD="$MYSQL_PATH/mysql -u$MYUSER -p$MYPASS -S $MYSOCK" 
+</span><span class='line'>#→全变量定义方式，显得更专业。  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -eq 0 ]   
+</span><span class='line'>then 
+</span><span class='line'>echo "MySQL is running! "   
+</span><span class='line'>exit 0  
+</span><span class='line'>else 
+</span><span class='line'>$MySQL_STARTUP start &gt;$LOG_FILE#→日志也是变量。  
+</span><span class='line'>sleep 5;  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -ne 0 ]  
+</span><span class='line'>then   
+</span><span class='line'>for num in `seq 10`#→通过for循环来杀死mysqld，真正杀死则退出循环或每隔个两秒杀一次，一共杀10次。  
+</span><span class='line'>do  
+</span><span class='line'>killall mysqld&gt;/dev/null 2&gt;&1   
+</span><span class='line'>[ $? -ne 0 ] && break;  
+</span><span class='line'>sleep 2  
+</span><span class='line'>done  
+</span><span class='line'>$MySQL_STARTUP start &gt;&gt;$LOG_FILE   
+</span><span class='line'>fi  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1 && Status="restarted" || Status="unknown"#→这个逻辑更准确。  
+</span><span class='line'>echo "MySQL status is $Status" &gt;&gt;$LOG_FILE  
+</span><span class='line'>mail -s "MySQL status is $Status" 31333741@qq.com &lt; $LOG_FILE  
+</span><span class='line'>#→把上面的Status作为结果标题传给邮件，当然你可以做短信，语音通话报警。  
+</span><span class='line'>fi  
+</span><span class='line'>exit </span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Java虚拟机的统计监测工具:jstat]]></title>
@@ -1649,656 +2436,6 @@ Compiled Size Type Method
 </span><span class='line'>echo "zhuhuijun = rw" &gt;&gt;/etc/subversion/dav_svn.authz
 </span><span class='line'>echo "* =" &gt;&gt;/etc/subversion/dav_svn.authz
 </span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[【proxmox】重复删除之后，克隆脚本]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/19/%5B%28proxmox%29%5D-zhong-fu-shan-chu-zhi-hou-%2Cke-long-jiao-ben/"/>
-    <updated>2013-08-19T14:25:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/19/[(proxmox)]-zhong-fu-shan-chu-zhi-hou-,ke-long-jiao-ben</id>
-    <content type="html"><![CDATA[<p>由于重复删除ID号之后 ，会出现镜像文件夹重名的问题
-新脚本中加入判断条件，这里如果符合目录存在的条件，则输出信息并推出克隆，这边也可以自己定义操作脚本。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
-</span><span class='line'>image_dir="/var/lib/vz/images/"
-</span><span class='line'>conf_dir="/etc/pve/nodes/dtt/qemu-server/"
-</span><span class='line'>source_vm_id=$1
-</span><span class='line'>dest_vm_id=$2
-</span><span class='line'>vm_name=$3
-</span><span class='line'>dest_vm_file="/vm-$dest_vm_id-disk-1.qcow2"
-</span><span class='line'>source_vm_file="/vm-$source_vm_id-disk-1.qcow2"
-</span><span class='line'>random_mac_addr="2A:AB:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"
-</span><span class='line'>
-</span><span class='line'>tmp_conf="/tmp/"$dest_vm_id".txt"
-</span><span class='line'>cat $conf_dir$source_vm_id".conf" &gt; $tmp_conf
-</span><span class='line'>sed -i -e 's/'${source_vm_id}'/'${dest_vm_id}'/g' $tmp_conf
-</span><span class='line'>sed -i -e "s/e1000=\S\+,/e1000=$random_mac_addr,/" $tmp_conf
-</span><span class='line'>sed -i -e "s/name: \S\+/name: $vm_name/" $tmp_conf
-</span><span class='line'>cat $tmp_conf &gt; $conf_dir$dest_vm_id".conf"
-</span><span class='line'>
-</span><span class='line'>if [ ! -d "$image_dir$dest_vm_id" ];then
-</span><span class='line'>cp -r $image_dir$source_vm_id $image_dir$dest_vm_id
-</span><span class='line'>mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file
-</span><span class='line'>else
-</span><span class='line'>echo "The directory already exists:"$image_dir$dest_vm_id
-</span><span class='line'>fi</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[如何防恶意解析，禁止用IP访问网站的Apache设置？]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-%2Cjin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-%3F/"/>
-    <updated>2013-08-19T14:19:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-,jin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-?</id>
-    <content type="html"><![CDATA[<p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
-
-<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
-
-<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
-
-<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
-
-<!-- more -->
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>NameVirtualHost 121.*.*.* 
-</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
-</span><span class='line'>ServerName 121.*.*.* 
-</span><span class='line'>&lt;Location /&gt; 
-</span><span class='line'>Order Allow,Deny 
-</span><span class='line'>Deny from all 
-</span><span class='line'>&lt;/Location&gt; 
-</span><span class='line'>&lt;/VirtualHost&gt; 
-</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
-</span><span class='line'>DocumentRoot /var/www/nowamagic/ 
-</span><span class='line'>ServerName www.nowamagic.net 
-</span><span class='line'>&lt;/VirtualHost&gt; 
-</span><span class='line'>&lt;VirtualHost 121.*.*.*&gt; 
-</span><span class='line'>DocumentRoot /var/www/nowamagic/ 
-</span><span class='line'>ServerName nowamagic.net 
-</span><span class='line'>&lt;/VirtualHost&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>第一部分代码是实现拒绝直接通过 121.<em>.</em>.<em> 这个IP的任何访问请求，这时如果你用 121.</em>.<em>.</em> 访问，会提示拒绝访问。</p>
-
-<p>第二部分代码就是允许通过 <a href="http://www.nowamagic.net/">http://www.nowamagic.net/</a> 这个域名访问，主目录指向 /var/www/nowamagic/ （这里服务器OS是 CentOS）。</p>
-
-<p>第三部分代码是允许不带 www 的域名访问，应该能和上面的合并一起写吧。</p>
-
-<p>在这里记录下，方便以后信手拈来。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[用Nginx负载均衡Openstack对象存储swift]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/"/>
-    <updated>2013-08-19T14:15:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift</id>
-    <content type="html"><![CDATA[<p>此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置</p>
-
-<p>1、下载Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cd</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">wget</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.2.6.tar.gz</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2、创建用户</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">useradd</span> <span class="o">-</span><span class="nx">c</span> <span class="s2">&quot;Nginx User&quot;</span> <span class="o">-</span><span class="nx">s</span> <span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">nologin</span> <span class="o">-</span><span class="nx">r</span> <span class="o">-</span><span class="nx">d</span> <span class="o">/</span><span class="kd">var</span><span class="err">/lib/nginx nginx </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3、安装Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="p">.</span><span class="nx">tar</span><span class="p">.</span><span class="nx">gz</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">cd</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<!-- more -->
-
-
-
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="o">/</span><span class="nx">configure</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">user</span><span class="o">=</span><span class="nx">nginx</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">group</span><span class="o">=</span><span class="nx">nginx</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">prefix</span><span class="o">=</span><span class="err">/usr/share \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">sbin</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/usr/sbin/nginx \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">conf</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/etc/nginx/nginx.conf \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">error</span><span class="o">-</span><span class="nx">log</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/nginx/error.log \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">http</span><span class="o">-</span><span class="nx">log</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/nginx/access.log \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">pid</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/run/nginx.pid \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">lock</span><span class="o">-</span><span class="nx">path</span><span class="o">=</span><span class="err">/var/log/lock/subsys/nginx \</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_stub_status_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="nx">without</span><span class="o">-</span><span class="nx">poll_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_gzip_static_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_realip_module</span> <span class="o">\</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">--</span><span class="kd">with</span><span class="o">-</span><span class="nx">http_ssl_module</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nx">make</span>
-</span><span class='line'><span class="nx">make</span> <span class="nx">install</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4、修改配置文件/etc/nginx/nginx.conf</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cat</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">nginx</span><span class="o">/</span><span class="nx">nginx</span><span class="p">.</span><span class="nx">conf</span> <span class="o">|</span> <span class="nx">grep</span> <span class="o">-</span><span class="nx">v</span> <span class="o">^</span><span class="nx">$</span> <span class="o">|</span> <span class="nx">grep</span> <span class="o">-</span><span class="nx">v</span> <span class="p">.</span><span class="o">*</span><span class="err">#</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">worker_processes</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">events</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">worker_connections</span> <span class="mi">1024</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">http</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">include</span> <span class="nx">mime</span><span class="p">.</span><span class="nx">types</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">default_type</span> <span class="nx">application</span><span class="o">/</span><span class="nx">octet</span><span class="o">-</span><span class="nx">stream</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">sendfile</span> <span class="nx">on</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">keepalive_timeout</span> <span class="mi">65</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">client_max_body_size</span> <span class="mi">6024</span><span class="nx">M</span><span class="p">;</span> <span class="err">#限制用户上传大小</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">proxy_ignore_client_abort</span> <span class="nx">on</span><span class="p">;</span> <span class="err">#解决</span><span class="mi">499</span><span class="err">错误，意思是代理服务器不要主动关闭客户端连接</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">upstream</span> <span class="nx">swift</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="mf">192.168</span><span class="p">.</span><span class="mf">100.7</span><span class="o">:</span><span class="mi">8080</span><span class="p">;</span> <span class="err">#此次</span><span class="nx">ip</span><span class="err">为</span><span class="nx">proxy</span><span class="err">的</span><span class="nx">swift</span> <span class="nx">ip</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="mf">192.168</span><span class="p">.</span><span class="mf">100.8</span><span class="o">:</span><span class="mi">8080</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">listen</span> <span class="mi">8080</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">server_name</span> <span class="nx">swift</span><span class="p">;</span> <span class="err">#主机名称</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">location</span> <span class="o">/</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">proxy_pass</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//swift/; #upstream 一致</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">error_page</span> <span class="mi">500</span> <span class="mi">502</span> <span class="mi">503</span> <span class="mi">504</span> <span class="o">/</span><span class="mi">50</span><span class="nx">x</span><span class="p">.</span><span class="nx">html</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">location</span> <span class="o">=</span> <span class="err">/50x.html {</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">root</span> <span class="nx">html</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>5、启动Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">/usr/sbin/nginx</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">netstat</span> <span class="o">-</span><span class="nx">ltunp</span> <span class="o">|</span> <span class="nx">grep</span> <span class="mi">8080</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>备注：记得只需要在endpoint里指向nginx服务器地址信息，其它proxy节点不需要指定。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[python用cx_Oracle模块连接数据库]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/"/>
-    <updated>2013-08-19T13:45:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku</id>
-    <content type="html"><![CDATA[<p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ImportError</span><span class="o">:</span> <span class="nx">libclntsh</span><span class="p">.</span><span class="nx">so</span><span class="p">.</span><span class="mf">11.1</span><span class="o">:</span> <span class="nx">cannot</span> <span class="nx">open</span> <span class="nx">shared</span> <span class="nx">object</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">such</span> <span class="nx">file</span> <span class="nx">or</span> <span class="nx">directory</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么需要在LD_LIBRARY_PATH中指定那些库的所在，典型是在下面</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nx">$ORACLE_HOME</span><span class="o">/</span><span class="nx">lib</span><span class="o">:</span><span class="err">/usr/lib:/usr/local/lib</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cx_Oracle</span><span class="p">.</span><span class="nx">InterfaceError</span><span class="o">:</span> <span class="nx">Unable</span> <span class="nx">to</span> <span class="nx">acquire</span> <span class="nx">Oracle</span> <span class="nx">environment</span> <span class="nx">handle</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下载\instantclient_10_2</p>
-
-<!-- more -->
-
-
-<p>然后把里面的动态链接库都复制到C:\Python27\Lib\site-packages下</p>
-
-<p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s1">&#39;&#39;&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">Created on 2013-8-2</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">@author: Sun</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&#39;&#39;&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">import</span> <span class="nx">cx_Oracle</span> <span class="nx">as</span> <span class="nx">oracle</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">usr</span> <span class="o">=</span> <span class="s2">&quot;****&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">pwd</span> <span class="o">=</span> <span class="s2">&quot;****&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;10.10.7.62&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">port</span> <span class="o">=</span> <span class="s2">&quot;1521&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">sid</span> <span class="o">=</span> <span class="s2">&quot;*******&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">dsn</span> <span class="o">=</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">makedsn</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span><span class="nx">port</span><span class="p">,</span><span class="nx">sid</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">#</span><span class="nx">con</span> <span class="o">=</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">usr</span><span class="p">,</span><span class="nx">pwd</span><span class="p">,</span><span class="nx">host</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">port</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">sid</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">con</span> <span class="o">=</span> <span class="nx">oracle</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">usr</span><span class="p">,</span><span class="nx">pwd</span><span class="p">,</span><span class="nx">dsn</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">print</span> <span class="s2">&quot;Oracle &quot;</span> <span class="o">+</span> <span class="nx">con</span><span class="p">.</span><span class="nx">version</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">con</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[PROXMOX安装 及批量部署脚本]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/"/>
-    <updated>2013-08-19T08:35:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben</id>
-    <content type="html"><![CDATA[<p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
-
-<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
-
-<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
-
-<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
-PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
-
-<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
-
-<!-- more -->
-
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/bash</span>
-</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
-</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/server9/qemu-server/&quot;</span>
-</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
-</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
-</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.qcow2&quot;</span>
-</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.qcow2&quot;</span>
-</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;52:54:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
-</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span>  <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
-</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>稍微解释下功能实现原理：</p>
-
-<pre><code>   1.虚拟机的配置文件分两种，第一种是纯粹的平台识别标志和一些目录指向，第二种就是数据文件，虚拟机数据存放的地方。目录如下/etc/pve/nodes/server9/qemu-server/，这个是配置数据文件存放目录；/var/lib/vz/images/，这是配置文件目录。这里多说点，做过集群的所有节点上都会存一份所有节点虚拟机的配置文件，也就是说节点控制台是可以看到其他节点的虚拟机基本信息，但是不能做控制，在/etc/pve/nodes下你会看见集群下所有节点的目录；数据目录下之存节点下的虚拟机数据文件。
-   2.复制原理，将配置文件下一些基本信息修改成新创建虚拟机的，然后将数据文件复制到新虚拟机配置文件制定的目录。这样平台上的信息就修改完毕了，然后就是修改虚拟机里面系统的配置了，一些主机名啊，IP啊什么的，这些也是可以通过初始化脚本实现的，时间问题目前没有脚本，晚些时候再贴出来。
-
-    3.至于脚本语法我就不解释了。
-</code></pre>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">root</span><span class="err">@</span><span class="nx">server9</span><span class="o">:~</span><span class="err">#</span> <span class="nx">more</span> <span class="o">/</span><span class="nx">etc</span><span class="o">/</span><span class="nx">pve</span><span class="o">/</span><span class="nx">nodes</span><span class="o">/</span><span class="nx">server9</span><span class="o">/</span><span class="nx">qemu</span><span class="o">-</span><span class="nx">server</span><span class="o">/</span><span class="mi">160</span><span class="p">.</span><span class="nx">conf</span>
-</span><span class='line'><span class="nx">bootdisk</span><span class="o">:</span> <span class="nx">virtio0</span>
-</span><span class='line'><span class="nx">cores</span><span class="o">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="nx">ide2</span><span class="o">:</span> <span class="nx">ISO</span><span class="o">-</span><span class="nx">Storage</span><span class="o">:</span><span class="nx">iso</span><span class="o">/</span><span class="nx">CentOS</span><span class="o">-</span><span class="mf">6.2</span><span class="o">-</span><span class="nx">x86_64</span><span class="o">-</span><span class="nx">bin</span><span class="o">-</span><span class="nx">DVD1</span><span class="p">.</span><span class="nx">iso</span><span class="p">,</span><span class="nx">media</span><span class="o">=</span><span class="nx">cdrom</span>
-</span><span class='line'><span class="nx">memory</span><span class="o">:</span> <span class="mi">4096</span>
-</span><span class='line'><span class="nx">name</span><span class="o">:</span> <span class="nx">hbase</span><span class="o">-</span><span class="nx">i1</span>
-</span><span class='line'><span class="nx">net0</span><span class="o">:</span> <span class="nx">virtio</span><span class="o">=</span><span class="nx">F6</span><span class="o">:</span><span class="mi">43</span><span class="o">:</span><span class="mi">53</span><span class="o">:</span><span class="nx">C5</span><span class="o">:</span><span class="nx">AC</span><span class="o">:</span><span class="mi">83</span><span class="p">,</span><span class="nx">bridge</span><span class="o">=</span><span class="nx">vmbr0</span>
-</span><span class='line'><span class="nx">ostype</span><span class="o">:</span> <span class="nx">l26</span>
-</span><span class='line'><span class="nx">sockets</span><span class="o">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="nx">virtio0</span><span class="o">:</span> <span class="nx">local</span><span class="o">:</span><span class="mi">160</span><span class="o">/</span><span class="nx">vm</span><span class="o">-</span><span class="mi">160</span><span class="o">-</span><span class="nx">disk</span><span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="nx">qcow2</span><span class="p">,</span><span class="nx">cache</span><span class="o">=</span><span class="nx">writeback</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个是平台配置文件里面的基本内容</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这两句是替换上面配置文件里面的VMID号，和MAC地址</p>
-
-<p>最新版，添加修改NAME</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/bash</span>
-</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
-</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/server9/qemu-server/&quot;</span>
-</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
-</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
-</span><span class='line'><span class="nx">vm_name</span><span class="o">=</span><span class="nx">$3</span>
-</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.qcow2&quot;</span>
-</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.qcow2&quot;</span>
-</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;52:60:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/virtio=\S\+,/virtio=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/name: \S\+/name: $vm_name/&quot;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
-</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span>  <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
-</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">vim</span> <span class="nx">clone_vmdk</span><span class="p">.</span><span class="nx">sh</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">#</span><span class="o">!</span><span class="err">/bin/sh</span>
-</span><span class='line'><span class="nx">image_dir</span><span class="o">=</span><span class="s2">&quot;/var/lib/vz/images/&quot;</span>
-</span><span class='line'><span class="nx">conf_dir</span><span class="o">=</span><span class="s2">&quot;/etc/pve/nodes/dtt/qemu-server/&quot;</span>
-</span><span class='line'><span class="nx">source_vm_id</span><span class="o">=</span><span class="nx">$1</span>
-</span><span class='line'><span class="nx">dest_vm_id</span><span class="o">=</span><span class="nx">$2</span>
-</span><span class='line'><span class="nx">vm_name</span><span class="o">=</span><span class="nx">$3</span>
-</span><span class='line'><span class="nx">dest_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$dest_vm_id-disk-1.vmdk&quot;</span>
-</span><span class='line'><span class="nx">source_vm_file</span><span class="o">=</span><span class="s2">&quot;/vm-$source_vm_id-disk-1.vmdk&quot;</span>
-</span><span class='line'><span class="nx">random_mac_addr</span><span class="o">=</span><span class="s2">&quot;2A:AB:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed &#39;s/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/&#39;)&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">tmp_conf</span><span class="o">=</span><span class="s2">&quot;/tmp/&quot;</span><span class="nx">$dest_vm_id</span><span class="s2">&quot;.txt&quot;</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$conf_dir$source_vm_id</span><span class="s2">&quot;.conf&quot;</span> <span class="o">&gt;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s1">&#39;s/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">source_vm_id</span><span class="p">}</span><span class="s1">&#39;/&#39;</span><span class="nx">$</span><span class="p">{</span><span class="nx">dest_vm_id</span><span class="p">}</span><span class="s1">&#39;/g&#39;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/e1000=\S\+,/e1000=$random_mac_addr,/&quot;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">sed</span> <span class="o">-</span><span class="nx">i</span> <span class="o">-</span><span class="nx">e</span> <span class="s2">&quot;s/name: \S\+/name: $vm_name/&quot;</span> <span class="nx">$tmp_conf</span>
-</span><span class='line'><span class="nx">cat</span> <span class="nx">$tmp_conf</span> <span class="o">&gt;</span> <span class="nx">$conf_dir$dest_vm_id</span><span class="s2">&quot;.conf&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="p">[</span> <span class="o">!</span> <span class="o">-</span><span class="nx">d</span> <span class="s2">&quot;$image_dir$dest_vm_id&quot;</span> <span class="p">];</span><span class="nx">then</span>
-</span><span class='line'><span class="nx">cp</span> <span class="o">-</span><span class="nx">r</span> <span class="nx">$image_dir$source_vm_id</span> <span class="nx">$image_dir$dest_vm_id</span>
-</span><span class='line'><span class="nx">mv</span> <span class="nx">$image_dir$dest_vm_id$source_vm_file</span> <span class="nx">$image_dir$dest_vm_id$dest_vm_file</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'><span class="nx">echo</span> <span class="s2">&quot;The directory already exists:&quot;</span><span class="nx">$image_dir$dest_vm_id</span>
-</span><span class='line'><span class="nx">fi</span>
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

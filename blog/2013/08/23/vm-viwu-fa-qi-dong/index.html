@@ -1,0 +1,132 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>[vm]vi无法启动 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。 登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误： Could not &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">[Vm]vi无法启动</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:40:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。</p>
+
+<p>登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误：</p>
+
+<p>Could not allocate space for object &lsquo;dbo.VPX_HOST_VM_CONFIG_OPTION&rsquo;.&lsquo;PK_VPX_HOST_VM_CONFIG_OPTION&rsquo; in database &lsquo;VIM_VCDB&rsquo; because the &lsquo;PRIMARY&rsquo; filegroup is full. Create disk space by deleting unneeded files, dropping objects in the filegroup, adding additional files to the filegroup, or setting autogrowth on for existing files in the filegroup.</p>
+
+<p>大致意思就是说filegroup满了。解决方法如下：</p>
+
+<p>1：下载安装sql server management studio express，连接到vc:  LINKZKSVCSRV\SQLEXP_VIM.</p>
+
+<p>2：在task中有个shrink，进行压缩</p>
+
+<p>3：然后在SQLEXP_VIM> Programmability > Stored Procedures > Right-Click dbo.cleanup_events_tasks_proc and click execute，自动执行清除日志动作。</p>
+
+<p>然后就ok了。其实建议大家在装vi的时候使用sql server不要使用express，有4G限制，另外在vSphere Client, click Administration > vCenter Server Settings > Database Retention Policy.设置相关日志保留周期，这样防止数据库一直增加。</p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

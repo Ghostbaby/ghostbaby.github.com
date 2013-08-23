@@ -7,8 +7,7 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="jstat:是JDK自带的虚拟机统计监测工具
-在命令行中执行jstat 1
+	<meta name="description" content="nginx安装 1
 2
 3
 4
@@ -18,17 +17,8 @@
 8
 9
 10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-Usage: jstat -help|-options jstat -&lt;option&gt; [-t] [-h&lt &hellip;">
+groupadd www useradd -g www www
+tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf nginx-0 &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -49,6 +39,938 @@ Usage: jstat -help|-options jstat -&lt;option&gt; [-t] [-h&lt &hellip;">
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/nginx-plus-keepalive-webji-qun/">Nginx+keepalive Web集群</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:45:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>nginx安装</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
+</span><span class='line'>useradd -g www www
+</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
+</span><span class='line'>cd pcre-7.8/  
+</span><span class='line'>./configure  
+</span><span class='line'>make && make install 
+</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
+</span><span class='line'>cd nginx-0.7.51/  
+</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
+</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>编辑vim /usr/local/webserver/nginx/conf/nginx.conf</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>user www www;  
+</span><span class='line'>worker_processes 8;  
+</span><span class='line'>
+</span><span class='line'>pid /usr/local/webserver/nginx/logs/nginx.pid;  
+</span><span class='line'>worker_rlimit_nofile 65535;  
+</span><span class='line'>
+</span><span class='line'>events  
+</span><span class='line'>{  
+</span><span class='line'>use epoll;  
+</span><span class='line'>worker_connections 65535;  
+</span><span class='line'>}  
+</span><span class='line'>http{  
+</span><span class='line'>include       mime.types;  
+</span><span class='line'>default_type application/octet-stream;  
+</span><span class='line'>server_names_hash_bucket_size 128;  
+</span><span class='line'>client_header_buffer_size 32k;  
+</span><span class='line'>large_client_header_buffers 4 32k;  
+</span><span class='line'>client_max_body_size 8m;  
+</span><span class='line'>sendfile on;  
+</span><span class='line'>tcp_nopush     on;  
+</span><span class='line'>keepalive_timeout 60;  
+</span><span class='line'>tcp_nodelay on;  
+</span><span class='line'>fastcgi_connect_timeout 300;  
+</span><span class='line'>fastcgi_send_timeout 300;  
+</span><span class='line'>fastcgi_read_timeout 300;  
+</span><span class='line'>fastcgi_buffer_size 64k;  
+</span><span class='line'>fastcgi_buffers 4 64k;  
+</span><span class='line'>fastcgi_busy_buffers_size 128k;  
+</span><span class='line'>fastcgi_temp_file_write_size 128k;  
+</span><span class='line'>gzip on;  
+</span><span class='line'>gzip_min_length 1k;  
+</span><span class='line'>gzip_buffers     4 16k;  
+</span><span class='line'>gzip_http_version 1.0;  
+</span><span class='line'>gzip_comp_level 2;  
+</span><span class='line'>gzip_types       text/plain application/x-javascript text/css application/xml;  
+</span><span class='line'>gzip_vary on;  
+</span><span class='line'>
+</span><span class='line'>upstream backend  
+</span><span class='line'>{  
+</span><span class='line'>server 192.168.75.240:80;  
+</span><span class='line'>server 192.168.0.115:80;  
+</span><span class='line'>}  
+</span><span class='line'>server {  
+</span><span class='line'>listen 80;  
+</span><span class='line'>#server_name www.yuhongchun027.com;  
+</span><span class='line'>location / {  
+</span><span class='line'>root /var/www ;  
+</span><span class='line'>index index.jsp index.htm index.html;  
+</span><span class='line'>proxy_redirect off;  
+</span><span class='line'>proxy_set_header Host $host;  
+</span><span class='line'>proxy_set_header X-Real-IP $remote_addr;  
+</span><span class='line'>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+</span><span class='line'>proxy_pass http://backend;  
+</span><span class='line'>}  
+</span><span class='line'>
+</span><span class='line'>location /nginx {  
+</span><span class='line'>access_log on;  
+</span><span class='line'>auth_basic "NginxStatus";  
+</span><span class='line'>auth_basic_user_file /usr/local/nginx/htpasswd;  
+</span><span class='line'>}  
+</span><span class='line'>
+</span><span class='line'>log_format access '$remote_addr - $remote_user [$time_local] "$request" '  
+</span><span class='line'>'$status $body_bytes_sent "$http_referer" '  
+</span><span class='line'>'"$http_user_agent" $http_x_forwarded_for';  
+</span><span class='line'>access_log /var/log/access.log access;  
+</span><span class='line'>
+</span><span class='line'>}  
+</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
+
+
+<p>新建nginx启动文件，/etc/rc.d/init.d/nginx</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
+</span><span class='line'># nginx Startup script for the Nginx HTTP Server 
+</span><span class='line'># it is v.1.3.0 version. 
+</span><span class='line'># chkconfig: - 85 15 
+</span><span class='line'># description: Nginx is a high-performance web and proxy server. 
+</span><span class='line'>#              It has a lot of features, but it's not for everyone. 
+</span><span class='line'># processname: nginx 
+</span><span class='line'># pidfile: /var/run/nginx.pid 
+</span><span class='line'># config: /usr/local/webserver/nginx/conf/nginx.conf 
+</span><span class='line'>nginxd=/usr/local/webserver/nginx/sbin/nginx 
+</span><span class='line'>nginx_config=/usr/local/webserver/nginx/conf/nginx.conf 
+</span><span class='line'>nginx_pid=/usr/local/webserver/nginx/logs/nginx.pid 
+</span><span class='line'>RETVAL=0 
+</span><span class='line'>prog="nginx" 
+</span><span class='line'># Source function library. 
+</span><span class='line'>.  /etc/rc.d/init.d/functions 
+</span><span class='line'># Source networking configuration. 
+</span><span class='line'>.  /etc/sysconfig/network 
+</span><span class='line'># Check that networking is up. 
+</span><span class='line'>[ ${NETWORKING} = "no" ] && exit 0 
+</span><span class='line'>[ -x $nginxd ] || exit 0 
+</span><span class='line'># Start nginx daemons functions. 
+</span><span class='line'>start() { 
+</span><span class='line'>if [ -e $nginx_pid ];then 
+</span><span class='line'>   echo "nginx already running...." 
+</span><span class='line'>   exit 1 
+</span><span class='line'>fi 
+</span><span class='line'>   echo -n [        DISCUZ_CODE_3        ]quot;Starting $prog: " 
+</span><span class='line'>   daemon $nginxd -c ${nginx_config} 
+</span><span class='line'>   RETVAL=$? 
+</span><span class='line'>   echo 
+</span><span class='line'>   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx 
+</span><span class='line'>   return $RETVAL 
+</span><span class='line'>} 
+</span><span class='line'># Stop nginx daemons functions. 
+</span><span class='line'>stop() { 
+</span><span class='line'>        echo -n [        DISCUZ_CODE_3        ]quot;Stopping $prog: " 
+</span><span class='line'>        killproc $nginxd 
+</span><span class='line'>        RETVAL=$? 
+</span><span class='line'>        echo 
+</span><span class='line'>        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/nginx /usr/local/webserver/nginx/logs/nginx.pid 
+</span><span class='line'>} 
+</span><span class='line'>reload() { 
+</span><span class='line'>    echo -n [        DISCUZ_CODE_3        ]quot;Reloading $prog: " 
+</span><span class='line'>    #kill -HUP `cat ${nginx_pid}` 
+</span><span class='line'>    killproc $nginxd -HUP 
+</span><span class='line'>    RETVAL=$? 
+</span><span class='line'>    echo 
+</span><span class='line'>} 
+</span><span class='line'># See how we were called. 
+</span><span class='line'>case "$1" in 
+</span><span class='line'>start) 
+</span><span class='line'>        start 
+</span><span class='line'>        ;; 
+</span><span class='line'>stop) 
+</span><span class='line'>        stop 
+</span><span class='line'>        ;; 
+</span><span class='line'>reload) 
+</span><span class='line'>        reload 
+</span><span class='line'>        ;; 
+</span><span class='line'>restart) 
+</span><span class='line'>        stop 
+</span><span class='line'>        start 
+</span><span class='line'>        ;; 
+</span><span class='line'>
+</span><span class='line'>status) 
+</span><span class='line'>        status $prog 
+</span><span class='line'>        RETVAL=$? 
+</span><span class='line'>        ;; 
+</span><span class='line'>*) 
+</span><span class='line'>        echo [        DISCUZ_CODE_3        ]quot;Usage: $prog {start|stop|restart|reload|status|help}" 
+</span><span class='line'>        exit 1 
+</span><span class='line'>esac 
+</span><span class='line'>exit $RETVAL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>安装keepalived，并将其做成服务模式，方便以后调试。
+装popt先</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget http://www.keepalived.org/software/keepalived-1.1.15.tar.gz  
+</span><span class='line'>#tar zxvf keepalived-1.1.15.tar.gz  
+</span><span class='line'>#cd keepalived-1.1.15  
+</span><span class='line'>#./configure --prefix=/usr/local/keepalived  
+</span><span class='line'>#make   
+</span><span class='line'>#make install  
+</span><span class='line'>#cp /usr/local/keepalived/sbin/keepalived /usr/sbin/  
+</span><span class='line'>#cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/  
+</span><span class='line'>#cp /usr/local/keepalived/etc/rc.d/init.d/keepalived /etc/init.d/  
+</span><span class='line'>#mkdir /etc/keepalived  
+</span><span class='line'>#cd /etc/keepalived/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>vim keepalived.conf<br/>
+master</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
+</span><span class='line'>global_defs {  
+</span><span class='line'>   notification_email {  
+</span><span class='line'>   13912979683@139.com
+</span><span class='line'>        }  
+</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
+</span><span class='line'>   smtp_server 127.0.0.1  
+</span><span class='line'>   smtp_connect_timeout 30  
+</span><span class='line'>   router_id LVS_DEVEL  
+</span><span class='line'>}  
+</span><span class='line'>vrrp_instance VI_1 {  
+</span><span class='line'>    state MASTER  
+</span><span class='line'>    interface eth1  
+</span><span class='line'>    virtual_router_id 60 
+</span><span class='line'>    mcast_src_ip 192.168.75.223     
+</span><span class='line'>    priority 100  
+</span><span class='line'>    advert_int 1  
+</span><span class='line'>    authentication {  
+</span><span class='line'>        auth_type PASS  
+</span><span class='line'>        auth_pass chtopnet  
+</span><span class='line'>    }  
+</span><span class='line'>    virtual_ipaddress {  
+</span><span class='line'>        192.168.75.242                     
+</span><span class='line'>    }  
+</span><span class='line'>}  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>bakup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
+</span><span class='line'>global_defs {  
+</span><span class='line'>   notification_email {  
+</span><span class='line'>   yuhongchun027@163.com  
+</span><span class='line'>        }  
+</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
+</span><span class='line'>   smtp_server 127.0.0.1  
+</span><span class='line'>   smtp_connect_timeout 30  
+</span><span class='line'>   router_id LVS_DEVEL  
+</span><span class='line'>}  
+</span><span class='line'>vrrp_instance VI_1 {  
+</span><span class='line'>    state BACKUP  
+</span><span class='line'>    interface eth1  
+</span><span class='line'>    virtual_router_id 50  
+</span><span class='line'>    mcast_src_ip 192.168.75.223              
+</span><span class='line'>    priority 100 
+</span><span class='line'>    advert_int 1  
+</span><span class='line'>    authentication {  
+</span><span class='line'>        auth_type PASS  
+</span><span class='line'>        auth_pass chtopnet  
+</span><span class='line'>    }  
+</span><span class='line'>    virtual_ipaddress {  
+</span><span class='line'>        192.168.75.242  
+</span><span class='line'>    }  
+</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后一个脚本是用来保证nginx无法恢复，关闭keepalive，切换到bakup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
+</span><span class='line'>while  : 
+</span><span class='line'>do 
+</span><span class='line'>nginxpid=`ps -C nginx --no-header | wc -l` 
+</span><span class='line'>if [ $nginxpid -eq 0 ];then 
+</span><span class='line'>  /usr/local/nginx/sbin/nginx 
+</span><span class='line'>  sleep 5 
+</span><span class='line'>  nginxpid=`ps -C nginx --no-header | wc -l` 
+</span><span class='line'>  echo $nginxpid 
+</span><span class='line'>    if [ $nginxpid -eq 0 ];then 
+</span><span class='line'>/etc/init.d/keepalived stop 
+</span><span class='line'>   fi 
+</span><span class='line'>fi 
+</span><span class='line'>sleep 5 
+</span><span class='line'>done </span></code></pre></td></tr></table></div></figure>
+
+
+<p> 我稍为解释一下，这是一个无限循环的脚本，放在主Nginx机器上（因为目前主要是由它提供服务），每隔5秒执行一次，用ps -C 命令来收集nginx的PID值到底是否为0，如果是0的话（即Nginx进程死掉了），尝试启动nginx进程；如果继续为0，即nginx启动失改，则关闭本机的Keeplaived进程，VIP地址则会由备机接管，当然了，整个网站就会由备机的Nginx来提供服务了，这样保证Nginx进程的高可用。</p>
+
+<pre><code> 正确写法为nohup/bin/bash /root/nginx_pid.sh &amp;,附带下注释:如果你正在运行一个进程，而且你觉得在退出帐户时该进程还不会结束，那么可以使用nohup命令。该命令可以在你退出root帐户之后继续运行相应的进程。nohup就是不挂起的意思( no hang up)。
+</code></pre>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-%28ppthe-visioban-%29/">VMware Visio精品图标库（PPT和Visio版）</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:43:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=2316439492&uk=3224714883</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang/">Linux下利用nc命令来监控检测服务器的端口使用情况</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:41:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>最近碰到一个项目，前端用apache htttpd进行发布（80端口），通过双机负载均衡转发到后端的两个tomcat进行处理（8081和8082端口），现在需要随时监控这三个端口的情况，一旦down掉需要能够立即告警处理。批量的系统监控比较好的是用nagios软件来实现，这样小项目专门装一个nagios软件，有点繁琐了。在网上查了一些资料，总结实验了一下，可以用简单的nc命令来实现。</p>
+
+<p>一、nc命令检测端口的用法</p>
+
+<h1>nc  -v  -w 10 %IP%   -z  %PORT%</h1>
+
+<p>-v  显示指令执行过程。
+-w  &lt;超时秒数>   设置等待连线的时间。
+-u  表示使用UDP协议
+-z  使用0输入/输出模式，只在扫描通信端口时使用。</p>
+
+<p>例1：扫描指定的8080端口</p>
+
+<h1>nc -v -w 10 -z 192.168.0.100 8080</h1>
+
+<p>Connection to 192.168.0.100 8080 port [tcp/http] succeeded!</p>
+
+<p>例2：扫描20到25的端口范围，并详细输出。</p>
+
+<h1>nc -v -w 2 -z 192.168.0.100 20-25</h1>
+
+<p>nc: connect to 192.168.0.100 port 20 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 21 (tcp) failed: Connection refused
+Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+nc: connect to 192.168.0.100 port 23 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100  port 24 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 25 (tcp) failed: Connection refused</p>
+
+<p>例3：扫描1到65535的端口范围，只输出打开的端口（去掉-v参数即可）</p>
+
+<h1>nc -w 1 -z 192.168.0.100 1-65535</h1>
+
+<p>Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+Connection to 192.168.0.100 80 port [tcp/http] succeeded!
+Connection to 192.168.0.100 2121 port [tcp/scientia-ssdb] succeeded!
+Connection to 192.168.0.100 4004 port [tcp/pxc-roid] succeeded!
+Connection to 192.168.0.100 8081 port [tcp/tproxy] succeeded!
+Connection to 192.168.0.100 11211 port [tcp/*] succeeded!</p>
+
+<p>二、批量检测服务器指定端口开放情况：</p>
+
+<p>1、假如我们要监控一堆指定的IP和端口，可新建一个文件（第1列服务器IP，第2列要监控的端口）。</p>
+
+<h1>vim /scripts/ip-ports.txt</h1>
+
+<p>192.168.0.100 80<br/>
+192.168.0.100 8081<br/>
+192.168.0.101 8082<br/>
+192.168.1.100 21</p>
+
+<p>2、我们可以写这样一个脚本来批量检测端口是否开放：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值显示ok，失败会返回1值显示fail</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok  
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+</code></pre>
+
+<p>  fi <br/>
+done</p>
+
+<p>3、执行脚本查看运行结果如下：</p>
+
+<h1>chmod a+x  /scripts/ncports.sh</h1>
+
+<h1>/scripts/ncports.sh</h1>
+
+<p>192.168.0.100 80：ok
+192.168.0.100 8081：ok
+192.168.0.101 8082：ok
+192.168.1.100 21：fail</p>
+
+<p>三、端口不通时设置告警：</p>
+
+<p>1、 邮件告警：</p>
+
+<p>(1) 先安装linux下面的邮件发送程序mutt（参见我另一篇文章《Linux下面如何用mutt命令发送邮件》</p>
+
+<p>(2) 修改上面的ncports.sh检测脚本，在显示失败fail的时候增加一行：</p>
+
+<pre><code>   ……………………
+  echo $line :fail
+  echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通" test@139.com
+  ……………………
+</code></pre>
+
+<p>(3) 如果上面的接收邮箱设置为移动139邮箱，并开启接收邮件短信告知，即可实现“短信告警”的功能。</p>
+
+<p>2、 windows消息弹窗告警：
+(1) 先打开接收消息弹窗windows客户机的“Messenger”服务，设置为“启动”
+(2) 利用smbclient命令来发送消息，net脚本文件如下：</p>
+
+<h1>vim /scripts/net.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>/scripts/net.sh</h1>
+
+<p>case &ldquo;$1&rdquo; in<br/>
+send)<br/>
+echo &ldquo;$3&rdquo;|smbclient -I &ldquo;$2&rdquo; -M <code>nmblookup -A "$2"|sed -e '1d' -e '3,/*/d'|cut -f2|cut -d' ' -f1</code><br/>
+;;<br/>
+*)<br/>
+echo &ldquo;Usage:net send &lt;IPaddr.> <message>&#8220;<br/>
+exit 1<br/>
+esac</p>
+
+<h1>chmod a+x /scripts/net.sh</h1>
+
+<p>(3) 发送消息弹窗命令测试：（发送给192.168.1.83这台win xp机子，发送内容不支持中文）</p>
+
+<h1>/scripts/net.sh  send  192.168.1.83     &ldquo;hello,nihao&rdquo;</h1>
+
+<p>3、端口不通时发送邮件并消息弹窗告警的脚本如下：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值，打不开会返回1值</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok   
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通"  test@139.com  
+/scripts/net send 192.168.1.83 "The $line fail"    
+</code></pre>
+
+<p>  fi <br/>
+done
+4、加入任务计划每2分钟执行一次</p>
+
+<h1>crontab -e</h1>
+
+<p>*/2 * * * *  /scripts/ncports.sh  > /dev/null 2>&amp;1</p>
+
+<h1>service crond restart</h1>
+
+<p>netcat 官网<a href="http://netcat.sourceforge.net/download.php">http://netcat.sourceforge.net/download.php</a></p>
+
+<p>软件可以从上面下载~</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/vm-viwu-fa-qi-dong/">[Vm]vi无法启动</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:40:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。</p>
+
+<p>登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误：</p>
+
+<p>Could not allocate space for object &lsquo;dbo.VPX_HOST_VM_CONFIG_OPTION&rsquo;.&lsquo;PK_VPX_HOST_VM_CONFIG_OPTION&rsquo; in database &lsquo;VIM_VCDB&rsquo; because the &lsquo;PRIMARY&rsquo; filegroup is full. Create disk space by deleting unneeded files, dropping objects in the filegroup, adding additional files to the filegroup, or setting autogrowth on for existing files in the filegroup.</p>
+
+<p>大致意思就是说filegroup满了。解决方法如下：</p>
+
+<p>1：下载安装sql server management studio express，连接到vc:  LINKZKSVCSRV\SQLEXP_VIM.</p>
+
+<p>2：在task中有个shrink，进行压缩</p>
+
+<p>3：然后在SQLEXP_VIM> Programmability > Stored Procedures > Right-Click dbo.cleanup_events_tasks_proc and click execute，自动执行清除日志动作。</p>
+
+<p>然后就ok了。其实建议大家在装vi的时候使用sql server不要使用express，有4G限制，另外在vSphere Client, click Administration > vCenter Server Settings > Database Retention Policy.设置相关日志保留周期，这样防止数据库一直增加。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/mysql-jian-kong-jiao-ben/">MySql 监控脚本</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:39:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash  
+</span><span class='line'>#created by oldboy QQ 49000448  
+</span><span class='line'>#date:20100918  
+</span><span class='line'>MYUSER=root  
+</span><span class='line'>MYPASS="oldboy" 
+</span><span class='line'>MYSOCK=/data/3306/mysql.sock  
+</span><span class='line'>MySQL_STARTUP="/data/3306/mysql" 
+</span><span class='line'>LOG_PATH=/tmp  
+</span><span class='line'>LOG_FILE=${LOG_PATH}/mysqllogs_`date +%F`.log  
+</span><span class='line'>MYSQL_PATH=/usr/local/mysql/bin  
+</span><span class='line'>MYSQL_CMD="$MYSQL_PATH/mysql -u$MYUSER -p$MYPASS -S $MYSOCK" 
+</span><span class='line'>#→全变量定义方式，显得更专业。  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -eq 0 ]   
+</span><span class='line'>then 
+</span><span class='line'>echo "MySQL is running! "   
+</span><span class='line'>exit 0  
+</span><span class='line'>else 
+</span><span class='line'>$MySQL_STARTUP start &gt;$LOG_FILE#→日志也是变量。  
+</span><span class='line'>sleep 5;  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -ne 0 ]  
+</span><span class='line'>then   
+</span><span class='line'>for num in `seq 10`#→通过for循环来杀死mysqld，真正杀死则退出循环或每隔个两秒杀一次，一共杀10次。  
+</span><span class='line'>do  
+</span><span class='line'>killall mysqld&gt;/dev/null 2&gt;&1   
+</span><span class='line'>[ $? -ne 0 ] && break;  
+</span><span class='line'>sleep 2  
+</span><span class='line'>done  
+</span><span class='line'>$MySQL_STARTUP start &gt;&gt;$LOG_FILE   
+</span><span class='line'>fi  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1 && Status="restarted" || Status="unknown"#→这个逻辑更准确。  
+</span><span class='line'>echo "MySQL status is $Status" &gt;&gt;$LOG_FILE  
+</span><span class='line'>mail -s "MySQL status is $Status" 31333741@qq.com &lt; $LOG_FILE  
+</span><span class='line'>#→把上面的Status作为结果标题传给邮件，当然你可以做短信，语音通话报警。  
+</span><span class='line'>fi  
+</span><span class='line'>exit </span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -432,590 +1354,6 @@ Compiled Size Type Method
 </span><span class='line'>mv db.* db_bak(最后看到几个__db.00*文件，我也给移走了，果然见效）
 </span><span class='line'>rpm --rebuilddb     重建rpm数据库
 </span><span class='line'>yum clean all</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu/">Openstack安装rabbitmq-server消息队列时出现错误</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T16:06:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
-</span><span class='line'>Processing triggers for man-db ...
-</span><span class='line'>Processing triggers for ureadahead ...
-</span><span class='line'>Setting up rabbitmq-server (2.5.0-1ubuntu2) ...
-</span><span class='line'>Starting rabbitmq-server: FAILED - check /var/log/rabbitmq/startup_{log, _err}
-</span><span class='line'>rabbitmq-server.
-</span><span class='line'>invoke-rc.d: inits_cript rabbitmq-server, action "start" failed.
-</span><span class='line'>dpkg: error processing rabbitmq-server (--configure):
-</span><span class='line'>subprocess installed post-installation s_cript returned error exit status 1
-</span><span class='line'>Errors were encountered while processing:
-</span><span class='line'>rabbitmq-server
-</span><span class='line'>E: Sub-process /usr/bin/dpkg returned an error code (1)</span></code></pre></td></tr></table></div></figure>
-
-
-<p>openstack安装rabbitmq-server消息队列时出现以下错误：</p>
-
-<p>因为安装完成后，在启动rabbitmq-server时会检测hostname和hosts记录的对应关系
-解决方法：
-查看hostname</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># hostname 
-</span><span class='line'>ubuntu6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>配置hosts文件</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># cat /etc/hosts |grep ubuntu6
-</span><span class='line'>127.0.0.1 ubuntu6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>重启服务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/init.d/rabbitmq-server start</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/nova-rootwrap-require-configuration-file-as-argument/">Nova-rootwrap Require Configuration File as Argument</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T16:04:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>nova root wrapper requires a configuration file as argument but devstack doesn't feed it. This error was reported in the log of nova-volume and nova-network service.
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>===========================nova-network log==========================
-</span><span class='line'>2012-06-28 17:17:49 DEBUG nova.utils [-] ['sudo', '/usr/local/bin/nova-rootwrap', 'iptables-save', '-t', 'filter'] failed. Retrying. from (pi
-</span><span class='line'>d=9143) execute /opt/stack/nova/nova/utils.py:197
-</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Running cmd (subprocess): sudo /usr/local/bin/nova-rootwrap iptables-save -t filter from (pid=9143)
-</span><span class='line'>execute /opt/stack/nova/nova/utils.py:168
-</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Result was 97 from (pid=9143) execute /opt/stack/nova/nova/utils.py:184
-</span><span class='line'>Traceback (most recent call last):
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 336, in fire_timers
-</span><span class='line'>    timer()
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/timer.py", line 56, in __call__
-</span><span class='line'>    cb(*args, **kw)
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
-</span><span class='line'>    result = function(*args, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 110, in run_server
-</span><span class='line'>    server.start()
-</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 182, in start
-</span><span class='line'>    self.manager.init_host()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
-</span><span class='line'>    self.l3driver.initialize()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
-</span><span class='line'>    linux_net.init_host()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
-</span><span class='line'>    add_snat_rule(ip_range)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
-</span><span class='line'>    iptables_manager.apply()
-</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 672, in inner
-</span><span class='line'>    retval = f(*args, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
-</span><span class='line'>    attempts=5)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
-</span><span class='line'>    return utils.execute(*cmd, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 191, in execute
-</span><span class='line'>    cmd=' '.join(cmd))
-</span><span class='line'>ProcessExecutionError: Unexpected error while running command.
-</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>Exit code: 97
-</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 CRITICAL nova [-] Unexpected error while running command.
-</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>Exit code: 97
-</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Traceback (most recent call last):
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/bin/nova-network", line 48, in &lt;module&gt;
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova _launcher.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 149, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova service.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 166, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self._exit_event.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/event.py", line 116, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return hubs.get_hub().switch()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 177, in switch
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self.greenlet.switch()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova result = function(*args, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 110, in run_server
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova server.start()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 182, in start
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.manager.init_host()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.l3driver.initialize()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova linux_net.init_host()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova add_snat_rule(ip_range)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova iptables_manager.apply()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 672, in inner
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova retval = f(*args, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova attempts=5)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return utils.execute(*cmd, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 191, in execute
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova cmd=' '.join(cmd))
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova ProcessExecutionError: Unexpected error while running command.
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Exit code: 97
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova
-</span><span class='line'>============================================================</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的错误日志是从帖子上抓取的，实际的日志报错都是一样的。上面的问题主要是在nova-rootwrap的权限和默认目录路径上，下面要对rootwrap.conf进行配置\</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>nova.conf
-</span><span class='line'>
-</span><span class='line'>The root_helper parameter is deprecated in favor of the rootwrap_config parameter:
-</span><span class='line'>
-</span><span class='line'>rootwrap_config=/etc/nova/rootwrap.conf
-</span><span class='line'>
-</span><span class='line'>If you still want to use root_helper, it now needs to include the configuration file:
-</span><span class='line'>
-</span><span class='line'>root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/linuxxia-ru-he-mo-ni-an-jian-shu-ru-he-mo-ni-shu-biao/">Linux下如何模拟按键输入和模拟鼠标</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T15:34:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>1.查看/dev/input/eventX是什么类型的事件， cat /proc/bus/input/devices</p>
-
-<p>设备有着自己特殊的按键键码，我需要将一些标准的按键，比如0－9，X－Z等模拟成标准按键，比如KEY_0,KEY-Z等，所以需要用到按键模拟，具体方法就是操作/dev/input/event1文件，向它写入个input_event结构体就可以模拟按键的输入了。</p>
-
-<pre><code>  linux/input.h中有定义，这个文件还定义了标准按键的编码等
-</code></pre>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>struct input_event {
-</span><span class='line'>
-</span><span class='line'>struct timeval time; //按键时间
-</span><span class='line'>
-</span><span class='line'>__u16 type; //类型，在下面有定义
-</span><span class='line'>
-</span><span class='line'>__u16 code; //要模拟成什么按键
-</span><span class='line'>
-</span><span class='line'>__s32 value;//是按下还是释放
-</span><span class='line'>
-</span><span class='line'>};</span></code></pre></td></tr></table></div></figure>
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/powershell-huo-qu-xu-ni-ji-zhuang-tai/">POWERSHELL 获取虚拟机状态</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T15:33:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$allvms = @()
-</span><span class='line'>$vms = Get-Vm
-</span><span class='line'>foreach($vm in $vms){
-</span><span class='line'>  $vmstat = "" | Select VmName, GuestName, NumCPU, ProvisionedSpaceGB, UsedSpaceGB, VmHost, MemMax, MemAvg, CPUMax, CPUAvg, DiskMax, DiskAvg 
-</span><span class='line'>  $vmstat.VmName = $vm.name
-</span><span class='line'>  $vmstat.GuestName = $vm.Guest.HostName 
-</span><span class='line'>  $vmstat.NumCPU = $vm.NumCPU
-</span><span class='line'>  $vmstat.ProvisionedSpaceGB = $vm.ProvisionedSpaceGB
-</span><span class='line'>  $vmstat.UsedSpaceGB = $vm.UsedSpaceGB
-</span><span class='line'>  $vmstat.VmHost = $vm.VMHost
-</span><span class='line'>  
-</span><span class='line'>  $statcpu = Get-Stat -Entity ($vm) `
-</span><span class='line'>           -start (get-date).AddDays(-30) `
-</span><span class='line'>           -Finish (Get-Date) `
-</span><span class='line'>             -stat cpu.usagemhz.average
-</span><span class='line'>  $statmem = Get-Stat -Entity ($vm) `
-</span><span class='line'>           -Start (get-date).AddDays(-30) `
-</span><span class='line'>           -Finish (Get-Date) `
-</span><span class='line'>             -stat mem.consumed.average
-</span><span class='line'>  $statdisk = Get-Stat -Entity ($vm) `
-</span><span class='line'>           -Start (get-date).AddDays(-30) `
-</span><span class='line'>           -Finish (Get-Date) `
-</span><span class='line'>             -stat disk.usage.average
-</span><span class='line'>
-</span><span class='line'>  $cpu = $statcpu | Measure-Object -Property value -Average -Maximum
-</span><span class='line'>  $mem = $statmem | Measure-Object -Property value -Average -Maximum
-</span><span class='line'>  $disk = $statdisk | Measure-Object -Property value -Average -Maximum
-</span><span class='line'>  
-</span><span class='line'>  $vmstat.CPUMax = $cpu.Maximum
-</span><span class='line'>  $vmstat.CPUAvg = $cpu.Average
-</span><span class='line'>  $vmstat.MemMax = $mem.Maximum
-</span><span class='line'>  $vmstat.MemAvg = $mem.Average
-</span><span class='line'>  $vmstat.DiskMax = $disk.Maximum
-</span><span class='line'>  $vmstat.DiskAvg = $disk.Average
-</span><span class='line'>  
-</span><span class='line'>  $allvms += $vmstat
-</span><span class='line'>}
-</span><span class='line'>$allvms | Export-Csv "VMs.csv" -noTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/powercli-xu-ni-ji-jian-dan-zhuang-tai-bao-gao/">POWERCLI 虚拟机简单状态报告</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T15:17:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$vms = get-vm|where {$_.name -like "XG*"}
-</span><span class='line'>$metrics = "cpu.usagemhz.average","mem.usage.average","cpu.usagemhz.minimum","mem.usage.minimum","cpu.usagemhz.maximum","mem.usage.maximum"
-</span><span class='line'>$start = Get-Date -Hour 7 -Minute 0 -Second 0 -Day 7 -Month 8 -Year 2012
-</span><span class='line'>$finish = Get-Date -Hour 11 -Minute 0 -Second 0 -Day 9 -Month 8 -Year 2012
-</span><span class='line'>Get-Stat -Entity ($vms) -Stat $metrics -Start $start -Finish $finish |
-</span><span class='line'>Group-Object -Property EntityId,Timestamp | %{
-</span><span class='line'>  New-Object PSObject -Property @{
-</span><span class='line'>    VMName = $_.Group[0].Entity.Name
-</span><span class='line'>    Date = $_.Group[0].Timestamp.ToLongDateString()
-</span><span class='line'>    Time = $_.Group[0].Timestamp.ToLongTimeString()
-</span><span class='line'>    MemMax = $_.Group | where {$_.MetricId -eq "mem.usage.maximum"} | Select -ExpandProperty Value
-</span><span class='line'>    MemAvg = $_.Group | where {$_.MetricId -eq "mem.usage.average"} | Select -ExpandProperty Value
-</span><span class='line'>    MemMin = $_.Group | where {$_.MetricId -eq "mem.usage.minimum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuMax = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.maximum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuMin = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.minimum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuAvg = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.average"} | Select -ExpandProperty Value
-</span><span class='line'>    NetMax = $_.Group | where {$_.MetricId -eq "net.usage.maximum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>    NetMin = $_.Group | where {$_.MetricId -eq "net.usage.minimum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>    NetAvg = $_.Group | where {$_.MetricId -eq "net.usage.average" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>  }
-</span><span class='line'>  } |Export-Csv D:\vmreport.csv -NoTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
 
 
   

@@ -7,7 +7,20 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="最近平台某个功能无法实现了，在中间件里面查看日志，发现有报错日志，将脚本单独提出来执行，发现数据的精度超出字段的定义，数据库为mysql，没有数据库表字典无法确定该字段含义，且修改数据库有风险，所以选择折中方案。 中间件运行在windows平台下，数据库在linux下， &hellip;">
+	<meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
+Processing triggers for man-db ... &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -28,6 +41,590 @@
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu/">Openstack安装rabbitmq-server消息队列时出现错误</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T16:06:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
+</span><span class='line'>Processing triggers for man-db ...
+</span><span class='line'>Processing triggers for ureadahead ...
+</span><span class='line'>Setting up rabbitmq-server (2.5.0-1ubuntu2) ...
+</span><span class='line'>Starting rabbitmq-server: FAILED - check /var/log/rabbitmq/startup_{log, _err}
+</span><span class='line'>rabbitmq-server.
+</span><span class='line'>invoke-rc.d: inits_cript rabbitmq-server, action "start" failed.
+</span><span class='line'>dpkg: error processing rabbitmq-server (--configure):
+</span><span class='line'>subprocess installed post-installation s_cript returned error exit status 1
+</span><span class='line'>Errors were encountered while processing:
+</span><span class='line'>rabbitmq-server
+</span><span class='line'>E: Sub-process /usr/bin/dpkg returned an error code (1)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>openstack安装rabbitmq-server消息队列时出现以下错误：</p>
+
+<p>因为安装完成后，在启动rabbitmq-server时会检测hostname和hosts记录的对应关系
+解决方法：
+查看hostname</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># hostname 
+</span><span class='line'>ubuntu6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>配置hosts文件</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># cat /etc/hosts |grep ubuntu6
+</span><span class='line'>127.0.0.1 ubuntu6</span></code></pre></td></tr></table></div></figure>
+
+
+<p>重启服务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/init.d/rabbitmq-server start</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/nova-rootwrap-require-configuration-file-as-argument/">Nova-rootwrap Require Configuration File as Argument</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T16:04:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>nova root wrapper requires a configuration file as argument but devstack doesn't feed it. This error was reported in the log of nova-volume and nova-network service.
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>===========================nova-network log==========================
+</span><span class='line'>2012-06-28 17:17:49 DEBUG nova.utils [-] ['sudo', '/usr/local/bin/nova-rootwrap', 'iptables-save', '-t', 'filter'] failed. Retrying. from (pi
+</span><span class='line'>d=9143) execute /opt/stack/nova/nova/utils.py:197
+</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Running cmd (subprocess): sudo /usr/local/bin/nova-rootwrap iptables-save -t filter from (pid=9143)
+</span><span class='line'>execute /opt/stack/nova/nova/utils.py:168
+</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Result was 97 from (pid=9143) execute /opt/stack/nova/nova/utils.py:184
+</span><span class='line'>Traceback (most recent call last):
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 336, in fire_timers
+</span><span class='line'>    timer()
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/timer.py", line 56, in __call__
+</span><span class='line'>    cb(*args, **kw)
+</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
+</span><span class='line'>    result = function(*args, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 110, in run_server
+</span><span class='line'>    server.start()
+</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 182, in start
+</span><span class='line'>    self.manager.init_host()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
+</span><span class='line'>    self.l3driver.initialize()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
+</span><span class='line'>    linux_net.init_host()
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
+</span><span class='line'>    add_snat_rule(ip_range)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
+</span><span class='line'>    iptables_manager.apply()
+</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 672, in inner
+</span><span class='line'>    retval = f(*args, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
+</span><span class='line'>    attempts=5)
+</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
+</span><span class='line'>    return utils.execute(*cmd, **kwargs)
+</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 191, in execute
+</span><span class='line'>    cmd=' '.join(cmd))
+</span><span class='line'>ProcessExecutionError: Unexpected error while running command.
+</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>Exit code: 97
+</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 CRITICAL nova [-] Unexpected error while running command.
+</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>Exit code: 97
+</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Traceback (most recent call last):
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/bin/nova-network", line 48, in &lt;module&gt;
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova _launcher.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 149, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova service.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 166, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self._exit_event.wait()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/event.py", line 116, in wait
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return hubs.get_hub().switch()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 177, in switch
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self.greenlet.switch()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova result = function(*args, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 110, in run_server
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova server.start()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 182, in start
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.manager.init_host()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.l3driver.initialize()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova linux_net.init_host()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova add_snat_rule(ip_range)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova iptables_manager.apply()
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 672, in inner
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova retval = f(*args, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova attempts=5)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova return utils.execute(*cmd, **kwargs)
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 191, in execute
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova cmd=' '.join(cmd))
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova ProcessExecutionError: Unexpected error while running command.
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Exit code: 97
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stderr: ''
+</span><span class='line'>2012-06-28 17:17:50 TRACE nova
+</span><span class='line'>============================================================</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的错误日志是从帖子上抓取的，实际的日志报错都是一样的。上面的问题主要是在nova-rootwrap的权限和默认目录路径上，下面要对rootwrap.conf进行配置\</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>nova.conf
+</span><span class='line'>
+</span><span class='line'>The root_helper parameter is deprecated in favor of the rootwrap_config parameter:
+</span><span class='line'>
+</span><span class='line'>rootwrap_config=/etc/nova/rootwrap.conf
+</span><span class='line'>
+</span><span class='line'>If you still want to use root_helper, it now needs to include the configuration file:
+</span><span class='line'>
+</span><span class='line'>root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/linuxxia-ru-he-mo-ni-an-jian-shu-ru-he-mo-ni-shu-biao/">Linux下如何模拟按键输入和模拟鼠标</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T15:34:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>1.查看/dev/input/eventX是什么类型的事件， cat /proc/bus/input/devices</p>
+
+<p>设备有着自己特殊的按键键码，我需要将一些标准的按键，比如0－9，X－Z等模拟成标准按键，比如KEY_0,KEY-Z等，所以需要用到按键模拟，具体方法就是操作/dev/input/event1文件，向它写入个input_event结构体就可以模拟按键的输入了。</p>
+
+<pre><code>  linux/input.h中有定义，这个文件还定义了标准按键的编码等
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>struct input_event {
+</span><span class='line'>
+</span><span class='line'>struct timeval time; //按键时间
+</span><span class='line'>
+</span><span class='line'>__u16 type; //类型，在下面有定义
+</span><span class='line'>
+</span><span class='line'>__u16 code; //要模拟成什么按键
+</span><span class='line'>
+</span><span class='line'>__s32 value;//是按下还是释放
+</span><span class='line'>
+</span><span class='line'>};</span></code></pre></td></tr></table></div></figure>
+
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/powershell-huo-qu-xu-ni-ji-zhuang-tai/">POWERSHELL 获取虚拟机状态</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T15:33:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$allvms = @()
+</span><span class='line'>$vms = Get-Vm
+</span><span class='line'>foreach($vm in $vms){
+</span><span class='line'>  $vmstat = "" | Select VmName, GuestName, NumCPU, ProvisionedSpaceGB, UsedSpaceGB, VmHost, MemMax, MemAvg, CPUMax, CPUAvg, DiskMax, DiskAvg 
+</span><span class='line'>  $vmstat.VmName = $vm.name
+</span><span class='line'>  $vmstat.GuestName = $vm.Guest.HostName 
+</span><span class='line'>  $vmstat.NumCPU = $vm.NumCPU
+</span><span class='line'>  $vmstat.ProvisionedSpaceGB = $vm.ProvisionedSpaceGB
+</span><span class='line'>  $vmstat.UsedSpaceGB = $vm.UsedSpaceGB
+</span><span class='line'>  $vmstat.VmHost = $vm.VMHost
+</span><span class='line'>  
+</span><span class='line'>  $statcpu = Get-Stat -Entity ($vm) `
+</span><span class='line'>           -start (get-date).AddDays(-30) `
+</span><span class='line'>           -Finish (Get-Date) `
+</span><span class='line'>             -stat cpu.usagemhz.average
+</span><span class='line'>  $statmem = Get-Stat -Entity ($vm) `
+</span><span class='line'>           -Start (get-date).AddDays(-30) `
+</span><span class='line'>           -Finish (Get-Date) `
+</span><span class='line'>             -stat mem.consumed.average
+</span><span class='line'>  $statdisk = Get-Stat -Entity ($vm) `
+</span><span class='line'>           -Start (get-date).AddDays(-30) `
+</span><span class='line'>           -Finish (Get-Date) `
+</span><span class='line'>             -stat disk.usage.average
+</span><span class='line'>
+</span><span class='line'>  $cpu = $statcpu | Measure-Object -Property value -Average -Maximum
+</span><span class='line'>  $mem = $statmem | Measure-Object -Property value -Average -Maximum
+</span><span class='line'>  $disk = $statdisk | Measure-Object -Property value -Average -Maximum
+</span><span class='line'>  
+</span><span class='line'>  $vmstat.CPUMax = $cpu.Maximum
+</span><span class='line'>  $vmstat.CPUAvg = $cpu.Average
+</span><span class='line'>  $vmstat.MemMax = $mem.Maximum
+</span><span class='line'>  $vmstat.MemAvg = $mem.Average
+</span><span class='line'>  $vmstat.DiskMax = $disk.Maximum
+</span><span class='line'>  $vmstat.DiskAvg = $disk.Average
+</span><span class='line'>  
+</span><span class='line'>  $allvms += $vmstat
+</span><span class='line'>}
+</span><span class='line'>$allvms | Export-Csv "VMs.csv" -noTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/powercli-xu-ni-ji-jian-dan-zhuang-tai-bao-gao/">POWERCLI 虚拟机简单状态报告</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T15:17:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$vms = get-vm|where {$_.name -like "XG*"}
+</span><span class='line'>$metrics = "cpu.usagemhz.average","mem.usage.average","cpu.usagemhz.minimum","mem.usage.minimum","cpu.usagemhz.maximum","mem.usage.maximum"
+</span><span class='line'>$start = Get-Date -Hour 7 -Minute 0 -Second 0 -Day 7 -Month 8 -Year 2012
+</span><span class='line'>$finish = Get-Date -Hour 11 -Minute 0 -Second 0 -Day 9 -Month 8 -Year 2012
+</span><span class='line'>Get-Stat -Entity ($vms) -Stat $metrics -Start $start -Finish $finish |
+</span><span class='line'>Group-Object -Property EntityId,Timestamp | %{
+</span><span class='line'>  New-Object PSObject -Property @{
+</span><span class='line'>    VMName = $_.Group[0].Entity.Name
+</span><span class='line'>    Date = $_.Group[0].Timestamp.ToLongDateString()
+</span><span class='line'>    Time = $_.Group[0].Timestamp.ToLongTimeString()
+</span><span class='line'>    MemMax = $_.Group | where {$_.MetricId -eq "mem.usage.maximum"} | Select -ExpandProperty Value
+</span><span class='line'>    MemAvg = $_.Group | where {$_.MetricId -eq "mem.usage.average"} | Select -ExpandProperty Value
+</span><span class='line'>    MemMin = $_.Group | where {$_.MetricId -eq "mem.usage.minimum"} | Select -ExpandProperty Value
+</span><span class='line'>    CpuMax = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.maximum"} | Select -ExpandProperty Value
+</span><span class='line'>    CpuMin = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.minimum"} | Select -ExpandProperty Value
+</span><span class='line'>    CpuAvg = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.average"} | Select -ExpandProperty Value
+</span><span class='line'>    NetMax = $_.Group | where {$_.MetricId -eq "net.usage.maximum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
+</span><span class='line'>    NetMin = $_.Group | where {$_.MetricId -eq "net.usage.minimum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
+</span><span class='line'>    NetAvg = $_.Group | where {$_.MetricId -eq "net.usage.average" -and $_.Instance -eq ""} | Select -ExpandProperty Value
+</span><span class='line'>  }
+</span><span class='line'>  } |Export-Csv D:\vmreport.csv -NoTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -476,314 +1073,6 @@
 </span><span class='line'>echo "zhuhuijun = rw" &gt;&gt;/etc/subversion/dav_svn.authz
 </span><span class='line'>echo "* =" &gt;&gt;/etc/subversion/dav_svn.authz
 </span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/%5B%28proxmox%29%5D-zhong-fu-shan-chu-zhi-hou-%2Cke-long-jiao-ben/">【proxmox】重复删除之后，克隆脚本</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:25:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>由于重复删除ID号之后 ，会出现镜像文件夹重名的问题
-新脚本中加入判断条件，这里如果符合目录存在的条件，则输出信息并推出克隆，这边也可以自己定义操作脚本。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
-</span><span class='line'>image_dir="/var/lib/vz/images/"
-</span><span class='line'>conf_dir="/etc/pve/nodes/dtt/qemu-server/"
-</span><span class='line'>source_vm_id=$1
-</span><span class='line'>dest_vm_id=$2
-</span><span class='line'>vm_name=$3
-</span><span class='line'>dest_vm_file="/vm-$dest_vm_id-disk-1.qcow2"
-</span><span class='line'>source_vm_file="/vm-$source_vm_id-disk-1.qcow2"
-</span><span class='line'>random_mac_addr="2A:AB:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"
-</span><span class='line'>
-</span><span class='line'>tmp_conf="/tmp/"$dest_vm_id".txt"
-</span><span class='line'>cat $conf_dir$source_vm_id".conf" &gt; $tmp_conf
-</span><span class='line'>sed -i -e 's/'${source_vm_id}'/'${dest_vm_id}'/g' $tmp_conf
-</span><span class='line'>sed -i -e "s/e1000=\S\+,/e1000=$random_mac_addr,/" $tmp_conf
-</span><span class='line'>sed -i -e "s/name: \S\+/name: $vm_name/" $tmp_conf
-</span><span class='line'>cat $tmp_conf &gt; $conf_dir$dest_vm_id".conf"
-</span><span class='line'>
-</span><span class='line'>if [ ! -d "$image_dir$dest_vm_id" ];then
-</span><span class='line'>cp -r $image_dir$source_vm_id $image_dir$dest_vm_id
-</span><span class='line'>mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file
-</span><span class='line'>else
-</span><span class='line'>echo "The directory already exists:"$image_dir$dest_vm_id
-</span><span class='line'>fi</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-%2Cjin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-%3F/">如何防恶意解析，禁止用IP访问网站的Apache设置？</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:19:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
-
-<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
-
-<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
-
-<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/">用Nginx负载均衡Openstack对象存储swift</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:15:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置</p>
-
-<p>1、下载Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cd</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">wget</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.2.6.tar.gz</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2、创建用户</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">useradd</span> <span class="o">-</span><span class="nx">c</span> <span class="s2">&quot;Nginx User&quot;</span> <span class="o">-</span><span class="nx">s</span> <span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">nologin</span> <span class="o">-</span><span class="nx">r</span> <span class="o">-</span><span class="nx">d</span> <span class="o">/</span><span class="kd">var</span><span class="err">/lib/nginx nginx </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3、安装Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="p">.</span><span class="nx">tar</span><span class="p">.</span><span class="nx">gz</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">cd</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/">python用cx_Oracle模块连接数据库</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T13:45:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ImportError</span><span class="o">:</span> <span class="nx">libclntsh</span><span class="p">.</span><span class="nx">so</span><span class="p">.</span><span class="mf">11.1</span><span class="o">:</span> <span class="nx">cannot</span> <span class="nx">open</span> <span class="nx">shared</span> <span class="nx">object</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">such</span> <span class="nx">file</span> <span class="nx">or</span> <span class="nx">directory</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么需要在LD_LIBRARY_PATH中指定那些库的所在，典型是在下面</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nx">$ORACLE_HOME</span><span class="o">/</span><span class="nx">lib</span><span class="o">:</span><span class="err">/usr/lib:/usr/local/lib</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cx_Oracle</span><span class="p">.</span><span class="nx">InterfaceError</span><span class="o">:</span> <span class="nx">Unable</span> <span class="nx">to</span> <span class="nx">acquire</span> <span class="nx">Oracle</span> <span class="nx">environment</span> <span class="nx">handle</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下载\instantclient_10_2</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T08:35:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
-
-<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
-
-<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
-
-<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
-PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
-
-<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
 
 
   

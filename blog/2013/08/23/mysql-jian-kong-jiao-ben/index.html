@@ -1,0 +1,229 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>MySql 监控脚本 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+#!/bin/bash #created by oldboy QQ 49000448 # &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">MySql 监控脚本</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:39:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash  
+</span><span class='line'>#created by oldboy QQ 49000448  
+</span><span class='line'>#date:20100918  
+</span><span class='line'>MYUSER=root  
+</span><span class='line'>MYPASS="oldboy" 
+</span><span class='line'>MYSOCK=/data/3306/mysql.sock  
+</span><span class='line'>MySQL_STARTUP="/data/3306/mysql" 
+</span><span class='line'>LOG_PATH=/tmp  
+</span><span class='line'>LOG_FILE=${LOG_PATH}/mysqllogs_`date +%F`.log  
+</span><span class='line'>MYSQL_PATH=/usr/local/mysql/bin  
+</span><span class='line'>MYSQL_CMD="$MYSQL_PATH/mysql -u$MYUSER -p$MYPASS -S $MYSOCK" 
+</span><span class='line'>#→全变量定义方式，显得更专业。  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -eq 0 ]   
+</span><span class='line'>then 
+</span><span class='line'>echo "MySQL is running! "   
+</span><span class='line'>exit 0  
+</span><span class='line'>else 
+</span><span class='line'>$MySQL_STARTUP start &gt;$LOG_FILE#→日志也是变量。  
+</span><span class='line'>sleep 5;  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -ne 0 ]  
+</span><span class='line'>then   
+</span><span class='line'>for num in `seq 10`#→通过for循环来杀死mysqld，真正杀死则退出循环或每隔个两秒杀一次，一共杀10次。  
+</span><span class='line'>do  
+</span><span class='line'>killall mysqld&gt;/dev/null 2&gt;&1   
+</span><span class='line'>[ $? -ne 0 ] && break;  
+</span><span class='line'>sleep 2  
+</span><span class='line'>done  
+</span><span class='line'>$MySQL_STARTUP start &gt;&gt;$LOG_FILE   
+</span><span class='line'>fi  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1 && Status="restarted" || Status="unknown"#→这个逻辑更准确。  
+</span><span class='line'>echo "MySQL status is $Status" &gt;&gt;$LOG_FILE  
+</span><span class='line'>mail -s "MySQL status is $Status" 31333741@qq.com &lt; $LOG_FILE  
+</span><span class='line'>#→把上面的Status作为结果标题传给邮件，当然你可以做短信，语音通话报警。  
+</span><span class='line'>fi  
+</span><span class='line'>exit </span></code></pre></td></tr></table></div></figure>
+
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

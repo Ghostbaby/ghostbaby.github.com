@@ -117,8 +117,32 @@
         <lastmod>2013-08-21T10:23:01+08:00</lastmod>
     </url>
     <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/23/mysql-jian-kong-jiao-ben/</loc>
+        <lastmod>2013-08-23T16:40:00+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/23/vm-viwu-fa-qi-dong/</loc>
+        <lastmod>2013-08-23T16:40:54+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang/
+        </loc>
+        <lastmod>2013-08-23T16:42:04+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-%28ppthe-visioban-%29/
+        </loc>
+        <lastmod>2013-08-23T16:45:08+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/23/nginx-plus-keepalive-webji-qun/</loc>
+        <lastmod>2013-08-23T16:53:34+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-21T10:23:01+08:00</lastmod>
+        <lastmod>2013-08-23T16:53:34+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -126,6 +150,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-21T10:23:01+08:00</lastmod>
+        <lastmod>2013-08-23T16:53:34+08:00</lastmod>
     </url>
 </urlset>
