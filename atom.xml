@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-23T16:53:54+08:00</updated>
+  <updated>2013-08-23T16:55:31+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -40,6 +40,9 @@
 </span><span class='line'>cd nginx-0.7.51/  
 </span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
 </span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
+
+
+<!--more-->
 
 
 <p>编辑vim /usr/local/webserver/nginx/conf/nginx.conf</p>
