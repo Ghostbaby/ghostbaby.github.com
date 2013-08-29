@@ -1,0 +1,160 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>pxe安装Centos 6 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="服务器端：win2003 (win7也可以)，iis（ftp也可以），软件tftpd32，syslinux。
+过程如下：
+1、在D：盘新建以下目录 D:linux-inst
+D:linux-inst\pxelinux.cfg\
+2、将CentOS-6.0-x86_64-bin-DVD1. &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">pxe安装Centos 6</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:24:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>服务器端：win2003 (win7也可以)，iis（ftp也可以），软件tftpd32，syslinux。
+过程如下：
+1、在D：盘新建以下目录</p>
+
+<p>D:linux-inst
+D:linux-inst\pxelinux.cfg\
+2、将CentOS-6.0-x86_64-bin-DVD1.iso挂载到虚拟光驱。
+3、打开镜像，把以下文件复制到D:linux-inst\文件夹中。
+H:\images\pxeboot\initr.img
+H:\images\pxeboot\vmlinux
+H:\ isolinux\boot.msg
+4、将ISO中的以下文件
+H:\isolinux\isolinux.cfg
+复制到 D:\linux-inst\pxelinux.cfg\目录中，然后将该文件重命名为“default” 注：default没有后缀名哦。</p>
+
+<p>5、将syslinux-4.04.zip解压，把以下文件拷贝到D:\linux-inst\。
+D:\syslinux-4.04\core\pxelinux.0
+6、安装dhcp服务器，使用tfpd32，下载zip版本的，直接解压打开设置如下。
+   a、设置文件存放目录。</p>
+
+<p>b、设置DHCP，第一项ip池起始地址，这里设为192.168.1.100，第二项ip池个数这里设为5个。BootFile 为pxelinux.0 （必须的）,下一项为服务器地址即本机IP：192.168.1.5 Mask 为255.255.255.0，其余为默认即可。点击OK后，关闭重启。</p>
+
+<p>下面，可以有两种方式:</p>
+
+<pre><code>        1.本地架设HTTP，FTP都可以讲本地镜像加载到虚拟光驱之后，挂载到服务上。
+        2.直接加载网络镜像里面的系统问题，推荐一个中国区的http://mirrors.163.com/centos/6/os/x86_64/
+</code></pre>
+
+<p>8、设置客户机从PXE启动，如果成功会获取到IP地址并进入boot：。（可能会提示错误，忽略）
+9、在boot里面输入linux（为图形安装），输入：linux text （文本模式）。</p>
+
+<p>10、开始进入安装，选择安装媒介的时候选择http，地址栏输入：<a href="ftp://192.168.1.5">ftp://192.168.1.5</a> 如果成功即可开始安装。
+备注：
+安装过程遇到的问题：
+1、如获取不到文件，请尝试关闭防火墙。
+2、客服端启动的时候，看到通过DHCP获取到了IP地址，但提示找不到文件。打开Tftpd32中的日志功能，日志显示pxelinux.0有问题。于是重新替换了下，正常了。
+3、安装到分区的时候，可能会提示文件repodata/无法找到。 原因是ISO里面的文件名可能和网上发布的repodata/不太一样（没搞懂）。需到mirrors里面去下载repodata/ 目录下的所有文件并替换掉ISO里面repodata/目录。方可成功。</p>
+
+<p>如果网络情况允许的话，建议用163镜像里面的安装</p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

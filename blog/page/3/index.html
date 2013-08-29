@@ -7,31 +7,8 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="由于重复删除ID号之后 ，会出现镜像文件夹重名的问题
-新脚本中加入判断条件，这里如果符合目录存在的条件，则输出信息并推出克隆，这边也可以自己定义操作脚本。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-#!/bin/sh &hellip;">
+	<meta name="description" content=" 1
+http://pan.baidu.com/share/link?shareid=2316439492&uk=3224714883 ">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -56,7 +33,7 @@
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/%5B%28proxmox%29%5D-zhong-fu-shan-chu-zhi-hou-%2Cke-long-jiao-ben/">【proxmox】重复删除之后，克隆脚本</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-%28ppthe-visioban-%29/">VMware Visio精品图标库（PPT和Visio版）</a></h1>
   
   
 
@@ -68,18 +45,308 @@
 
 
 	
-		<time datetime="2013-08-19T14:25:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-23T16:43:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>由于重复删除ID号之后 ，会出现镜像文件夹重名的问题
-新脚本中加入判断条件，这里如果符合目录存在的条件，则输出信息并推出克隆，这边也可以自己定义操作脚本。</p>
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=2316439492&uk=3224714883</span></code></pre></td></tr></table></div></figure>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang/">Linux下利用nc命令来监控检测服务器的端口使用情况</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:41:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>最近碰到一个项目，前端用apache htttpd进行发布（80端口），通过双机负载均衡转发到后端的两个tomcat进行处理（8081和8082端口），现在需要随时监控这三个端口的情况，一旦down掉需要能够立即告警处理。批量的系统监控比较好的是用nagios软件来实现，这样小项目专门装一个nagios软件，有点繁琐了。在网上查了一些资料，总结实验了一下，可以用简单的nc命令来实现。</p>
+
+<p>一、nc命令检测端口的用法</p>
+
+<h1>nc  -v  -w 10 %IP%   -z  %PORT%</h1>
+
+<p>-v  显示指令执行过程。
+-w  &lt;超时秒数>   设置等待连线的时间。
+-u  表示使用UDP协议
+-z  使用0输入/输出模式，只在扫描通信端口时使用。</p>
+
+<p>例1：扫描指定的8080端口</p>
+
+<h1>nc -v -w 10 -z 192.168.0.100 8080</h1>
+
+<p>Connection to 192.168.0.100 8080 port [tcp/http] succeeded!</p>
+
+<p>例2：扫描20到25的端口范围，并详细输出。</p>
+
+<h1>nc -v -w 2 -z 192.168.0.100 20-25</h1>
+
+<p>nc: connect to 192.168.0.100 port 20 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 21 (tcp) failed: Connection refused
+Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+nc: connect to 192.168.0.100 port 23 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100  port 24 (tcp) failed: Connection refused
+nc: connect to 192.168.0.100 port 25 (tcp) failed: Connection refused</p>
+
+<p>例3：扫描1到65535的端口范围，只输出打开的端口（去掉-v参数即可）</p>
+
+<h1>nc -w 1 -z 192.168.0.100 1-65535</h1>
+
+<p>Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
+Connection to 192.168.0.100 80 port [tcp/http] succeeded!
+Connection to 192.168.0.100 2121 port [tcp/scientia-ssdb] succeeded!
+Connection to 192.168.0.100 4004 port [tcp/pxc-roid] succeeded!
+Connection to 192.168.0.100 8081 port [tcp/tproxy] succeeded!
+Connection to 192.168.0.100 11211 port [tcp/*] succeeded!</p>
+
+<p>二、批量检测服务器指定端口开放情况：</p>
+
+<p>1、假如我们要监控一堆指定的IP和端口，可新建一个文件（第1列服务器IP，第2列要监控的端口）。</p>
+
+<h1>vim /scripts/ip-ports.txt</h1>
+
+<p>192.168.0.100 80<br/>
+192.168.0.100 8081<br/>
+192.168.0.101 8082<br/>
+192.168.1.100 21</p>
+
+<p>2、我们可以写这样一个脚本来批量检测端口是否开放：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值显示ok，失败会返回1值显示fail</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok  
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+</code></pre>
+
+<p>  fi <br/>
+done</p>
+
+<p>3、执行脚本查看运行结果如下：</p>
+
+<h1>chmod a+x  /scripts/ncports.sh</h1>
+
+<h1>/scripts/ncports.sh</h1>
+
+<p>192.168.0.100 80：ok
+192.168.0.100 8081：ok
+192.168.0.101 8082：ok
+192.168.1.100 21：fail</p>
+
+<p>三、端口不通时设置告警：</p>
+
+<p>1、 邮件告警：</p>
+
+<p>(1) 先安装linux下面的邮件发送程序mutt（参见我另一篇文章《Linux下面如何用mutt命令发送邮件》</p>
+
+<p>(2) 修改上面的ncports.sh检测脚本，在显示失败fail的时候增加一行：</p>
+
+<pre><code>   ……………………
+  echo $line :fail
+  echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通" test@139.com
+  ……………………
+</code></pre>
+
+<p>(3) 如果上面的接收邮箱设置为移动139邮箱，并开启接收邮件短信告知，即可实现“短信告警”的功能。</p>
+
+<p>2、 windows消息弹窗告警：
+(1) 先打开接收消息弹窗windows客户机的“Messenger”服务，设置为“启动”
+(2) 利用smbclient命令来发送消息，net脚本文件如下：</p>
+
+<h1>vim /scripts/net.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>/scripts/net.sh</h1>
+
+<p>case &ldquo;$1&rdquo; in<br/>
+send)<br/>
+echo &ldquo;$3&rdquo;|smbclient -I &ldquo;$2&rdquo; -M <code>nmblookup -A "$2"|sed -e '1d' -e '3,/*/d'|cut -f2|cut -d' ' -f1</code><br/>
+;;<br/>
+*)<br/>
+echo &ldquo;Usage:net send &lt;IPaddr.> <message>&#8220;<br/>
+exit 1<br/>
+esac</p>
+
+<h1>chmod a+x /scripts/net.sh</h1>
+
+<p>(3) 发送消息弹窗命令测试：（发送给192.168.1.83这台win xp机子，发送内容不支持中文）</p>
+
+<h1>/scripts/net.sh  send  192.168.1.83     &ldquo;hello,nihao&rdquo;</h1>
+
+<p>3、端口不通时发送邮件并消息弹窗告警的脚本如下：</p>
+
+<h1>vim /scripts/ncports.sh</h1>
+
+<h1>!/bin/bash</h1>
+
+<h1>检测服务器端口是否开放，成功会返回0值，打不开会返回1值</h1>
+
+<p>cat /scripts/ip-ports.txt | while read line<br/>
+do<br/>
+  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
+  if [ $? -eq 0 ]<br/>
+  then</p>
+
+<pre><code>echo $line:ok   
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>echo $line:fail  
+echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通"  test@139.com  
+/scripts/net send 192.168.1.83 "The $line fail"    
+</code></pre>
+
+<p>  fi <br/>
+done
+4、加入任务计划每2分钟执行一次</p>
+
+<h1>crontab -e</h1>
+
+<p>*/2 * * * *  /scripts/ncports.sh  > /dev/null 2>&amp;1</p>
+
+<h1>service crond restart</h1>
+
+<p>netcat 官网<a href="http://netcat.sourceforge.net/download.php">http://netcat.sourceforge.net/download.php</a></p>
+
+<p>软件可以从上面下载~</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/vm-viwu-fa-qi-dong/">[Vm]vi无法启动</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:40:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。</p>
+
+<p>登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误：</p>
+
+<p>Could not allocate space for object &lsquo;dbo.VPX_HOST_VM_CONFIG_OPTION&rsquo;.&lsquo;PK_VPX_HOST_VM_CONFIG_OPTION&rsquo; in database &lsquo;VIM_VCDB&rsquo; because the &lsquo;PRIMARY&rsquo; filegroup is full. Create disk space by deleting unneeded files, dropping objects in the filegroup, adding additional files to the filegroup, or setting autogrowth on for existing files in the filegroup.</p>
+
+<p>大致意思就是说filegroup满了。解决方法如下：</p>
+
+<p>1：下载安装sql server management studio express，连接到vc:  LINKZKSVCSRV\SQLEXP_VIM.</p>
+
+<p>2：在task中有个shrink，进行压缩</p>
+
+<p>3：然后在SQLEXP_VIM> Programmability > Stored Procedures > Right-Click dbo.cleanup_events_tasks_proc and click execute，自动执行清除日志动作。</p>
+
+<p>然后就ok了。其实建议大家在装vi的时候使用sql server不要使用express，有4G限制，另外在vSphere Client, click Administration > vCenter Server Settings > Database Retention Policy.设置相关日志保留周期，这样防止数据库一直增加。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/23/mysql-jian-kong-jiao-ben/">MySql 监控脚本</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-23T16:39:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -102,29 +369,57 @@
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
-</span><span class='line'>image_dir="/var/lib/vz/images/"
-</span><span class='line'>conf_dir="/etc/pve/nodes/dtt/qemu-server/"
-</span><span class='line'>source_vm_id=$1
-</span><span class='line'>dest_vm_id=$2
-</span><span class='line'>vm_name=$3
-</span><span class='line'>dest_vm_file="/vm-$dest_vm_id-disk-1.qcow2"
-</span><span class='line'>source_vm_file="/vm-$source_vm_id-disk-1.qcow2"
-</span><span class='line'>random_mac_addr="2A:AB:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum |sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"
-</span><span class='line'>
-</span><span class='line'>tmp_conf="/tmp/"$dest_vm_id".txt"
-</span><span class='line'>cat $conf_dir$source_vm_id".conf" &gt; $tmp_conf
-</span><span class='line'>sed -i -e 's/'${source_vm_id}'/'${dest_vm_id}'/g' $tmp_conf
-</span><span class='line'>sed -i -e "s/e1000=\S\+,/e1000=$random_mac_addr,/" $tmp_conf
-</span><span class='line'>sed -i -e "s/name: \S\+/name: $vm_name/" $tmp_conf
-</span><span class='line'>cat $tmp_conf &gt; $conf_dir$dest_vm_id".conf"
-</span><span class='line'>
-</span><span class='line'>if [ ! -d "$image_dir$dest_vm_id" ];then
-</span><span class='line'>cp -r $image_dir$source_vm_id $image_dir$dest_vm_id
-</span><span class='line'>mv $image_dir$dest_vm_id$source_vm_file $image_dir$dest_vm_id$dest_vm_file
-</span><span class='line'>else
-</span><span class='line'>echo "The directory already exists:"$image_dir$dest_vm_id
-</span><span class='line'>fi</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash  
+</span><span class='line'>#created by oldboy QQ 49000448  
+</span><span class='line'>#date:20100918  
+</span><span class='line'>MYUSER=root  
+</span><span class='line'>MYPASS="oldboy" 
+</span><span class='line'>MYSOCK=/data/3306/mysql.sock  
+</span><span class='line'>MySQL_STARTUP="/data/3306/mysql" 
+</span><span class='line'>LOG_PATH=/tmp  
+</span><span class='line'>LOG_FILE=${LOG_PATH}/mysqllogs_`date +%F`.log  
+</span><span class='line'>MYSQL_PATH=/usr/local/mysql/bin  
+</span><span class='line'>MYSQL_CMD="$MYSQL_PATH/mysql -u$MYUSER -p$MYPASS -S $MYSOCK" 
+</span><span class='line'>#→全变量定义方式，显得更专业。  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -eq 0 ]   
+</span><span class='line'>then 
+</span><span class='line'>echo "MySQL is running! "   
+</span><span class='line'>exit 0  
+</span><span class='line'>else 
+</span><span class='line'>$MySQL_STARTUP start &gt;$LOG_FILE#→日志也是变量。  
+</span><span class='line'>sleep 5;  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
+</span><span class='line'>if [ $? -ne 0 ]  
+</span><span class='line'>then   
+</span><span class='line'>for num in `seq 10`#→通过for循环来杀死mysqld，真正杀死则退出循环或每隔个两秒杀一次，一共杀10次。  
+</span><span class='line'>do  
+</span><span class='line'>killall mysqld&gt;/dev/null 2&gt;&1   
+</span><span class='line'>[ $? -ne 0 ] && break;  
+</span><span class='line'>sleep 2  
+</span><span class='line'>done  
+</span><span class='line'>$MySQL_STARTUP start &gt;&gt;$LOG_FILE   
+</span><span class='line'>fi  
+</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1 && Status="restarted" || Status="unknown"#→这个逻辑更准确。  
+</span><span class='line'>echo "MySQL status is $Status" &gt;&gt;$LOG_FILE  
+</span><span class='line'>mail -s "MySQL status is $Status" 31333741@qq.com &lt; $LOG_FILE  
+</span><span class='line'>#→把上面的Status作为结果标题传给邮件，当然你可以做短信，语音通话报警。  
+</span><span class='line'>fi  
+</span><span class='line'>exit </span></code></pre></td></tr></table></div></figure>
 
 
   
@@ -143,7 +438,7 @@
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-%2Cjin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-%3F/">如何防恶意解析，禁止用IP访问网站的Apache设置？</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/21/javaxu-ni-ji-de-tong-ji-jian-ce-gong-ju-jstat/">Java虚拟机的统计监测工具:jstat</a></h1>
   
   
 
@@ -155,90 +450,206 @@
 
 
 	
-		<time datetime="2013-08-19T14:19:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-21T10:05:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
+    <p>jstat:是JDK自带的虚拟机统计监测工具
+在命令行中执行jstat</p>
 
-<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
-
-<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
-
-<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/">用Nginx负载均衡Openstack对象存储swift</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:15:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置</p>
-
-<p>1、下载Nginx</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cd</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Usage: jstat -help|-options
+</span><span class='line'>       jstat -&lt;option&gt; [-t] [-h&lt;lines&gt;] &lt;vmid&gt; [&lt;interval&gt; [&lt;count&gt;]]
 </span><span class='line'>
-</span><span class='line'><span class="nx">wget</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.2.6.tar.gz</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>Definitions:
+</span><span class='line'>  &lt;option&gt;      An option reported by the -options option
+</span><span class='line'>  &lt;vmid&gt;        Virtual Machine Identifier. A vmid takes the following form:
+</span><span class='line'>                     &lt;lvmid&gt;[@&lt;hostname&gt;[:&lt;port&gt;]]
+</span><span class='line'>                Where &lt;lvmid&gt; is the local vm identifier for the target
+</span><span class='line'>                Java virtual machine, typically a process id; &lt;hostname&gt; is
+</span><span class='line'>                the name of the host running the target Java virtual machine;
+</span><span class='line'>                and &lt;port&gt; is the port number for the rmiregistry on the
+</span><span class='line'>                target host. See the jvmstat documentation for a more complete
+</span><span class='line'>                description of the Virtual Machine Identifier.
+</span><span class='line'>  &lt;lines&gt;       Number of samples between header lines.
+</span><span class='line'>  &lt;interval&gt;    Sampling interval. The following forms are allowed:
+</span><span class='line'>                    &lt;n&gt;["ms"|"s"]
+</span><span class='line'>                Where &lt;n&gt; is an integer and the suffix specifies the units as
+</span><span class='line'>                milliseconds("ms") or seconds("s"). The default units are "ms".
+</span><span class='line'>  &lt;count&gt;       Number of samples to take before terminating.
+</span><span class='line'>  -J&lt;flag&gt;      Pass &lt;flag&gt; directly to the runtime system.</span></code></pre></td></tr></table></div></figure>
 
 
-<p>2、创建用户</p>
+<p>通过不的option可以查看JVM当前的各种信息,比如:类, 内存等
+参数主要有:</p>
 
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">useradd</span> <span class="o">-</span><span class="nx">c</span> <span class="s2">&quot;Nginx User&quot;</span> <span class="o">-</span><span class="nx">s</span> <span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">nologin</span> <span class="o">-</span><span class="nx">r</span> <span class="o">-</span><span class="nx">d</span> <span class="o">/</span><span class="kd">var</span><span class="err">/lib/nginx nginx </span>
-</span></code></pre></td></tr></table></div></figure>
+<p>class: 类装载器统计
+compiler: HotSpot JVM实时编译统计
+gc: 垃圾回收堆统计
+gccapacity: 内存统计
+gccause: 垃圾回收统计信息，包括回收事件
+gcnew: 对象创建情况
+gcnewcapacity: 对象创建内存情况
+gcold: 老年代和永久代统计
+gcoldcapacity: 老年代统计
+gcpermcapacity: 永久代统计
+gcutil: 垃圾收集的统计
+printcompilation: HotSpot编译器的方法统计</p>
+
+<p>执行: jstat -class 2000 结果如下
+加载类的个数  加载类的大小  卸载类的个数  卸载类的大小  加载和卸载所占用的时间
+Loaded      Bytes       Unloaded    Bytes       Time
+23624       29798.8     1346        1225.8      218.34</p>
+
+<p>执行: jstat -compiler 2000 结果如下</p>
+
+<p>编译的个数     编译失败的个数       无效的编译个数       编译所用时间  最后一次编译失败的类型       最后一次编译失败的方法
+Compiled    Failed          Invalid         Time        FailedType          FailedMethod
+1629        1           0           0.86        1               org/springframework/asm/ClassReader accept</p>
+
+<p>执行: jstat -gc 2000 结果如下</p>
+
+<p>Survivor 0的大小(KB) Survivor 1的大小(KB) Survivor 0使用大小 Survivor 1使用大小 Eden大小 Eden使用大小 Old大小 Old使用大小 Permanent大小 Permanent使用大小 Young generation GC次数 Young generation GC时间 Full GC次数 Full GC时间 所有GC时间
+S0C S1C S0U S1U EC EU OC OU PC PU YGC YGCT FGC FGCT GCT
+14016.0 14016.0 2932.5 0.0 112192.0 96465.9 280212.0 227679.0 116480.0 116338.6 418 37.823 34 59.928 97.751</p>
+
+<p>执行: jstat -gccapacity 2000 结果如下</p>
+
+<p>新生代最小 新生代最大 当前新生代(NGC=S0C+S1C+EC) Survivor 0大小 Survivor 1大小 Eden大小 老年代最小 老年代最大 老年代当前大小 老年代当前容量 永久代最小 永久代最大 当前永久代大小 永久代容量 Young GC次数 Full GC次数
+NGCMN NGCMX NGC S0C S1C EC OGCMN OGCMX OGC OC PGCMN PGCMX PGC PC YGC FGC
+13632.0 174720.0 140224.0 14016.0 14016.0 112192.0 27328.0 349568.0 280212.0 280212.0 12288.0 262144.0 116480.0 116480.0 419 34</p>
+
+<p>执行: jstat -gccause 2000 结果如下</p>
+
+<p>Survivor 0使用率 Survivor 1使用率 Eden使用率 Old使用率 Permanent使用率 YoungGC次数 YoungGC时间 FullGC次数 FullGC时间 GC总时间 上一次GC原因 当前GC原因
+S0 S1 E O P YGC YGCT FGC FGCT GCT LGCC GCC
+0.00 21.85 20.68 81.25 99.88 419 37.836 34 59.928 97.764 unknown GCCause No GC</p>
+
+<p>执行: jstat -printcompilation 2000 结果如下</p>
+
+<p>编译次数 方法的字节码的字节数 编译类型 编译方法
+Compiled Size Type Method
+13575 17 1 org/eclipse/swt/widgets/Caret hasFocus</p>
+
+  
+  
+  <footer class="meta">
+    
 
 
-<p>3、安装Nginx</p>
 
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/jvm-sheng-cheng-javacorehe-heapdumpwen-jian/">Jvm 生成javacore和heapdump文件</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T10:03:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>（1）如果使用Oracle JVM也就是标准的SUN JVM（SUN已被oracle收购）
+当内存溢出时生成heapdump文件配置如下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="p">.</span><span class="nx">tar</span><span class="p">.</span><span class="nx">gz</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">cd</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span>
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-Xloggc:${目录}/temp_gc.log           （GC日志文件）
+</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
+</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
 
 
+<p>如果要即时动态生成heapdump文件可以使用jmap命令，jdk6.0已取消了-XX:+HeapDumpOnCtrlBreak配置参数通过ctrl+break的方式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（2）HP JVM</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-Xverbosegc:file=${目录}/temp_gc.log  （GC日志文件）
+</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
+</span><span class='line'>-XX:+HeapDumpOnCtrlBreak              （可以通过ctrl+break组合键动态生成heapdump文件）
+</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（3）IBM JVM</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>非windows操作系统环境中
+</span><span class='line'>-XverboseGClog: ${目录}/temp_gc.log   （GC日志文件）
+</span><span class='line'>-Xdump:heap:events=user,file=${目录}/pid%uid%pid.phd
+</span><span class='line'>表示可以根据需要通过kill -3 &lt;pid&gt;产生DUMP文件，%uid和%pid为变量</span></code></pre></td></tr></table></div></figure>
+
+
+<p>windows操作系统环境中</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>启动wsadmin,进入wsadmin环境
+</span><span class='line'>wsadmin&gt; set jvm [$AdminControl completeObjectName type=JVM,process=server1,*]
+</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm generateHeapDump
+</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm dumpThreads</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这句要特地说明，如果你的应用负载很高，堆栈已经要满了，千万不用。生成DUMP文件类似于目前堆栈的镜像，会占用很多资源。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>01.jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>temp_heapdump_1360_2.hprof  生成类似的文件，基本跟你目前堆栈使用大小持平。文件生成之后，就开始用 IBM HeapAnalyzer  进行分析。</p>
 
   
   
@@ -256,7 +667,7 @@
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/">python用cx_Oracle模块连接数据库</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/21/ibm-heapanalyzer/">IBM HeapAnalyzer</a></h1>
   
   
 
@@ -268,7 +679,127 @@
 
 
 	
-		<time datetime="2013-08-19T13:45:00+08:00">
+		<time datetime="2013-08-21T10:00:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=4106270763&uk=3224714883</span></code></pre></td></tr></table></div></figure>
+
+
+<p>HeapAnalyzer 是 IBM 的一个用来分析 Java 程序的内存堆使用情况的图形化工具。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/21/tong-guo-deng-lu-ipji-lu-linuxsuo-you-yong-hu-deng-lu-suo-cao-zuo-de-ri-zhi/">通过登陆IP记录Linux所有用户登录所操作的日志</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-21T09:58:00+08:00">
+			<span class="day">21</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>/etc/profile 在末尾添加如下代码</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>history
+</span><span class='line'>USER=`whoami`
+</span><span class='line'>USER_IP=`who -u am i 2&gt;/dev/null| awk '{print $NF}'|sed -e 's/[()]//g'`
+</span><span class='line'>if [ "$USER_IP" = "" ]; then
+</span><span class='line'>USER_IP=`hostname`
+</span><span class='line'>fi
+</span><span class='line'>if [ ! -d /tmp/history ]; then
+</span><span class='line'>mkdir /tmp/history
+</span><span class='line'>chmod 777 /tmp/history
+</span><span class='line'>fi
+</span><span class='line'>if [ ! -d /tmp/history/${LOGNAME} ]; then
+</span><span class='line'>mkdir /tmp/history/${LOGNAME}
+</span><span class='line'>chmod 300 /tmp/history/${LOGNAME}
+</span><span class='line'>fi
+</span><span class='line'>export HISTSIZE=4096
+</span><span class='line'>DT=`date +"%Y-%m-%d_%H:%M:%S"`
+</span><span class='line'>export HISTFILE="/tmp/history/${LOGNAME}/${USER}@${USER_IP}_history.$DT"
+</span><span class='line'>chmod 600 /tmp/history/${LOGNAME}/*history* 2&gt;/dev/null</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过上面的脚本代码可以看出来，在系统的/tmp下就新建了个history目录（这个目录可以自定义），在目录中记录了所有的登陆过系统的用户和IP地址，这也是监测系统安全的方法之一。在进行一系列的操作之后，我们进入/tmp/history目录查看历史记录。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/rpmdb-unable-to-join-the-environmentjie-jue-ban-fa/">Rpmdb: Unable to Join the Environment解决办法</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T16:47:00+08:00">
 			<span class="day">19</span><span class="month">Aug</span>
 		</time>
 	
@@ -276,28 +807,16 @@
 </header>
 <div class="entry-content">
   
-    <p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ImportError</span><span class="o">:</span> <span class="nx">libclntsh</span><span class="p">.</span><span class="nx">so</span><span class="p">.</span><span class="mf">11.1</span><span class="o">:</span> <span class="nx">cannot</span> <span class="nx">open</span> <span class="nx">shared</span> <span class="nx">object</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">such</span> <span class="nx">file</span> <span class="nx">or</span> <span class="nx">directory</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么需要在LD_LIBRARY_PATH中指定那些库的所在，典型是在下面</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nx">$ORACLE_HOME</span><span class="o">/</span><span class="nx">lib</span><span class="o">:</span><span class="err">/usr/lib:/usr/local/lib</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在的时候可能会报这些错误</p>
-
-<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cx_Oracle</span><span class="p">.</span><span class="nx">InterfaceError</span><span class="o">:</span> <span class="nx">Unable</span> <span class="nx">to</span> <span class="nx">acquire</span> <span class="nx">Oracle</span> <span class="nx">environment</span> <span class="nx">handle</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下载\instantclient_10_2</p>
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /var/lib/rpm/
+</span><span class='line'>mkdir db_bak
+</span><span class='line'>mv db.* db_bak(最后看到几个__db.00*文件，我也给移走了，果然见效）
+</span><span class='line'>rpm --rebuilddb     重建rpm数据库
+</span><span class='line'>yum clean all</span></code></pre></td></tr></table></div></figure>
 
 
   
@@ -316,7 +835,7 @@
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu/">Openstack安装rabbitmq-server消息队列时出现错误</a></h1>
   
   
 
@@ -328,7 +847,7 @@
 
 
 	
-		<time datetime="2013-08-19T08:35:00+08:00">
+		<time datetime="2013-08-19T16:06:00+08:00">
 			<span class="day">19</span><span class="month">Aug</span>
 		</time>
 	
@@ -336,73 +855,58 @@
 </header>
 <div class="entry-content">
   
-    <p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
-
-<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
-
-<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
-
-<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
-PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
-
-<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/">Puppet Svn 更新发布测试</a></h1>
-  
-  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
+</span><span class='line'>Processing triggers for man-db ...
+</span><span class='line'>Processing triggers for ureadahead ...
+</span><span class='line'>Setting up rabbitmq-server (2.5.0-1ubuntu2) ...
+</span><span class='line'>Starting rabbitmq-server: FAILED - check /var/log/rabbitmq/startup_{log, _err}
+</span><span class='line'>rabbitmq-server.
+</span><span class='line'>invoke-rc.d: inits_cript rabbitmq-server, action "start" failed.
+</span><span class='line'>dpkg: error processing rabbitmq-server (--configure):
+</span><span class='line'>subprocess installed post-installation s_cript returned error exit status 1
+</span><span class='line'>Errors were encountered while processing:
+</span><span class='line'>rabbitmq-server
+</span><span class='line'>E: Sub-process /usr/bin/dpkg returned an error code (1)</span></code></pre></td></tr></table></div></figure>
 
 
+<p>openstack安装rabbitmq-server消息队列时出现以下错误：</p>
+
+<p>因为安装完成后，在启动rabbitmq-server时会检测hostname和hosts记录的对应关系
+解决方法：
+查看hostname</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># hostname 
+</span><span class='line'>ubuntu6</span></code></pre></td></tr></table></div></figure>
 
 
+<p>配置hosts文件</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># cat /etc/hosts |grep ubuntu6
+</span><span class='line'>127.0.0.1 ubuntu6</span></code></pre></td></tr></table></div></figure>
 
 
+<p>重启服务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/init.d/rabbitmq-server start</span></code></pre></td></tr></table></div></figure>
 
 
-	
-		<time datetime="2013-08-16T14:52:00+08:00">
-			<span class="day">16</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>【导读】</p>
-
-<p>puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)，</p>
-
-<p>里面有很多模板，大家有兴趣可以仔细看下：<a href="http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0">http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0</a></p>
-
-<p>有介绍，毕竟有部分同学还不知道hooks是干吗用的，了解svn的钩子后，</p>
-
-<p>就会明白上面的需求只需要在commit代码的时候，执行post-commit这个钩子，就可以</p>
-
-<p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
-
-<p>[基础]</p>
-
-<p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
-
-<p>然还有puppet了，熟悉操作puppet也是不可少的。关于puppet 中文资料，可以参阅本站</p>
-
-<p>栏目。</p>
 
 
   
@@ -421,7 +925,7 @@ PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有�
 
 <nav id="pagenavi">
 	<a href="/blog/page/2/" class="prev alignleft">Prev</a>
-	
+	<a href="/blog/page/4/" class="next alignright">Next</a>
  <div class="clearfix"></div>
 </nav>
 </div>

@@ -1,0 +1,252 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SSH通道批量管理主机 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="这边用到了expect，先yum装下。 下面是一个类似自动输入的方法 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+#!/usr/bin/expect -f
+set user root
+set host [lindex $argv 0]
+set password &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">SSH通道批量管理主机</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:04:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>这边用到了expect，先yum装下。</p>
+
+<p>下面是一个类似自动输入的方法</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/usr/bin/expect -f
+</span><span class='line'>set user root
+</span><span class='line'>set host [lindex $argv 0]
+</span><span class='line'>set password "*******"
+</span><span class='line'>set timeout 5
+</span><span class='line'>spawn ssh-copy-id -i  /root/.ssh/id_rsa.pub $user@$host
+</span><span class='line'>expect {
+</span><span class='line'>
+</span><span class='line'>"Are you sure you want to continue connecting (yes/no)?" {send "yes\r";exp_continue}
+</span><span class='line'>"*assword:*" {send "$password\r"}
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>expect eof</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面就是发送批量指令方法</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash
+</span><span class='line'>
+</span><span class='line'># auto copy publick key to ssh server,but you must create the rsa public key first!
+</span><span class='line'>
+</span><span class='line'>#
+</span><span class='line'>
+</span><span class='line'># include a  expect expect script
+</span><span class='line'>
+</span><span class='line'># see the log file  /tmp/test.log
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>if
+</span><span class='line'> rpm -q expect
+</span><span class='line'>then
+</span><span class='line'> echo "good" &gt;/dev/null
+</span><span class='line'>else
+</span><span class='line'> ehco "you must install the expect package"
+</span><span class='line'>fi
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>for i in {11..29}
+</span><span class='line'>
+</span><span class='line'>do
+</span><span class='line'>
+</span><span class='line'>#if
+</span><span class='line'>
+</span><span class='line'>ping -c2 10.1.128.$i
+</span><span class='line'>
+</span><span class='line'>#then
+</span><span class='line'>
+</span><span class='line'>/tmp/abc.sh 10.1.128.$i
+</span><span class='line'>
+</span><span class='line'>echo "********10.1.128.$i**************"&gt;&gt;/tmp/test.log
+</span><span class='line'>
+</span><span class='line'>#ssh 10.1.128.$i "chkconfig --level 123456 NetworkManager off"
+</span><span class='line'>
+</span><span class='line'>ssh 10.1.128.$i " cp /etc/sysconfig/network-scripts/ifcfg-eth1 /etc/sysconfig/network-scripts/ifcfg-eth1.bak"
+</span><span class='line'>#else
+</span><span class='line'>
+</span><span class='line'>#echo "the server 10.1.128.$i is't exsit"&gt;&gt;/tmp/down.log</span></code></pre></td></tr></table></div></figure>
+
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

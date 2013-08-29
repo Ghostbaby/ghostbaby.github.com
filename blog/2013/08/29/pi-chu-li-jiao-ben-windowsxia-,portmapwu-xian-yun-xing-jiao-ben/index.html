@@ -1,0 +1,142 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>[批处理脚本]windows下，PortMap无限运行脚本 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="该脚本来源于一个肉鸡扫描守护脚本。黑客在获取administrators权限之后，通过恶意脚本篡改注册表，使任务管理器、用户管理器无法正常启动，无法切换console，无法修改系统密码；当合法管理员登陆，只能通过tasklist来打印进程，通过taskkill来杀掉进程； &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">[批处理脚本]windows下，PortMap无限运行脚本</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:32:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>该脚本来源于一个肉鸡扫描守护脚本。黑客在获取administrators权限之后，通过恶意脚本篡改注册表，使任务管理器、用户管理器无法正常启动，无法切换console，无法修改系统密码；当合法管理员登陆，只能通过tasklist来打印进程，通过taskkill来杀掉进程；这个脚本就是检测进程是否存在，如果被管理员杀掉之后，会自动启动。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@echo off
+</span><span class='line'>setlocal
+</span><span class='line'>cls
+</span><span class='line'>color f0
+</span><span class='line'>mode con: cols=20 lines=5
+</span><span class='line'>title 软件监听器
+</span><span class='line'>@echo off
+</span><span class='line'>:en
+</span><span class='line'>tasklist |find "PortMap.exe"||start PortMap.exe
+</span><span class='line'>ping -n 10 127.0.0.1&gt;nul
+</span><span class='line'>goto en</span></code></pre></td></tr></table></div></figure>
+
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Linux服务器安全初始化Shell脚本 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52 &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">Linux服务器安全初始化Shell脚本</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:34:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
+</span><span class='line'># desc: setup linux system security
+</span><span class='line'># author:coralzd
+</span><span class='line'># powered by www.freebsdsystem.org
+</span><span class='line'># version 0.1.2 written by 2011.05.03
+</span><span class='line'>
+</span><span class='line'>#设置账号
+</span><span class='line'>passwd -l xfs
+</span><span class='line'>passwd -l news
+</span><span class='line'>passwd -l nscd
+</span><span class='line'>passwd -l dbus
+</span><span class='line'>passwd -l vcsa
+</span><span class='line'>passwd -l games
+</span><span class='line'>passwd -l nobody
+</span><span class='line'>passwd -l avahi
+</span><span class='line'>passwd -l haldaemon
+</span><span class='line'>passwd -l gopher
+</span><span class='line'>passwd -l ftp
+</span><span class='line'>passwd -l mailnull
+</span><span class='line'>passwd -l pcap
+</span><span class='line'>passwd -l mail
+</span><span class='line'>passwd -l shutdown
+</span><span class='line'>passwd -l halt
+</span><span class='line'>passwd -l uucp
+</span><span class='line'>passwd -l operator
+</span><span class='line'>passwd -l sync
+</span><span class='line'>passwd -l adm
+</span><span class='line'>passwd -l lp
+</span><span class='line'>
+</span><span class='line'># 用chattr给用户路径更改属性。chattr命令用法参考文末说明[1]
+</span><span class='line'>chattr +i /etc/passwd
+</span><span class='line'>chattr +i /etc/shadow
+</span><span class='line'>chattr +i /etc/group
+</span><span class='line'>chattr +i /etc/gshadow
+</span><span class='line'>
+</span><span class='line'># 设置密码连续输错3次后锁定5分钟
+</span><span class='line'>sed -i 's#auth        required      pam_env.so#auth        required      pam_env.so\nauth       required       pam_tally.so  onerr=fail deny=3 unlock_time=300\nauth           required     /lib/security/$ISA/pam_tally.so onerr=fail deny=3 unlock_time=300#' /etc/pam.d/system-auth
+</span><span class='line'>
+</span><span class='line'># 5分钟后自动登出，原因参考文末说明[2]
+</span><span class='line'>echo "TMOUT=300" &gt;&gt;/etc/profile
+</span><span class='line'>
+</span><span class='line'># 历史命令记录数设定为10条
+</span><span class='line'>sed -i "s/HISTSIZE=1000/HISTSIZE=10/" /etc/profile
+</span><span class='line'>
+</span><span class='line'># 让以上针对 /etc/profile 的改动立即生效
+</span><span class='line'>source /etc/profile
+</span><span class='line'>
+</span><span class='line'># 在 /etc/sysctl.conf 中启用 syncookie
+</span><span class='line'>echo "net.ipv4.tcp_syncookies=1" &gt;&gt; /etc/sysctl.conf
+</span><span class='line'>sysctl -p # exec sysctl.conf enable
+</span><span class='line'>
+</span><span class='line'># 优化 sshd_config
+</span><span class='line'>sed -i "s/#MaxAuthTries 6/MaxAuthTries 6/" /etc/ssh/sshd_config
+</span><span class='line'>sed -i  "s/#UseDNS yes/UseDNS no/" /etc/ssh/sshd_config
+</span><span class='line'>
+</span><span class='line'># 限制重要命令的权限
+</span><span class='line'>chmod 700 /bin/ping
+</span><span class='line'>chmod 700 /usr/bin/finger
+</span><span class='line'>chmod 700 /usr/bin/who
+</span><span class='line'>chmod 700 /usr/bin/w
+</span><span class='line'>chmod 700 /usr/bin/locate
+</span><span class='line'>chmod 700 /usr/bin/whereis
+</span><span class='line'>chmod 700 /sbin/ifconfig
+</span><span class='line'>chmod 700 /usr/bin/pico
+</span><span class='line'>chmod 700 /bin/vi
+</span><span class='line'>chmod 700 /usr/bin/which
+</span><span class='line'>chmod 700 /usr/bin/gcc
+</span><span class='line'>chmod 700 /usr/bin/make
+</span><span class='line'>chmod 700 /bin/rpm
+</span><span class='line'>
+</span><span class='line'># 历史安全
+</span><span class='line'>chattr +a /root/.bash_history
+</span><span class='line'>chattr +i /root/.bash_history
+</span><span class='line'>
+</span><span class='line'># 给重要命令写 md5
+</span><span class='line'>cat &gt; list &lt;&lt; "EOF" &&
+</span><span class='line'>/bin/ping
+</span><span class='line'>/usr/bin/finger
+</span><span class='line'>/usr/bin/who
+</span><span class='line'>/usr/bin/w
+</span><span class='line'>/usr/bin/locate
+</span><span class='line'>/usr/bin/whereis
+</span><span class='line'>/sbin/ifconfig
+</span><span class='line'>/bin/vi
+</span><span class='line'>/usr/bin/vim
+</span><span class='line'>/usr/bin/which
+</span><span class='line'>/usr/bin/gcc
+</span><span class='line'>/usr/bin/make
+</span><span class='line'>/bin/rpm
+</span><span class='line'>EOF
+</span><span class='line'>
+</span><span class='line'>for i in `cat list`
+</span><span class='line'>do
+</span><span class='line'>   if [ ! -x $i ];then
+</span><span class='line'>   echo "$i not found,no md5sum!"
+</span><span class='line'>  else
+</span><span class='line'>   md5sum $i &gt;&gt; /var/log/`hostname`.log
+</span><span class='line'>  fi
+</span><span class='line'>done
+</span><span class='line'>rm -f list</span></code></pre></td></tr></table></div></figure>
+
+
+<!--more-->
+
+
+<p>知识点[1]：有关chattr命令</p>
+
+<pre><code>   chattr命令可以修改文件属性，达到保护文件和目录的作用。相比改变文件读写、执行权限的chmod命令，chattr命令可以控制更底层的文件属性。该命令十分强大，其中一些功能是由Linux内核版本来支持的，如果Linux内核版本低于2.2，那么许多功能不能实现。同样-D检查压缩文件中的错误的功能，需要2.5.19以上内核才能支持。另外，通过chattr命令修改属性能够提高系统的安全性，但是它并不适合所有的目录。chattr命令不能保护/、/dev、/tmp、/var目录。
+
+  此类属性的查看可以通过lsattr命令完成。
+
+  chattr命令的用法：chattr [ -RV ] [ -v version ] [ mode ] files...
+
+ 最关键的是在[mode]部分，，即文件属性部分。[mode]部分是由+-=和[ASacDdIijsTtu]这些字符组合的。
+
+ + ：在原有参数设定基础上，追加参数。
+
+ - ：在原有参数设定基础上，移除参数。
+
+ = ：更新为指定参数设定。
+
+ A：文件或目录的 atime (access time)不可被修改(modified), 可以有效预防例如手提电脑磁盘I/O错误的发生。
+
+ S：硬盘I/O同步选项，功能类似sync。
+
+ a：即append，设定该参数后，只能向文件中添加数据，而不能删除，多用于服务器日志文 件安全，只有root才能设定这个属性。
+
+ c：即compresse，设定文件是否经压缩后再存储。读取时需要经过自动解压操作。
+
+ d：即no dump，设定文件不能成为dump程序的备份目标。
+
+ i：设定文件不能被删除、改名、设定链接关系，同时不能写入或新增内容。i参数对于文件 系统的安全设置有很大帮助。
+
+ j：即journal，设定此参数使得当通过mount参数：data=ordered 或者 data=writeback 挂 载的文件系统，文件在写入时会先被记录(在journal中)。如果filesystem被设定参数为 data=journal，则该参数自动失效。
+
+ s：保密性地删除文件或目录，即硬盘空间被全部收回。
+
+ u：与s相反，当设定为u时，数据内容其实还存在磁盘中，可以用于undeletion.
+
+ 各参数选项中常用到的是a和i。a选项强制只可添加不可删除，多用于日志系统的安全设定。而i是更为严格的安全设定，只有superuser (root) 或具有CAP_LINUX_IMMUTABLE处理能力（标识）的进程能够施加该选项。
+
+ 应用实例：
+ 1、用chattr命令防止系统中某个关键文件被修改
+</code></pre>
+
+<h1>chattr +i /etc/fstab</h1>
+
+<p>复制代码</p>
+
+<pre><code> 然后试一下rm mv rename等命令操作于该文件，都是得到Operation not permitted 的结果
+
+ 2、让某个文件只能往里面追加内容，不能删除，一些日志文件适用于这种操作
+</code></pre>
+
+<h1>chattr +a /data1/user_act.log</h1>
+
+<p>复制代码</p>
+
+<pre><code> 知识点[2]：为何要设置5分钟后自动登出
+
+ 由于客户的维护人员常常登陆上去后通过直接关闭TERM端口非法退出telnet，造成系统的pts进程越来越多，一个月下来竟然近百，当进程过多的时候系统就会产生报警。规范操作应该是用exit或者ctrl+D，但是其他人并不这样操作，所以我们定义了echo "TMOUT=300" &gt;&gt;/etc/profile这一项内容，是让服务器自动剔除300秒没有任何动作的客户端。当然了这一项大家可以根据实际需求而决定是否添加；
+</code></pre>
+
+<p>脚本如果有任何bug或问题，可在51CTO上联系抚琴煮酒，或在<a href="http://www.freebsdsystem.org/%E4%B8%8A%E8%81%94%E7%B3%BB%E6%99%93%E8%BE%89%E3%80%82">http://www.freebsdsystem.org/%E4%B8%8A%E8%81%94%E7%B3%BB%E6%99%93%E8%BE%89%E3%80%82</a></p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

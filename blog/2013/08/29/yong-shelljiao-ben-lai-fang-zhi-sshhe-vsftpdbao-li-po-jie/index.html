@@ -1,0 +1,184 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>用SHELL脚本来防止SSH和vsftpd暴力破解 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+#! /bin/bash
+cat /var/log/secure|awk '/Failed/{print $(NF-3)}'|sort|uniq -c|awk '{print $2"="$1;}' &gt; / &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">用SHELL脚本来防止SSH和vsftpd暴力破解</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:36:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#! /bin/bash
+</span><span class='line'>cat /var/log/secure|awk '/Failed/{print $(NF-3)}'|sort|uniq -c|awk '{print $2"="$1;}' &gt; /root/black.txt
+</span><span class='line'>DEFINE="100"
+</span><span class='line'>for i in `cat /root/black.txt`
+</span><span class='line'>do
+</span><span class='line'>IP=`echo $i |awk -F= '{print $1}'`
+</span><span class='line'>NUM=`echo $i|awk -F= '{print $2}'`
+</span><span class='line'>if [ $NUM -gt $DEFINE ];
+</span><span class='line'>then
+</span><span class='line'>grep $IP /etc/hosts.deny &gt; /dev/null
+</span><span class='line'>if [ $? -gt 0 ];
+</span><span class='line'>then
+</span><span class='line'>echo "sshd:$IP" &gt;&gt; /etc/hosts.deny
+</span><span class='line'>echo "vsftpd:$IP" &gt;&gt; /etc/hosts.deny
+</span><span class='line'>fi
+</span><span class='line'>fi
+</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
+
+
+<p>脚本思路如下：</p>
+
+<pre><code> 由于/var/log/secure是以星期为轮询的，所以我们每次可以查看这个文件，利用SHELL脚本统计出其中访问失败比较频繁的IP，并定义一个阀值为100，如果大于100的话就将其放进/etc/hosts.deny文件，阻止其继续访问vsftpd和ssh;然后将其写进crontab计划列表里，每隔一段时间进行一次排查，如果下次排查的某IP次数又大于100，首先检查它在不在我们的黑名单，如果在的话就无视过去;如果不在，就继续添加进/etc/hosts.deny文件。
+</code></pre>
+
+<p>   我的/etc/crontab文件最后一行为</p>
+
+<ul>
+<li><p>*/1 * * * root sh /root/hosts_deny.sh</p>
+
+<p>   即每隔1小时就重复执行一次这个脚本，这里也有一个情况要说明下，/var/log/secure是每隔一个星期轮询一次的，所以我们这里可以根据服务器的具体情况来配置多少时间执行一次此脚本，暴力破解频繁的机器可适当缩小这个周期。</p></li>
+</ul>
+
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

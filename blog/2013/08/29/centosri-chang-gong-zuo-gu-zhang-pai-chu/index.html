@@ -1,0 +1,239 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>centos日常工作故障排除 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="2012年6月25日 下午接到保障，说新装的一台mysql服务器SSH连不上，去机房连上服务器看下，机器硬件没有问题正常工作，指示灯全部正常；登陆界面输入用户名密码之后，没有进入命令行模式，直接退回到登陆界面，这个是密码输入正确的情况下，密码输入错误回报警，说明登陆严重环节没有问题， &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">Centos日常工作故障排除</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:16:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>2012年6月25日</p>
+
+<pre><code>   下午接到保障，说新装的一台mysql服务器SSH连不上，去机房连上服务器看下，机器硬件没有问题正常工作，指示灯全部正常；登陆界面输入用户名密码之后，没有进入命令行模式，直接退回到登陆界面，这个是密码输入正确的情况下，密码输入错误回报警，说明登陆严重环节没有问题，应该是登陆控制的问题，把本地登陆给屏蔽了。查询相关资料之后，找到问题的原因，由于/etc/pam.d/login文件里面添加了控制库。
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@mysql ~]# more /etc/pam.d/login 
+</span><span class='line'>#%PAM-1.0
+</span><span class='line'>auth [user_unknown=ignore success=ok ignore=ignore default=bad] pam_securetty.so
+</span><span class='line'>auth       include      system-auth
+</span><span class='line'>account    required     pam_nologin.so
+</span><span class='line'>account    include      system-auth
+</span><span class='line'>password   include      system-auth
+</span><span class='line'># pam_selinux.so close should be the first session rule
+</span><span class='line'>session    required     pam_selinux.so close
+</span><span class='line'>session    required     pam_loginuid.so
+</span><span class='line'>session    optional     pam_console.so
+</span><span class='line'>session    required     /lib64/security/pam_limits.so
+</span><span class='line'># pam_selinux.so open should only be followed by sessions to be executed in the 
+</span><span class='line'>user context
+</span><span class='line'>session    required     pam_selinux.so open
+</span><span class='line'>session    required     pam_namespace.so
+</span><span class='line'>session    optional     pam_keyinit.so force revoke
+</span><span class='line'>session    include      system-auth
+</span><span class='line'>-session   optional     pam_ck_connector.so</span></code></pre></td></tr></table></div></figure>
+
+
+<p>黄色背景的一行是故障点，在进入单用户模式的时候这行是“session    required     /lib/security/pam_limits.so”，指向的是32位的目录，将目录修改成代码框里的之后重启，登陆正常。</p>
+
+<pre><code>    进入系统之后，查看网卡状态，正常ETH0启动，ping其他主机也是通的，以为正常从机房出来，到工作机上测试，还是连不上，ping不通，ssh不通；以为是iptables阻止了，去机房把iptables策略全部清空，继续ping其他主机还是通的，但是ssh连接其他主机是不通的，然后arp -a查看，arp表竟然是空的，route查看路由192.168.75.1竟然绑定在lo上面，打开ifcfg-lo文件，IPADDR上面赫然显示192.168.75.102，问题找到了，将lo配置文件还原，重启network服务，系统正常了。
+    下面就是排查是操作时上面时候进行的
+</code></pre>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@mysql ~]# history |grep -B10 "ifcfg-lo"
+</span><span class='line'>  472  2012-06-26_09:36:30 ipconfig --help
+</span><span class='line'>  473  2012-06-26_09:36:30 cd etc/syscofig
+</span><span class='line'>  474  2012-06-26_09:36:30 ls
+</span><span class='line'>  475  2012-06-26_09:36:30 cd ..
+</span><span class='line'>  476  2012-06-26_09:36:30 ls
+</span><span class='line'>  477  2012-06-26_09:36:30 cd etc
+</span><span class='line'>  478  2012-06-26_09:36:30 cd sysconfig
+</span><span class='line'>  479  2012-06-26_09:36:30 ls
+</span><span class='line'>  480  2012-06-26_09:36:30 cd network-scripts
+</span><span class='line'>  481  2012-06-26_09:36:30 ls
+</span><span class='line'>  482  2012-06-26_09:36:30 vi ifcfg-lo</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是查询结果，这里解释下，前面的时间戳是故障发生之后才配置的，所以这个时间是不准的，但是已经找到了修改文件的命令，而且可以看出来这个修改的人对centos的网络配置文件目录不是太熟悉，为以后排查人员提供一些佐证，接下来就是查看日志文件，看故障点之前谁登陆过系统。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>more /var/log/secure</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Jun 25 12:17:29 mysql sshd[30293]: Accepted publickey for root from 192.168.***.21 port 24940 ssh2
+</span><span class='line'>Jun 25 12:17:29 mysql sshd[30293]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: Accepted publickey for root from 192.168.***.21 port 24942 ssh2
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: Received disconnect from 192.168.***.21: 11: disconnected by user
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:02:20 mysql sshd[31813]: Accepted password for root from 192.168.***.117 port 4878 ssh2
+</span><span class='line'>Jun 25 13:02:20 mysql sshd[31813]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 13:13:18 mysql sshd[31813]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:21:47 mysql sshd[30293]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:25:07 mysql login: PAM unable to dlopen(/lib/security/pam_limits.so): /lib/security/pam_limits.so: cannot open shared object file: N
+</span><span class='line'>o such file or directory
+</span><span class='line'>Jun 25 13:25:07 mysql login: PAM adding faulty module: /lib/security/pam_limits.so
+</span><span class='line'>Jun 25 13:25:09 mysql login: pam_unix(login:session): session opened for user root by LOGIN(uid=0)
+</span><span class='line'>Jun 25 13:25:09 mysql login: Module is unknown</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在故障最后登陆的几个IP地址，上面几个是软件测试的IP地址，正在测试软件部署，最后一个IP登陆之后所有的连接全部开，
+而且从命令行的使用熟练度来讲，前面几个不会出现目录都不知道在哪里的情况，最后一个IP嫌疑比较大。</p>
+
+<pre><code> 后面就是找办公网来确认IP地址登记的使用者了。
+</code></pre>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

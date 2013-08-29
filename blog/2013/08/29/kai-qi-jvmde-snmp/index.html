@@ -1,0 +1,163 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>开启JVM的SNMP | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="在jdk1.6.0_12\jre\lib\management目录中找到management.properties文件（如果没有可以创建一个）如果目录中有这个文件一般情况下里面都是帮助文档，英文好的直接看里面说明。可以掠过我的文章。英文不好的，按部就班的跟我来。
+1、删除所有内容留下两句话： &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">开启JVM的SNMP</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:19:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>在jdk1.6.0_12\jre\lib\management目录中找到management.properties文件（如果没有可以创建一个）如果目录中有这个文件一般情况下里面都是帮助文档，英文好的直接看里面说明。可以掠过我的文章。英文不好的，按部就班的跟我来。
+1、删除所有内容留下两句话：
+com.sun.management.snmp.interface=0.0.0.0
+com.sun.management.snmp.acl.file=jdk1.6.0_12/jre/lib/management/snmp.acl
+这两行的意思是，允许jvm的snmp agent监听所有网卡，并且指定acl文件的位置。
+2、按照prperties文件指定的位置，新建一个snmp.acl文件。
+内容如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#The communities public and private are allowed access from the local host.
+</span><span class='line'>acl = {
+</span><span class='line'>        {
+</span><span class='line'>          communities = public, private
+</span><span class='line'>          access = read-only
+</span><span class='line'>          managers = cactihostip
+</span><span class='line'>        }
+</span><span class='line'>}
+</span><span class='line'># Traps are sent to localhost only
+</span><span class='line'>trap = {
+</span><span class='line'>          {
+</span><span class='line'>            trap-community = public
+</span><span class='line'>            hosts = cactihostip
+</span><span class='line'>          }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>作用，是对获取snmp信息的机器IP进行限制。只有managers一行指定的IP才能够获取snmp信息
+3、启动JVM时候加上-Dcom.sun.management.snmp.port=1161这个参数。指定jvm的snmp agent工作在1161端口上。（当然端口号可以根据自己的情况修改，不要端口冲突哦）
+4、修改management.properties和snmp.acl两个文件的权限，都修改成600，并将文件的属主修改成运行jvm的用户。（NTFS盘的话，需要把这两个文件只读，并把其他权限去除，否则会无法访问。）
+这时，再启动jvm，并且用netstat查看，如果正常的话，就会发现已经有程序监听在1161端口上。
+这个方法WINDOWS和LINUX通用，注意路径即可。</p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

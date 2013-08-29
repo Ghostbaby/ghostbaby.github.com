@@ -7,7 +7,7 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="nginx安装 1
+	<meta name="description" content="1
 2
 3
 4
@@ -17,8 +17,15 @@
 8
 9
 10
-groupadd www useradd -g www www
-tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf nginx-0 &hellip;">
+11
+12
+13
+14
+15
+16
+17
+#! /bin/bash
+cat /var/log/secure|awk '/Failed/{print $(NF-3)}'|sort|uniq -c|awk '{print $2"="$1;}' &gt; / &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -43,7 +50,7 @@ tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf 
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/23/nginx-plus-keepalive-webji-qun/">Nginx+keepalive Web集群</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/yong-shelljiao-ben-lai-fang-zhi-sshhe-vsftpdbao-li-po-jie/">用SHELL脚本来防止SSH和vsftpd暴力破解</a></h1>
   
   
 
@@ -55,17 +62,15 @@ tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf 
 
 
 	
-		<time datetime="2013-08-23T16:45:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:36:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>nginx安装</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -75,17 +80,44 @@ tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf 
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
-</span><span class='line'>useradd -g www www
-</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
-</span><span class='line'>cd pcre-7.8/  
-</span><span class='line'>./configure  
-</span><span class='line'>make && make install 
-</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
-</span><span class='line'>cd nginx-0.7.51/  
-</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
-</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#! /bin/bash
+</span><span class='line'>cat /var/log/secure|awk '/Failed/{print $(NF-3)}'|sort|uniq -c|awk '{print $2"="$1;}' &gt; /root/black.txt
+</span><span class='line'>DEFINE="100"
+</span><span class='line'>for i in `cat /root/black.txt`
+</span><span class='line'>do
+</span><span class='line'>IP=`echo $i |awk -F= '{print $1}'`
+</span><span class='line'>NUM=`echo $i|awk -F= '{print $2}'`
+</span><span class='line'>if [ $NUM -gt $DEFINE ];
+</span><span class='line'>then
+</span><span class='line'>grep $IP /etc/hosts.deny &gt; /dev/null
+</span><span class='line'>if [ $? -gt 0 ];
+</span><span class='line'>then
+</span><span class='line'>echo "sshd:$IP" &gt;&gt; /etc/hosts.deny
+</span><span class='line'>echo "vsftpd:$IP" &gt;&gt; /etc/hosts.deny
+</span><span class='line'>fi
+</span><span class='line'>fi
+</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
 
+
+<p>脚本思路如下：</p>
+
+<pre><code> 由于/var/log/secure是以星期为轮询的，所以我们每次可以查看这个文件，利用SHELL脚本统计出其中访问失败比较频繁的IP，并定义一个阀值为100，如果大于100的话就将其放进/etc/hosts.deny文件，阻止其继续访问vsftpd和ssh;然后将其写进crontab计划列表里，每隔一段时间进行一次排查，如果下次排查的某IP次数又大于100，首先检查它在不在我们的黑名单，如果在的话就无视过去;如果不在，就继续添加进/etc/hosts.deny文件。
+</code></pre>
+
+<p>   我的/etc/crontab文件最后一行为</p>
+
+<ul>
+<li><p>*/1 * * * root sh /root/hosts_deny.sh</p>
+
+<p>   即每隔1小时就重复执行一次这个脚本，这里也有一个情况要说明下，/var/log/secure是每隔一个星期轮询一次的，所以我们这里可以根据服务器的具体情况来配置多少时间执行一次此脚本，暴力破解频繁的机器可适当缩小这个周期。</p></li>
+</ul>
 
 
   
@@ -104,7 +136,7 @@ tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf 
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/23/vmware-visiojing-pin-tu-biao-ku-%28ppthe-visioban-%29/">VMware Visio精品图标库（PPT和Visio版）</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/linuxfu-wu-qi-an-quan-chu-shi-hua-shelljiao-ben/">Linux服务器安全初始化Shell脚本</a></h1>
   
   
 
@@ -116,301 +148,8 @@ tar zxvf pcre-7.8.tar.gz cd pcre-7.8/ ./configure make && make install tar zxvf 
 
 
 	
-		<time datetime="2013-08-23T16:43:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=2316439492&uk=3224714883</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/23/linuxxia-li-yong-ncming-ling-lai-jian-kong-jian-ce-fu-wu-qi-de-duan-kou-shi-yong-qing-kuang/">Linux下利用nc命令来监控检测服务器的端口使用情况</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-23T16:41:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>最近碰到一个项目，前端用apache htttpd进行发布（80端口），通过双机负载均衡转发到后端的两个tomcat进行处理（8081和8082端口），现在需要随时监控这三个端口的情况，一旦down掉需要能够立即告警处理。批量的系统监控比较好的是用nagios软件来实现，这样小项目专门装一个nagios软件，有点繁琐了。在网上查了一些资料，总结实验了一下，可以用简单的nc命令来实现。</p>
-
-<p>一、nc命令检测端口的用法</p>
-
-<h1>nc  -v  -w 10 %IP%   -z  %PORT%</h1>
-
-<p>-v  显示指令执行过程。
--w  &lt;超时秒数>   设置等待连线的时间。
--u  表示使用UDP协议
--z  使用0输入/输出模式，只在扫描通信端口时使用。</p>
-
-<p>例1：扫描指定的8080端口</p>
-
-<h1>nc -v -w 10 -z 192.168.0.100 8080</h1>
-
-<p>Connection to 192.168.0.100 8080 port [tcp/http] succeeded!</p>
-
-<p>例2：扫描20到25的端口范围，并详细输出。</p>
-
-<h1>nc -v -w 2 -z 192.168.0.100 20-25</h1>
-
-<p>nc: connect to 192.168.0.100 port 20 (tcp) failed: Connection refused
-nc: connect to 192.168.0.100 port 21 (tcp) failed: Connection refused
-Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
-nc: connect to 192.168.0.100 port 23 (tcp) failed: Connection refused
-nc: connect to 192.168.0.100  port 24 (tcp) failed: Connection refused
-nc: connect to 192.168.0.100 port 25 (tcp) failed: Connection refused</p>
-
-<p>例3：扫描1到65535的端口范围，只输出打开的端口（去掉-v参数即可）</p>
-
-<h1>nc -w 1 -z 192.168.0.100 1-65535</h1>
-
-<p>Connection to 192.168.0.100 22 port [tcp/ssh] succeeded!
-Connection to 192.168.0.100 80 port [tcp/http] succeeded!
-Connection to 192.168.0.100 2121 port [tcp/scientia-ssdb] succeeded!
-Connection to 192.168.0.100 4004 port [tcp/pxc-roid] succeeded!
-Connection to 192.168.0.100 8081 port [tcp/tproxy] succeeded!
-Connection to 192.168.0.100 11211 port [tcp/*] succeeded!</p>
-
-<p>二、批量检测服务器指定端口开放情况：</p>
-
-<p>1、假如我们要监控一堆指定的IP和端口，可新建一个文件（第1列服务器IP，第2列要监控的端口）。</p>
-
-<h1>vim /scripts/ip-ports.txt</h1>
-
-<p>192.168.0.100 80<br/>
-192.168.0.100 8081<br/>
-192.168.0.101 8082<br/>
-192.168.1.100 21</p>
-
-<p>2、我们可以写这样一个脚本来批量检测端口是否开放：</p>
-
-<h1>vim /scripts/ncports.sh</h1>
-
-<h1>!/bin/bash</h1>
-
-<h1>检测服务器端口是否开放，成功会返回0值显示ok，失败会返回1值显示fail</h1>
-
-<p>cat /scripts/ip-ports.txt | while read line<br/>
-do<br/>
-  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
-  if [ $? -eq 0 ]<br/>
-  then</p>
-
-<pre><code>echo $line:ok  
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>echo $line:fail  
-</code></pre>
-
-<p>  fi <br/>
-done</p>
-
-<p>3、执行脚本查看运行结果如下：</p>
-
-<h1>chmod a+x  /scripts/ncports.sh</h1>
-
-<h1>/scripts/ncports.sh</h1>
-
-<p>192.168.0.100 80：ok
-192.168.0.100 8081：ok
-192.168.0.101 8082：ok
-192.168.1.100 21：fail</p>
-
-<p>三、端口不通时设置告警：</p>
-
-<p>1、 邮件告警：</p>
-
-<p>(1) 先安装linux下面的邮件发送程序mutt（参见我另一篇文章《Linux下面如何用mutt命令发送邮件》</p>
-
-<p>(2) 修改上面的ncports.sh检测脚本，在显示失败fail的时候增加一行：</p>
-
-<pre><code>   ……………………
-  echo $line :fail
-  echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通" test@139.com
-  ……………………
-</code></pre>
-
-<p>(3) 如果上面的接收邮箱设置为移动139邮箱，并开启接收邮件短信告知，即可实现“短信告警”的功能。</p>
-
-<p>2、 windows消息弹窗告警：
-(1) 先打开接收消息弹窗windows客户机的“Messenger”服务，设置为“启动”
-(2) 利用smbclient命令来发送消息，net脚本文件如下：</p>
-
-<h1>vim /scripts/net.sh</h1>
-
-<h1>!/bin/bash</h1>
-
-<h1>/scripts/net.sh</h1>
-
-<p>case &ldquo;$1&rdquo; in<br/>
-send)<br/>
-echo &ldquo;$3&rdquo;|smbclient -I &ldquo;$2&rdquo; -M <code>nmblookup -A "$2"|sed -e '1d' -e '3,/*/d'|cut -f2|cut -d' ' -f1</code><br/>
-;;<br/>
-*)<br/>
-echo &ldquo;Usage:net send &lt;IPaddr.> <message>&#8220;<br/>
-exit 1<br/>
-esac</p>
-
-<h1>chmod a+x /scripts/net.sh</h1>
-
-<p>(3) 发送消息弹窗命令测试：（发送给192.168.1.83这台win xp机子，发送内容不支持中文）</p>
-
-<h1>/scripts/net.sh  send  192.168.1.83     &ldquo;hello,nihao&rdquo;</h1>
-
-<p>3、端口不通时发送邮件并消息弹窗告警的脚本如下：</p>
-
-<h1>vim /scripts/ncports.sh</h1>
-
-<h1>!/bin/bash</h1>
-
-<h1>检测服务器端口是否开放，成功会返回0值，打不开会返回1值</h1>
-
-<p>cat /scripts/ip-ports.txt | while read line<br/>
-do<br/>
-  nc -w 10 -z $line > /dev/null 2>&amp;1<br/>
-  if [ $? -eq 0 ]<br/>
-  then</p>
-
-<pre><code>echo $line:ok   
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>echo $line:fail  
-echo "服务器 $line 端口不通，请尽快处理！" | mutt -s "【机房监控】服务器$line端口不通"  test@139.com  
-/scripts/net send 192.168.1.83 "The $line fail"    
-</code></pre>
-
-<p>  fi <br/>
-done
-4、加入任务计划每2分钟执行一次</p>
-
-<h1>crontab -e</h1>
-
-<p>*/2 * * * *  /scripts/ncports.sh  > /dev/null 2>&amp;1</p>
-
-<h1>service crond restart</h1>
-
-<p>netcat 官网<a href="http://netcat.sourceforge.net/download.php">http://netcat.sourceforge.net/download.php</a></p>
-
-<p>软件可以从上面下载~</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/23/vm-viwu-fa-qi-dong/">[Vm]vi无法启动</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-23T16:40:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>The Connect-VISERVER Cmdlet did not work, please check you VI Server.。立刻崩溃。。。。。</p>
-
-<p>登陆上vc后发现服务停止了，启动后短时间可以登陆，但一会又不行。。没办法，检查系统日志发现又以下错误：</p>
-
-<p>Could not allocate space for object &lsquo;dbo.VPX_HOST_VM_CONFIG_OPTION&rsquo;.&lsquo;PK_VPX_HOST_VM_CONFIG_OPTION&rsquo; in database &lsquo;VIM_VCDB&rsquo; because the &lsquo;PRIMARY&rsquo; filegroup is full. Create disk space by deleting unneeded files, dropping objects in the filegroup, adding additional files to the filegroup, or setting autogrowth on for existing files in the filegroup.</p>
-
-<p>大致意思就是说filegroup满了。解决方法如下：</p>
-
-<p>1：下载安装sql server management studio express，连接到vc:  LINKZKSVCSRV\SQLEXP_VIM.</p>
-
-<p>2：在task中有个shrink，进行压缩</p>
-
-<p>3：然后在SQLEXP_VIM> Programmability > Stored Procedures > Right-Click dbo.cleanup_events_tasks_proc and click execute，自动执行清除日志动作。</p>
-
-<p>然后就ok了。其实建议大家在装vi的时候使用sql server不要使用express，有4G限制，另外在vSphere Client, click Administration > vCenter Server Settings > Database Retention Policy.设置相关日志保留周期，这样防止数据库一直增加。</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/23/mysql-jian-kong-jiao-ben/">MySql 监控脚本</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-23T16:39:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:34:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
@@ -454,43 +193,170 @@ done
 <span class='line-number'>35</span>
 <span class='line-number'>36</span>
 <span class='line-number'>37</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash  
-</span><span class='line'>#created by oldboy QQ 49000448  
-</span><span class='line'>#date:20100918  
-</span><span class='line'>MYUSER=root  
-</span><span class='line'>MYPASS="oldboy" 
-</span><span class='line'>MYSOCK=/data/3306/mysql.sock  
-</span><span class='line'>MySQL_STARTUP="/data/3306/mysql" 
-</span><span class='line'>LOG_PATH=/tmp  
-</span><span class='line'>LOG_FILE=${LOG_PATH}/mysqllogs_`date +%F`.log  
-</span><span class='line'>MYSQL_PATH=/usr/local/mysql/bin  
-</span><span class='line'>MYSQL_CMD="$MYSQL_PATH/mysql -u$MYUSER -p$MYPASS -S $MYSOCK" 
-</span><span class='line'>#→全变量定义方式，显得更专业。  
-</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
-</span><span class='line'>if [ $? -eq 0 ]   
-</span><span class='line'>then 
-</span><span class='line'>echo "MySQL is running! "   
-</span><span class='line'>exit 0  
-</span><span class='line'>else 
-</span><span class='line'>$MySQL_STARTUP start &gt;$LOG_FILE#→日志也是变量。  
-</span><span class='line'>sleep 5;  
-</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1  
-</span><span class='line'>if [ $? -ne 0 ]  
-</span><span class='line'>then   
-</span><span class='line'>for num in `seq 10`#→通过for循环来杀死mysqld，真正杀死则退出循环或每隔个两秒杀一次，一共杀10次。  
-</span><span class='line'>do  
-</span><span class='line'>killall mysqld&gt;/dev/null 2&gt;&1   
-</span><span class='line'>[ $? -ne 0 ] && break;  
-</span><span class='line'>sleep 2  
-</span><span class='line'>done  
-</span><span class='line'>$MySQL_STARTUP start &gt;&gt;$LOG_FILE   
-</span><span class='line'>fi  
-</span><span class='line'>$MYSQL_CMD -e "select version();" &gt;/dev/null 2&gt;&1 && Status="restarted" || Status="unknown"#→这个逻辑更准确。  
-</span><span class='line'>echo "MySQL status is $Status" &gt;&gt;$LOG_FILE  
-</span><span class='line'>mail -s "MySQL status is $Status" 31333741@qq.com &lt; $LOG_FILE  
-</span><span class='line'>#→把上面的Status作为结果标题传给邮件，当然你可以做短信，语音通话报警。  
-</span><span class='line'>fi  
-</span><span class='line'>exit </span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
+</span><span class='line'># desc: setup linux system security
+</span><span class='line'># author:coralzd
+</span><span class='line'># powered by www.freebsdsystem.org
+</span><span class='line'># version 0.1.2 written by 2011.05.03
+</span><span class='line'>
+</span><span class='line'>#设置账号
+</span><span class='line'>passwd -l xfs
+</span><span class='line'>passwd -l news
+</span><span class='line'>passwd -l nscd
+</span><span class='line'>passwd -l dbus
+</span><span class='line'>passwd -l vcsa
+</span><span class='line'>passwd -l games
+</span><span class='line'>passwd -l nobody
+</span><span class='line'>passwd -l avahi
+</span><span class='line'>passwd -l haldaemon
+</span><span class='line'>passwd -l gopher
+</span><span class='line'>passwd -l ftp
+</span><span class='line'>passwd -l mailnull
+</span><span class='line'>passwd -l pcap
+</span><span class='line'>passwd -l mail
+</span><span class='line'>passwd -l shutdown
+</span><span class='line'>passwd -l halt
+</span><span class='line'>passwd -l uucp
+</span><span class='line'>passwd -l operator
+</span><span class='line'>passwd -l sync
+</span><span class='line'>passwd -l adm
+</span><span class='line'>passwd -l lp
+</span><span class='line'>
+</span><span class='line'># 用chattr给用户路径更改属性。chattr命令用法参考文末说明[1]
+</span><span class='line'>chattr +i /etc/passwd
+</span><span class='line'>chattr +i /etc/shadow
+</span><span class='line'>chattr +i /etc/group
+</span><span class='line'>chattr +i /etc/gshadow
+</span><span class='line'>
+</span><span class='line'># 设置密码连续输错3次后锁定5分钟
+</span><span class='line'>sed -i 's#auth        required      pam_env.so#auth        required      pam_env.so\nauth       required       pam_tally.so  onerr=fail deny=3 unlock_time=300\nauth           required     /lib/security/$ISA/pam_tally.so onerr=fail deny=3 unlock_time=300#' /etc/pam.d/system-auth
+</span><span class='line'>
+</span><span class='line'># 5分钟后自动登出，原因参考文末说明[2]
+</span><span class='line'>echo "TMOUT=300" &gt;&gt;/etc/profile
+</span><span class='line'>
+</span><span class='line'># 历史命令记录数设定为10条
+</span><span class='line'>sed -i "s/HISTSIZE=1000/HISTSIZE=10/" /etc/profile
+</span><span class='line'>
+</span><span class='line'># 让以上针对 /etc/profile 的改动立即生效
+</span><span class='line'>source /etc/profile
+</span><span class='line'>
+</span><span class='line'># 在 /etc/sysctl.conf 中启用 syncookie
+</span><span class='line'>echo "net.ipv4.tcp_syncookies=1" &gt;&gt; /etc/sysctl.conf
+</span><span class='line'>sysctl -p # exec sysctl.conf enable
+</span><span class='line'>
+</span><span class='line'># 优化 sshd_config
+</span><span class='line'>sed -i "s/#MaxAuthTries 6/MaxAuthTries 6/" /etc/ssh/sshd_config
+</span><span class='line'>sed -i  "s/#UseDNS yes/UseDNS no/" /etc/ssh/sshd_config
+</span><span class='line'>
+</span><span class='line'># 限制重要命令的权限
+</span><span class='line'>chmod 700 /bin/ping
+</span><span class='line'>chmod 700 /usr/bin/finger
+</span><span class='line'>chmod 700 /usr/bin/who
+</span><span class='line'>chmod 700 /usr/bin/w
+</span><span class='line'>chmod 700 /usr/bin/locate
+</span><span class='line'>chmod 700 /usr/bin/whereis
+</span><span class='line'>chmod 700 /sbin/ifconfig
+</span><span class='line'>chmod 700 /usr/bin/pico
+</span><span class='line'>chmod 700 /bin/vi
+</span><span class='line'>chmod 700 /usr/bin/which
+</span><span class='line'>chmod 700 /usr/bin/gcc
+</span><span class='line'>chmod 700 /usr/bin/make
+</span><span class='line'>chmod 700 /bin/rpm
+</span><span class='line'>
+</span><span class='line'># 历史安全
+</span><span class='line'>chattr +a /root/.bash_history
+</span><span class='line'>chattr +i /root/.bash_history
+</span><span class='line'>
+</span><span class='line'># 给重要命令写 md5
+</span><span class='line'>cat &gt; list &lt;&lt; "EOF" &&
+</span><span class='line'>/bin/ping
+</span><span class='line'>/usr/bin/finger
+</span><span class='line'>/usr/bin/who
+</span><span class='line'>/usr/bin/w
+</span><span class='line'>/usr/bin/locate
+</span><span class='line'>/usr/bin/whereis
+</span><span class='line'>/sbin/ifconfig
+</span><span class='line'>/bin/vi
+</span><span class='line'>/usr/bin/vim
+</span><span class='line'>/usr/bin/which
+</span><span class='line'>/usr/bin/gcc
+</span><span class='line'>/usr/bin/make
+</span><span class='line'>/bin/rpm
+</span><span class='line'>EOF
+</span><span class='line'>
+</span><span class='line'>for i in `cat list`
+</span><span class='line'>do
+</span><span class='line'>   if [ ! -x $i ];then
+</span><span class='line'>   echo "$i not found,no md5sum!"
+</span><span class='line'>  else
+</span><span class='line'>   md5sum $i &gt;&gt; /var/log/`hostname`.log
+</span><span class='line'>  fi
+</span><span class='line'>done
+</span><span class='line'>rm -f list</span></code></pre></td></tr></table></div></figure>
+
 
 
   
@@ -509,7 +375,7 @@ done
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/21/javaxu-ni-ji-de-tong-ji-jian-ce-gong-ju-jstat/">Java虚拟机的统计监测工具:jstat</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/pi-chu-li-jiao-ben-windowsxia-%2Cportmapwu-xian-yun-xing-jiao-ben/">[批处理脚本]windows下，PortMap无限运行脚本</a></h1>
   
   
 
@@ -521,16 +387,351 @@ done
 
 
 	
-		<time datetime="2013-08-21T10:05:00+08:00">
-			<span class="day">21</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:32:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>jstat:是JDK自带的虚拟机统计监测工具
-在命令行中执行jstat</p>
+    <p>该脚本来源于一个肉鸡扫描守护脚本。黑客在获取administrators权限之后，通过恶意脚本篡改注册表，使任务管理器、用户管理器无法正常启动，无法切换console，无法修改系统密码；当合法管理员登陆，只能通过tasklist来打印进程，通过taskkill来杀掉进程；这个脚本就是检测进程是否存在，如果被管理员杀掉之后，会自动启动。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@echo off
+</span><span class='line'>setlocal
+</span><span class='line'>cls
+</span><span class='line'>color f0
+</span><span class='line'>mode con: cols=20 lines=5
+</span><span class='line'>title 软件监听器
+</span><span class='line'>@echo off
+</span><span class='line'>:en
+</span><span class='line'>tasklist |find "PortMap.exe"||start PortMap.exe
+</span><span class='line'>ping -n 10 127.0.0.1&gt;nul
+</span><span class='line'>goto en</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/pxean-zhuang-centos-6/">pxe安装Centos 6</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:24:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>服务器端：win2003 (win7也可以)，iis（ftp也可以），软件tftpd32，syslinux。
+过程如下：
+1、在D：盘新建以下目录</p>
+
+<p>D:linux-inst
+D:linux-inst\pxelinux.cfg\
+2、将CentOS-6.0-x86_64-bin-DVD1.iso挂载到虚拟光驱。
+3、打开镜像，把以下文件复制到D:linux-inst\文件夹中。
+H:\images\pxeboot\initr.img
+H:\images\pxeboot\vmlinux
+H:\ isolinux\boot.msg
+4、将ISO中的以下文件
+H:\isolinux\isolinux.cfg
+复制到 D:\linux-inst\pxelinux.cfg\目录中，然后将该文件重命名为“default” 注：default没有后缀名哦。</p>
+
+<p>5、将syslinux-4.04.zip解压，把以下文件拷贝到D:\linux-inst\。
+D:\syslinux-4.04\core\pxelinux.0
+6、安装dhcp服务器，使用tfpd32，下载zip版本的，直接解压打开设置如下。
+   a、设置文件存放目录。</p>
+
+<p>b、设置DHCP，第一项ip池起始地址，这里设为192.168.1.100，第二项ip池个数这里设为5个。BootFile 为pxelinux.0 （必须的）,下一项为服务器地址即本机IP：192.168.1.5 Mask 为255.255.255.0，其余为默认即可。点击OK后，关闭重启。</p>
+
+<p>下面，可以有两种方式:</p>
+
+<pre><code>        1.本地架设HTTP，FTP都可以讲本地镜像加载到虚拟光驱之后，挂载到服务上。
+        2.直接加载网络镜像里面的系统问题，推荐一个中国区的http://mirrors.163.com/centos/6/os/x86_64/
+</code></pre>
+
+<p>8、设置客户机从PXE启动，如果成功会获取到IP地址并进入boot：。（可能会提示错误，忽略）
+9、在boot里面输入linux（为图形安装），输入：linux text （文本模式）。</p>
+
+<p>10、开始进入安装，选择安装媒介的时候选择http，地址栏输入：<a href="ftp://192.168.1.5">ftp://192.168.1.5</a> 如果成功即可开始安装。
+备注：
+安装过程遇到的问题：
+1、如获取不到文件，请尝试关闭防火墙。
+2、客服端启动的时候，看到通过DHCP获取到了IP地址，但提示找不到文件。打开Tftpd32中的日志功能，日志显示pxelinux.0有问题。于是重新替换了下，正常了。
+3、安装到分区的时候，可能会提示文件repodata/无法找到。 原因是ISO里面的文件名可能和网上发布的repodata/不太一样（没搞懂）。需到mirrors里面去下载repodata/ 目录下的所有文件并替换掉ISO里面repodata/目录。方可成功。</p>
+
+<p>如果网络情况允许的话，建议用163镜像里面的安装</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/centosxia-diao-zheng-lvmfen-qu-da-xiao/">Centos下调整LVM分区大小</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:21:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>1.用df -ahT来查看分区挂载在什么目录上</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@mysql /]# df -ahT
+</span><span class='line'>Filesystem    Type    Size  Used Avail Use% Mounted on
+</span><span class='line'>/dev/mapper/vg_mysql-lv_root
+</span><span class='line'>              ext4     50G  2.4G   45G   5% /
+</span><span class='line'>proc          proc       0     0     0   -  /proc
+</span><span class='line'>sysfs        sysfs       0     0     0   -  /sys
+</span><span class='line'>devpts      devpts       0     0     0   -  /dev/pts
+</span><span class='line'>tmpfs        tmpfs     24G     0   24G   0% /dev/shm
+</span><span class='line'>/dev/sda1     ext4    485M   37M  423M   8% /boot
+</span><span class='line'>none   binfmt_misc       0     0     0   -  /proc/sys/fs/binfmt_misc
+</span><span class='line'>sunrpc  rpc_pipefs       0     0     0   -  /var/lib/nfs/rpc_pipefs
+</span><span class='line'>/dev/mapper/vg_mysql-lv_home
+</span><span class='line'>              ext4     99G  188M   94G   1% /home</span></code></pre></td></tr></table></div></figure>
+
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/kai-qi-jvmde-snmp/">开启JVM的SNMP</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:19:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>在jdk1.6.0_12\jre\lib\management目录中找到management.properties文件（如果没有可以创建一个）如果目录中有这个文件一般情况下里面都是帮助文档，英文好的直接看里面说明。可以掠过我的文章。英文不好的，按部就班的跟我来。
+1、删除所有内容留下两句话：
+com.sun.management.snmp.interface=0.0.0.0
+com.sun.management.snmp.acl.file=jdk1.6.0_12/jre/lib/management/snmp.acl
+这两行的意思是，允许jvm的snmp agent监听所有网卡，并且指定acl文件的位置。
+2、按照prperties文件指定的位置，新建一个snmp.acl文件。
+内容如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#The communities public and private are allowed access from the local host.
+</span><span class='line'>acl = {
+</span><span class='line'>        {
+</span><span class='line'>          communities = public, private
+</span><span class='line'>          access = read-only
+</span><span class='line'>          managers = cactihostip
+</span><span class='line'>        }
+</span><span class='line'>}
+</span><span class='line'># Traps are sent to localhost only
+</span><span class='line'>trap = {
+</span><span class='line'>          {
+</span><span class='line'>            trap-community = public
+</span><span class='line'>            hosts = cactihostip
+</span><span class='line'>          }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>作用，是对获取snmp信息的机器IP进行限制。只有managers一行指定的IP才能够获取snmp信息
+3、启动JVM时候加上-Dcom.sun.management.snmp.port=1161这个参数。指定jvm的snmp agent工作在1161端口上。（当然端口号可以根据自己的情况修改，不要端口冲突哦）
+4、修改management.properties和snmp.acl两个文件的权限，都修改成600，并将文件的属主修改成运行jvm的用户。（NTFS盘的话，需要把这两个文件只读，并把其他权限去除，否则会无法访问。）
+这时，再启动jvm，并且用netstat查看，如果正常的话，就会发现已经有程序监听在1161端口上。
+这个方法WINDOWS和LINUX通用，注意路径即可。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/centos-64bitmi-ma-zheng-que-que-wu-fa-deng-lu-init-3/">CentOS 64bit密码正确却无法登录init 3</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:18:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>登陆界面输入正确的账号密码会重新返回登陆界面且没有任何提示，
+输入错误的账号密码会提示账号密码错误。解决方法方法：
+重启电脑进入单用户模式
+vi /etc/pam.d/login
+将如下行：
+session required /lib/security/pam_limits.so
+换成：
+session required /lib64/security/pam_limits.so
+重启，故障排除。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/centosri-chang-gong-zuo-gu-zhang-pai-chu/">Centos日常工作故障排除</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:16:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>2012年6月25日</p>
+
+<pre><code>   下午接到保障，说新装的一台mysql服务器SSH连不上，去机房连上服务器看下，机器硬件没有问题正常工作，指示灯全部正常；登陆界面输入用户名密码之后，没有进入命令行模式，直接退回到登陆界面，这个是密码输入正确的情况下，密码输入错误回报警，说明登陆严重环节没有问题，应该是登陆控制的问题，把本地登陆给屏蔽了。查询相关资料之后，找到问题的原因，由于/etc/pam.d/login文件里面添加了控制库。
+</code></pre>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -551,256 +752,66 @@ done
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
 <span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Usage: jstat -help|-options
-</span><span class='line'>       jstat -&lt;option&gt; [-t] [-h&lt;lines&gt;] &lt;vmid&gt; [&lt;interval&gt; [&lt;count&gt;]]
-</span><span class='line'>
-</span><span class='line'>Definitions:
-</span><span class='line'>  &lt;option&gt;      An option reported by the -options option
-</span><span class='line'>  &lt;vmid&gt;        Virtual Machine Identifier. A vmid takes the following form:
-</span><span class='line'>                     &lt;lvmid&gt;[@&lt;hostname&gt;[:&lt;port&gt;]]
-</span><span class='line'>                Where &lt;lvmid&gt; is the local vm identifier for the target
-</span><span class='line'>                Java virtual machine, typically a process id; &lt;hostname&gt; is
-</span><span class='line'>                the name of the host running the target Java virtual machine;
-</span><span class='line'>                and &lt;port&gt; is the port number for the rmiregistry on the
-</span><span class='line'>                target host. See the jvmstat documentation for a more complete
-</span><span class='line'>                description of the Virtual Machine Identifier.
-</span><span class='line'>  &lt;lines&gt;       Number of samples between header lines.
-</span><span class='line'>  &lt;interval&gt;    Sampling interval. The following forms are allowed:
-</span><span class='line'>                    &lt;n&gt;["ms"|"s"]
-</span><span class='line'>                Where &lt;n&gt; is an integer and the suffix specifies the units as
-</span><span class='line'>                milliseconds("ms") or seconds("s"). The default units are "ms".
-</span><span class='line'>  &lt;count&gt;       Number of samples to take before terminating.
-</span><span class='line'>  -J&lt;flag&gt;      Pass &lt;flag&gt; directly to the runtime system.</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@mysql ~]# more /etc/pam.d/login 
+</span><span class='line'>#%PAM-1.0
+</span><span class='line'>auth [user_unknown=ignore success=ok ignore=ignore default=bad] pam_securetty.so
+</span><span class='line'>auth       include      system-auth
+</span><span class='line'>account    required     pam_nologin.so
+</span><span class='line'>account    include      system-auth
+</span><span class='line'>password   include      system-auth
+</span><span class='line'># pam_selinux.so close should be the first session rule
+</span><span class='line'>session    required     pam_selinux.so close
+</span><span class='line'>session    required     pam_loginuid.so
+</span><span class='line'>session    optional     pam_console.so
+</span><span class='line'>session    required     /lib64/security/pam_limits.so
+</span><span class='line'># pam_selinux.so open should only be followed by sessions to be executed in the 
+</span><span class='line'>user context
+</span><span class='line'>session    required     pam_selinux.so open
+</span><span class='line'>session    required     pam_namespace.so
+</span><span class='line'>session    optional     pam_keyinit.so force revoke
+</span><span class='line'>session    include      system-auth
+</span><span class='line'>-session   optional     pam_ck_connector.so</span></code></pre></td></tr></table></div></figure>
 
 
-<p>通过不的option可以查看JVM当前的各种信息,比如:类, 内存等
-参数主要有:</p>
+<p>黄色背景的一行是故障点，在进入单用户模式的时候这行是“session    required     /lib/security/pam_limits.so”，指向的是32位的目录，将目录修改成代码框里的之后重启，登陆正常。</p>
 
-<p>class: 类装载器统计
-compiler: HotSpot JVM实时编译统计
-gc: 垃圾回收堆统计
-gccapacity: 内存统计
-gccause: 垃圾回收统计信息，包括回收事件
-gcnew: 对象创建情况
-gcnewcapacity: 对象创建内存情况
-gcold: 老年代和永久代统计
-gcoldcapacity: 老年代统计
-gcpermcapacity: 永久代统计
-gcutil: 垃圾收集的统计
-printcompilation: HotSpot编译器的方法统计</p>
-
-<p>执行: jstat -class 2000 结果如下
-加载类的个数  加载类的大小  卸载类的个数  卸载类的大小  加载和卸载所占用的时间
-Loaded      Bytes       Unloaded    Bytes       Time
-23624       29798.8     1346        1225.8      218.34</p>
-
-<p>执行: jstat -compiler 2000 结果如下</p>
-
-<p>编译的个数     编译失败的个数       无效的编译个数       编译所用时间  最后一次编译失败的类型       最后一次编译失败的方法
-Compiled    Failed          Invalid         Time        FailedType          FailedMethod
-1629        1           0           0.86        1               org/springframework/asm/ClassReader accept</p>
-
-<p>执行: jstat -gc 2000 结果如下</p>
-
-<p>Survivor 0的大小(KB) Survivor 1的大小(KB) Survivor 0使用大小 Survivor 1使用大小 Eden大小 Eden使用大小 Old大小 Old使用大小 Permanent大小 Permanent使用大小 Young generation GC次数 Young generation GC时间 Full GC次数 Full GC时间 所有GC时间
-S0C S1C S0U S1U EC EU OC OU PC PU YGC YGCT FGC FGCT GCT
-14016.0 14016.0 2932.5 0.0 112192.0 96465.9 280212.0 227679.0 116480.0 116338.6 418 37.823 34 59.928 97.751</p>
-
-<p>执行: jstat -gccapacity 2000 结果如下</p>
-
-<p>新生代最小 新生代最大 当前新生代(NGC=S0C+S1C+EC) Survivor 0大小 Survivor 1大小 Eden大小 老年代最小 老年代最大 老年代当前大小 老年代当前容量 永久代最小 永久代最大 当前永久代大小 永久代容量 Young GC次数 Full GC次数
-NGCMN NGCMX NGC S0C S1C EC OGCMN OGCMX OGC OC PGCMN PGCMX PGC PC YGC FGC
-13632.0 174720.0 140224.0 14016.0 14016.0 112192.0 27328.0 349568.0 280212.0 280212.0 12288.0 262144.0 116480.0 116480.0 419 34</p>
-
-<p>执行: jstat -gccause 2000 结果如下</p>
-
-<p>Survivor 0使用率 Survivor 1使用率 Eden使用率 Old使用率 Permanent使用率 YoungGC次数 YoungGC时间 FullGC次数 FullGC时间 GC总时间 上一次GC原因 当前GC原因
-S0 S1 E O P YGC YGCT FGC FGCT GCT LGCC GCC
-0.00 21.85 20.68 81.25 99.88 419 37.836 34 59.928 97.764 unknown GCCause No GC</p>
-
-<p>执行: jstat -printcompilation 2000 结果如下</p>
-
-<p>编译次数 方法的字节码的字节数 编译类型 编译方法
-Compiled Size Type Method
-13575 17 1 org/eclipse/swt/widgets/Caret hasFocus</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/21/jvm-sheng-cheng-javacorehe-heapdumpwen-jian/">Jvm 生成javacore和heapdump文件</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-21T10:03:00+08:00">
-			<span class="day">21</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>（1）如果使用Oracle JVM也就是标准的SUN JVM（SUN已被oracle收购）
-当内存溢出时生成heapdump文件配置如下</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-Xloggc:${目录}/temp_gc.log           （GC日志文件）
-</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
-</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果要即时动态生成heapdump文件可以使用jmap命令，jdk6.0已取消了-XX:+HeapDumpOnCtrlBreak配置参数通过ctrl+break的方式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>（2）HP JVM</p>
+<pre><code>    进入系统之后，查看网卡状态，正常ETH0启动，ping其他主机也是通的，以为正常从机房出来，到工作机上测试，还是连不上，ping不通，ssh不通；以为是iptables阻止了，去机房把iptables策略全部清空，继续ping其他主机还是通的，但是ssh连接其他主机是不通的，然后arp -a查看，arp表竟然是空的，route查看路由192.168.75.1竟然绑定在lo上面，打开ifcfg-lo文件，IPADDR上面赫然显示192.168.75.102，问题找到了，将lo配置文件还原，重启network服务，系统正常了。
+    下面就是排查是操作时上面时候进行的
+</code></pre>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-Xverbosegc:file=${目录}/temp_gc.log  （GC日志文件）
-</span><span class='line'>-XX:+HeapDumpOnOutOfMemoryError       （内存溢出时生成heapdump文件）
-</span><span class='line'>-XX:+HeapDumpOnCtrlBreak              （可以通过ctrl+break组合键动态生成heapdump文件）
-</span><span class='line'>-XX:HeapDumpPath=${目录}              （heapdump文件存放位置）</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[root@mysql ~]# history |grep -B10 "ifcfg-lo"
+</span><span class='line'>  472  2012-06-26_09:36:30 ipconfig --help
+</span><span class='line'>  473  2012-06-26_09:36:30 cd etc/syscofig
+</span><span class='line'>  474  2012-06-26_09:36:30 ls
+</span><span class='line'>  475  2012-06-26_09:36:30 cd ..
+</span><span class='line'>  476  2012-06-26_09:36:30 ls
+</span><span class='line'>  477  2012-06-26_09:36:30 cd etc
+</span><span class='line'>  478  2012-06-26_09:36:30 cd sysconfig
+</span><span class='line'>  479  2012-06-26_09:36:30 ls
+</span><span class='line'>  480  2012-06-26_09:36:30 cd network-scripts
+</span><span class='line'>  481  2012-06-26_09:36:30 ls
+</span><span class='line'>  482  2012-06-26_09:36:30 vi ifcfg-lo</span></code></pre></td></tr></table></div></figure>
 
 
-<p>（3）IBM JVM</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>非windows操作系统环境中
-</span><span class='line'>-XverboseGClog: ${目录}/temp_gc.log   （GC日志文件）
-</span><span class='line'>-Xdump:heap:events=user,file=${目录}/pid%uid%pid.phd
-</span><span class='line'>表示可以根据需要通过kill -3 &lt;pid&gt;产生DUMP文件，%uid和%pid为变量</span></code></pre></td></tr></table></div></figure>
-
-
-<p>windows操作系统环境中</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>启动wsadmin,进入wsadmin环境
-</span><span class='line'>wsadmin&gt; set jvm [$AdminControl completeObjectName type=JVM,process=server1,*]
-</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm generateHeapDump
-</span><span class='line'>wsadmin&gt; $AdminControl invoke $jvm dumpThreads</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这句要特地说明，如果你的应用负载很高，堆栈已经要满了，千万不用。生成DUMP文件类似于目前堆栈的镜像，会占用很多资源。</p>
+<p>上面是查询结果，这里解释下，前面的时间戳是故障发生之后才配置的，所以这个时间是不准的，但是已经找到了修改文件的命令，而且可以看出来这个修改的人对centos的网络配置文件目录不是太熟悉，为以后排查人员提供一些佐证，接下来就是查看日志文件，看故障点之前谁登陆过系统。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>01.jmap -dump:format=b,file=temp_heapdump.hprof &lt;pid&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>temp_heapdump_1360_2.hprof  生成类似的文件，基本跟你目前堆栈使用大小持平。文件生成之后，就开始用 IBM HeapAnalyzer  进行分析。</p>
-
-  
-  
-  <footer class="meta">
-    
+</pre></td><td class='code'><pre><code class=''><span class='line'>more /var/log/secure</span></code></pre></td></tr></table></div></figure>
 
 
 
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/21/ibm-heapanalyzer/">IBM HeapAnalyzer</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-21T10:00:00+08:00">
-			<span class="day">21</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>http://pan.baidu.com/share/link?shareid=4106270763&uk=3224714883</span></code></pre></td></tr></table></div></figure>
-
-
-<p>HeapAnalyzer 是 IBM 的一个用来分析 Java 程序的内存堆使用情况的图形化工具。</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/21/tong-guo-deng-lu-ipji-lu-linuxsuo-you-yong-hu-deng-lu-suo-cao-zuo-de-ri-zhi/">通过登陆IP记录Linux所有用户登录所操作的日志</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-21T09:58:00+08:00">
-			<span class="day">21</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>/etc/profile 在末尾添加如下代码</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -817,30 +828,28 @@ Compiled Size Type Method
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>history
-</span><span class='line'>USER=`whoami`
-</span><span class='line'>USER_IP=`who -u am i 2&gt;/dev/null| awk '{print $NF}'|sed -e 's/[()]//g'`
-</span><span class='line'>if [ "$USER_IP" = "" ]; then
-</span><span class='line'>USER_IP=`hostname`
-</span><span class='line'>fi
-</span><span class='line'>if [ ! -d /tmp/history ]; then
-</span><span class='line'>mkdir /tmp/history
-</span><span class='line'>chmod 777 /tmp/history
-</span><span class='line'>fi
-</span><span class='line'>if [ ! -d /tmp/history/${LOGNAME} ]; then
-</span><span class='line'>mkdir /tmp/history/${LOGNAME}
-</span><span class='line'>chmod 300 /tmp/history/${LOGNAME}
-</span><span class='line'>fi
-</span><span class='line'>export HISTSIZE=4096
-</span><span class='line'>DT=`date +"%Y-%m-%d_%H:%M:%S"`
-</span><span class='line'>export HISTFILE="/tmp/history/${LOGNAME}/${USER}@${USER_IP}_history.$DT"
-</span><span class='line'>chmod 600 /tmp/history/${LOGNAME}/*history* 2&gt;/dev/null</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Jun 25 12:17:29 mysql sshd[30293]: Accepted publickey for root from 192.168.***.21 port 24940 ssh2
+</span><span class='line'>Jun 25 12:17:29 mysql sshd[30293]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: Accepted publickey for root from 192.168.***.21 port 24942 ssh2
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: Received disconnect from 192.168.***.21: 11: disconnected by user
+</span><span class='line'>Jun 25 12:17:51 mysql sshd[30343]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:02:20 mysql sshd[31813]: Accepted password for root from 192.168.***.117 port 4878 ssh2
+</span><span class='line'>Jun 25 13:02:20 mysql sshd[31813]: pam_unix(sshd:session): session opened for user root by (uid=0)
+</span><span class='line'>Jun 25 13:13:18 mysql sshd[31813]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:21:47 mysql sshd[30293]: pam_unix(sshd:session): session closed for user root
+</span><span class='line'>Jun 25 13:25:07 mysql login: PAM unable to dlopen(/lib/security/pam_limits.so): /lib/security/pam_limits.so: cannot open shared object file: N
+</span><span class='line'>o such file or directory
+</span><span class='line'>Jun 25 13:25:07 mysql login: PAM adding faulty module: /lib/security/pam_limits.so
+</span><span class='line'>Jun 25 13:25:09 mysql login: pam_unix(login:session): session opened for user root by LOGIN(uid=0)
+</span><span class='line'>Jun 25 13:25:09 mysql login: Module is unknown</span></code></pre></td></tr></table></div></figure>
 
 
-<p>通过上面的脚本代码可以看出来，在系统的/tmp下就新建了个history目录（这个目录可以自定义），在目录中记录了所有的登陆过系统的用户和IP地址，这也是监测系统安全的方法之一。在进行一系列的操作之后，我们进入/tmp/history目录查看历史记录。</p>
+<p>在故障最后登陆的几个IP地址，上面几个是软件测试的IP地址，正在测试软件部署，最后一个IP登陆之后所有的连接全部开，
+而且从命令行的使用熟练度来讲，前面几个不会出现目录都不知道在哪里的情况，最后一个IP嫌疑比较大。</p>
+
+<pre><code> 后面就是找办公网来确认IP地址登记的使用者了。
+</code></pre>
 
   
   
@@ -858,7 +867,7 @@ Compiled Size Type Method
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/rpmdb-unable-to-join-the-environmentjie-jue-ban-fa/">Rpmdb: Unable to Join the Environment解决办法</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/linuxji-chu-%3Arang-historyji-lu-ming-ling-de-li-shi-zhi-xing-shi-jian/">Linux基础：让history记录命令的历史执行时间</a></h1>
   
   
 
@@ -870,25 +879,139 @@ Compiled Size Type Method
 
 
 	
-		<time datetime="2013-08-19T16:47:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:12:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+    <p>缺省情况，我们在Linux查看历史记录命令，后面是无任何执行时间显示的</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>history</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么如果想要用到记录命令的执行时间，可以这么操作：</p>
+
+<h1>编辑/etc/bashrc，添加以下内容</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/bashrc</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>让系统记录每条历史命令的执行时间。注意最后的&#8221;号前面要放个空格</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISTTIMEFORMAT="%Y-%m-%d_%H:%M:%S "</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>设置保存历史命令的文件大小</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISFILESIZE=1000000</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>保存历史命令条数</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISTSIZE=2000</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>执行下面的命令使配置立即生效</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>source /etc/bashrc</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/shellbi-jiao-liang-ge-wen-dang-%2Cshu-chu-bu-tong/">Shell比较两个文档，输出不同</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:08:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>今天，同事想找出短信分发机和平台注册SIM卡的差距，将两个平台的SIM卡分别存到两个文件，本来说是想再数据库里面，通过数据库的函数来做比较，正好最近在学SHELL，想用shell写个脚本来实现。</p>
+
+<pre><code>    以下为几个不同实现方法。
+</code></pre>
+
+<p>方法一：使用grep</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>grep -v -f file1 file2 && grep -v -f file2 file1 </span></code></pre></td></tr></table></div></figure>
+
+
+<p>grep命令的详细使用方法，可以参考man，这里有一个简单实用的介绍：<a href="http://linux.ccidnet.com/art/3067/20070313/1035613_1.html%E3%80%82">http://linux.ccidnet.com/art/3067/20070313/1035613_1.html%E3%80%82</a>
+ 在方法一中，用到了两个参数。参数-v，表示invert match，即反向匹配，输出没有匹配上的项。参数-f，表示从文件中读取匹配模板(pattern)。方法一中的前一部分，在文件file1中匹配模板，来反向匹配文件file2中的内容，即输出文件file2中，在file1中没有的内容。后面的一部分同理可得，输出文件file1中，在file2中没有的内容。</p>
+
+<p> 2.方法二：实用comm</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>comm -3 file1 file2</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 这个方法看起来最简单。命令comm的功能就是，逐行比较两个排好序的文件，默认输出有三列：只在file1中有的行、只在file2中有的行、在file1和file2中共有的行。有参数-1 -2 -3，分别来抑制输出对应的列。例如在我们的方法二中，实用-3参数，不输出file1和file2中共有的部分。即能达到我们本文的目的。</p>
+
+<p>3.方法三：使用awk</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd /var/lib/rpm/
-</span><span class='line'>mkdir db_bak
-</span><span class='line'>mv db.* db_bak(最后看到几个__db.00*文件，我也给移走了，果然见效）
-</span><span class='line'>rpm --rebuilddb     重建rpm数据库
-</span><span class='line'>yum clean all</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>awk '{print NR, $0}' file1 file2 |sort -k2|uniq -u -f 1|sort -k1|awk '{print $2}'
+</span><span class='line'>或者：
+</span><span class='line'>awk '{print $0}' file1 file2 |sort|uniq -u</span></code></pre></td></tr></table></div></figure>
 
+
+<p>awk命令的使用，听牛人说可谓博大精深，我也没有太搞清楚。这里只是使用了一些简单的功能。下面以我自己的理解来解释一下上面的shell代码。awk就是文本的解释器和过滤器。awk把每一行看成是一个记录(record)，每个记录使用分隔符(默认是空格)把每条记录分成若干域。awk内置参数$0表示整行，$1、$2&hellip;分别表示各域，内置参数NR，表示记录的计数，awk &lsquo;{print NR, $0}&rsquo; file1 file2表示依次读取file1 file2，打印出每行，并且在前面添加行号。
+ 命令sort，就是对行进行排序，参数-k表示根据各行的第几个参数关键字开进行排序，这里的-k2表示根据第二个关键字开始进行排序。
+ 命令uniq，进行报告或者忽略重复的行，参数-u，表示只是打印出唯一的行(unique lines)，-f表示忽略的每行的前n个域的比较。</p>
+
+<p>4.方法四：使用for、grep</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>for i in `cat new.ods`;do cat old.ods|grep $i &gt; /dev/null ||echo $i ;done;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>找出文件new里面有得old里面不存在的</p>
+
+<p>总的来说，几个方法我都使用了，前面三个都是找出两边所有不同的，第一个grep效率低点，最高的还是第四个，比较好用，筛选出来的数据还可以反复验证下，比较好用。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>comm -12 fileA fileB</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比较文件，输出两个文件相同数据。</p>
 
   
   

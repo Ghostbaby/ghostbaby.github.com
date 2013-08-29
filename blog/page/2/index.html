@@ -7,20 +7,7 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
-Processing triggers for man-db ... &hellip;">
+	<meta name="description" content="snmpd默认在udp161上监听SNMP请求，处于安全考虑，我们可能希望改变端口，可以通过给snmpd指定监听端口。 修改snmp启动配置文件 /etc/init.d/snmpd 修改前 OPTIONS=&ldquo;-Lsd -Lf /dev/null -p /var/run/snmpd. &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -45,7 +32,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/openstackan-zhuang-rabbitmq-serverxiao-xi-dui-lie-shi-chu-xian-cuo-wu/">Openstack安装rabbitmq-server消息队列时出现错误</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/linuxxiu-gai-snmpde-mo-ren-jian-ting-duan-kou/">Linux修改snmp的默认监听端口</a></h1>
   
   
 
@@ -57,67 +44,22 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T16:06:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:07:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Unpacking rabbitmq-server (from .../rabbitmq-server_2.5.0-1ubuntu2_all.deb) ...
-</span><span class='line'>Processing triggers for man-db ...
-</span><span class='line'>Processing triggers for ureadahead ...
-</span><span class='line'>Setting up rabbitmq-server (2.5.0-1ubuntu2) ...
-</span><span class='line'>Starting rabbitmq-server: FAILED - check /var/log/rabbitmq/startup_{log, _err}
-</span><span class='line'>rabbitmq-server.
-</span><span class='line'>invoke-rc.d: inits_cript rabbitmq-server, action "start" failed.
-</span><span class='line'>dpkg: error processing rabbitmq-server (--configure):
-</span><span class='line'>subprocess installed post-installation s_cript returned error exit status 1
-</span><span class='line'>Errors were encountered while processing:
-</span><span class='line'>rabbitmq-server
-</span><span class='line'>E: Sub-process /usr/bin/dpkg returned an error code (1)</span></code></pre></td></tr></table></div></figure>
+    <p>snmpd默认在udp161上监听SNMP请求，处于安全考虑，我们可能希望改变端口，可以通过给snmpd指定监听端口。</p>
 
+<p>修改snmp启动配置文件 /etc/init.d/snmpd</p>
 
-<p>openstack安装rabbitmq-server消息队列时出现以下错误：</p>
+<p>修改前 OPTIONS=&ldquo;-Lsd -Lf /dev/null -p /var/run/snmpd.pid -a&rdquo;
+修改后 OPTIONS=&ldquo; udp:9999 -Lsd -Lf /dev/null -p /var/run/snmpd.pid -a&rdquo;</p>
 
-<p>因为安装完成后，在启动rabbitmq-server时会检测hostname和hosts记录的对应关系
-解决方法：
-查看hostname</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># hostname 
-</span><span class='line'>ubuntu6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>配置hosts文件</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># cat /etc/hosts |grep ubuntu6
-</span><span class='line'>127.0.0.1 ubuntu6</span></code></pre></td></tr></table></div></figure>
-
-
-<p>重启服务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/init.d/rabbitmq-server start</span></code></pre></td></tr></table></div></figure>
-
-
-
+<p>最后重启snmp就行了。</p>
 
   
   
@@ -135,7 +77,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/nova-rootwrap-require-configuration-file-as-argument/">Nova-rootwrap Require Configuration File as Argument</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/vmware-vsphere-powercli-yin-wei-zai-ci-xi-tong-zhong-jin-zhi-zhi-xing-jiao-ben/">VMware vSphere PowerCLI 因为在此系统中禁止执行脚本</a></h1>
   
   
 
@@ -147,15 +89,183 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T16:04:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:06:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+    <p>VMware vSphere PowerCLI 因为在此系统中禁止执行脚本。有关详细信息，请参阅 &ldquo;get-help about_signi
+打开 VMware vSphere PowerCLI 出现
+无法加载文件 C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-PowerCLIEnvironment.ps1，因为在此系统中禁止执行脚本。有关详细信息，请参阅 &#8220;get-help about_signing&#8221;。所在位置 行:1 字符: 2
++ . &lt;&lt;&lt;&lt;  &#8220;C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Script
+s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
+
+<pre><code>+ CategoryInfo          : NotSpecified: (:) [], PSSecurityException
++ FullyQualifiedErrorId : RuntimeException
+</code></pre>
+
+<p>执行：get-help about_signing 命令</p>
+
+<p>执行：get-executionpolicy 命令查看 策略
+显示为:  Restricted    该策略不允许任何脚本运行。</p>
+
+<p>执行： set-executionpolicy remotesigned  修改执行策略。</p>
+
+<p>输入： y</p>
+
+<p>退出在打开时候，显示正常</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/powercli-pi-liang-chuang-jian-xu-ni-ji/">PowerCLI 批量创建虚拟机</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:05:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>首先，创建一个虚拟机的配置</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PS D:\Program Files (x86)\VMware&gt; New-OSCustomizationSpec -Name testByAVA -OSType Linux -NamingScheme vm -Domain avarcher.net -DnsServer 8.8.8.8</span></code></pre></td></tr></table></div></figure>
+
+
+<p>添加一个名字为testByAVA，类型为linux的主机的策略。</p>
+
+<p>第二部，创建脚本</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$vmhost="10.1.128.235"
+</span><span class='line'>$template="XGTEMP"
+</span><span class='line'>$datastore="datastore05"
+</span><span class='line'>$custsysprep = Get-OSCustomizationSpec
+</span><span class='line'>1..2 | Foreach {
+</span><span class='line'>$ip=30
+</span><span class='line'>$name="XG13"
+</span><span class='line'>$ip=$ip+$_
+</span><span class='line'>$name=$name+$_
+</span><span class='line'>$custsysprep | Get-OSCustomizationNicMapping |Set-OSCustomizationNicMapping -IpMode UseStaticIP -IpAddress 10.1.128.1$ip -SubnetMask 255.255.254.0 -DefaultGateway 10.1.128.2
+</span><span class='line'>New-vm -vmhost $vmhost -Name $name -Template $template -Datastore $datastore -OSCustomizationspec $custsysprep
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在模板的时候，在虚拟机的
+/etc/rc.d/rc.local文件下   添加一句</p>
+
+<p>service network  restart</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/sshtong-dao-pi-liang-guan-li-zhu-ji/">SSH通道批量管理主机</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:04:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>这边用到了expect，先yum装下。</p>
+
+<p>下面是一个类似自动输入的方法</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/usr/bin/expect -f
+</span><span class='line'>set user root
+</span><span class='line'>set host [lindex $argv 0]
+</span><span class='line'>set password "*******"
+</span><span class='line'>set timeout 5
+</span><span class='line'>spawn ssh-copy-id -i  /root/.ssh/id_rsa.pub $user@$host
+</span><span class='line'>expect {
+</span><span class='line'>
+</span><span class='line'>"Are you sure you want to continue connecting (yes/no)?" {send "yes\r";exp_continue}
+</span><span class='line'>"*assword:*" {send "$password\r"}
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>expect eof</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面就是发送批量指令方法</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -197,158 +307,48 @@ Processing triggers for man-db ... &hellip;">
 <span class='line-number'>40</span>
 <span class='line-number'>41</span>
 <span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>nova root wrapper requires a configuration file as argument but devstack doesn't feed it. This error was reported in the log of nova-volume and nova-network service.
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash
+</span><span class='line'>
+</span><span class='line'># auto copy publick key to ssh server,but you must create the rsa public key first!
+</span><span class='line'>
+</span><span class='line'>#
+</span><span class='line'>
+</span><span class='line'># include a  expect expect script
+</span><span class='line'>
+</span><span class='line'># see the log file  /tmp/test.log
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'>===========================nova-network log==========================
-</span><span class='line'>2012-06-28 17:17:49 DEBUG nova.utils [-] ['sudo', '/usr/local/bin/nova-rootwrap', 'iptables-save', '-t', 'filter'] failed. Retrying. from (pi
-</span><span class='line'>d=9143) execute /opt/stack/nova/nova/utils.py:197
-</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Running cmd (subprocess): sudo /usr/local/bin/nova-rootwrap iptables-save -t filter from (pid=9143)
-</span><span class='line'>execute /opt/stack/nova/nova/utils.py:168
-</span><span class='line'>2012-06-28 17:17:50 DEBUG nova.utils [-] Result was 97 from (pid=9143) execute /opt/stack/nova/nova/utils.py:184
-</span><span class='line'>Traceback (most recent call last):
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 336, in fire_timers
-</span><span class='line'>    timer()
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/hubs/timer.py", line 56, in __call__
-</span><span class='line'>    cb(*args, **kw)
-</span><span class='line'>  File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
-</span><span class='line'>    result = function(*args, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 110, in run_server
-</span><span class='line'>    server.start()
-</span><span class='line'>  File "/opt/stack/nova/nova/service.py", line 182, in start
-</span><span class='line'>    self.manager.init_host()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
-</span><span class='line'>    self.l3driver.initialize()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
-</span><span class='line'>    linux_net.init_host()
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
-</span><span class='line'>    add_snat_rule(ip_range)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
-</span><span class='line'>    iptables_manager.apply()
-</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 672, in inner
-</span><span class='line'>    retval = f(*args, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
-</span><span class='line'>    attempts=5)
-</span><span class='line'>  File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
-</span><span class='line'>    return utils.execute(*cmd, **kwargs)
-</span><span class='line'>  File "/opt/stack/nova/nova/utils.py", line 191, in execute
-</span><span class='line'>    cmd=' '.join(cmd))
-</span><span class='line'>ProcessExecutionError: Unexpected error while running command.
-</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>Exit code: 97
-</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 CRITICAL nova [-] Unexpected error while running command.
-</span><span class='line'>Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>Exit code: 97
-</span><span class='line'>Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Traceback (most recent call last):
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/bin/nova-network", line 48, in &lt;module&gt;
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova _launcher.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 149, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova service.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 166, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self._exit_event.wait()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/event.py", line 116, in wait
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return hubs.get_hub().switch()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/hubs/hub.py", line 177, in switch
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return self.greenlet.switch()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/usr/lib/python2.7/dist-packages/eventlet/greenthread.py", line 192, in main
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova result = function(*args, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 110, in run_server
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova server.start()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/service.py", line 182, in start
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.manager.init_host()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/manager.py", line 1766, in init_host
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova self.l3driver.initialize()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/l3.py", line 82, in initialize
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova linux_net.init_host()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 447, in init_host
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova add_snat_rule(ip_range)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 437, in add_snat_rule
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova iptables_manager.apply()
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 672, in inner
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova retval = f(*args, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 333, in apply
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova attempts=5)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/network/linux_net.py", line 828, in _execute
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova return utils.execute(*cmd, **kwargs)
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova File "/opt/stack/nova/nova/utils.py", line 191, in execute
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova cmd=' '.join(cmd))
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova ProcessExecutionError: Unexpected error while running command.
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Command: sudo /usr/local/bin/nova-rootwrap iptables-save -t filter
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Exit code: 97
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stdout: '/usr/local/bin/nova-rootwrap: Incorrect configuration file: iptables-save\n'
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova Stderr: ''
-</span><span class='line'>2012-06-28 17:17:50 TRACE nova
-</span><span class='line'>============================================================</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的错误日志是从帖子上抓取的，实际的日志报错都是一样的。上面的问题主要是在nova-rootwrap的权限和默认目录路径上，下面要对rootwrap.conf进行配置\</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>nova.conf
+</span><span class='line'>if
+</span><span class='line'> rpm -q expect
+</span><span class='line'>then
+</span><span class='line'> echo "good" &gt;/dev/null
+</span><span class='line'>else
+</span><span class='line'> ehco "you must install the expect package"
+</span><span class='line'>fi
 </span><span class='line'>
-</span><span class='line'>The root_helper parameter is deprecated in favor of the rootwrap_config parameter:
 </span><span class='line'>
-</span><span class='line'>rootwrap_config=/etc/nova/rootwrap.conf
 </span><span class='line'>
-</span><span class='line'>If you still want to use root_helper, it now needs to include the configuration file:
 </span><span class='line'>
-</span><span class='line'>root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>for i in {11..29}
+</span><span class='line'>
+</span><span class='line'>do
+</span><span class='line'>
+</span><span class='line'>#if
+</span><span class='line'>
+</span><span class='line'>ping -c2 10.1.128.$i
+</span><span class='line'>
+</span><span class='line'>#then
+</span><span class='line'>
+</span><span class='line'>/tmp/abc.sh 10.1.128.$i
+</span><span class='line'>
+</span><span class='line'>echo "********10.1.128.$i**************"&gt;&gt;/tmp/test.log
+</span><span class='line'>
+</span><span class='line'>#ssh 10.1.128.$i "chkconfig --level 123456 NetworkManager off"
+</span><span class='line'>
+</span><span class='line'>ssh 10.1.128.$i " cp /etc/sysconfig/network-scripts/ifcfg-eth1 /etc/sysconfig/network-scripts/ifcfg-eth1.bak"
+</span><span class='line'>#else
+</span><span class='line'>
+</span><span class='line'>#echo "the server 10.1.128.$i is't exsit"&gt;&gt;/tmp/down.log</span></code></pre></td></tr></table></div></figure>
 
 
   
@@ -367,7 +367,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/linuxxia-ru-he-mo-ni-an-jian-shu-ru-he-mo-ni-shu-biao/">Linux下如何模拟按键输入和模拟鼠标</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/powerclizhua-qu-xu-ni-ji-lie-biao-bing-shu-chu-wei-csvge-shi/">PowerCLI抓取虚拟机列表并输出为csv格式</a></h1>
   
   
 
@@ -379,20 +379,69 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T15:34:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T09:01:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>1.查看/dev/input/eventX是什么类型的事件， cat /proc/bus/input/devices</p>
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Get-VM | Select-Object Name,NumCPU,MemoryMB,PowerState,Host | Export-Csv VMsList.csv -NoTypeInformation</span></code></pre></td></tr></table></div></figure>
 
-<p>设备有着自己特殊的按键键码，我需要将一些标准的按键，比如0－9，X－Z等模拟成标准按键，比如KEY_0,KEY-Z等，所以需要用到按键模拟，具体方法就是操作/dev/input/event1文件，向它写入个input_event结构体就可以模拟按键的输入了。</p>
 
-<pre><code>  linux/input.h中有定义，这个文件还定义了标准按键的编码等
-</code></pre>
+<p>该命令不需要连接到vcs上面，直接连vmhost即可。
+下面为查询结果</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/powerclihuo-qu-esxizhu-ji-de-ying-jian-pei-zhi-xin-xi/">PowerCLI获取ESXi主机的硬件配置信息</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:00:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Get-VmHost | Get-View | ForEach-Object
+</span><span class='line'>{
+</span><span class='line'>$_.Summary.Hardware | Add-Member -MemberType NoteProperty -Name "Name" -Value $_.Name -PassThru
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>查询vmhost物理机一件配置</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -405,17 +454,108 @@ Processing triggers for man-db ... &hellip;">
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>struct input_event {
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PowerCLI D:\Program Files (x86)\VMware&gt; Get-VmHost | Get-View | ForEach-Object{$_.Summary.Hardware | Add-Member -MemberType NotePr
+</span><span class='line'>operty -Name "Name" -Value $_.Name -PassThru}
 </span><span class='line'>
-</span><span class='line'>struct timeval time; //按键时间
 </span><span class='line'>
-</span><span class='line'>__u16 type; //类型，在下面有定义
+</span><span class='line'>Name                 : localhost.
+</span><span class='line'>Vendor               : IBM
+</span><span class='line'>Model                : BladeCenter **********
+</span><span class='line'>Uuid                 : ***************************
+</span><span class='line'>OtherIdentifyingInfo : {VMware.Vim.HostSystemIdentificationInfo}
+</span><span class='line'>MemorySize           : *****************
+</span><span class='line'>CpuModel             : *****************
+</span><span class='line'>CpuMhz               : ******
+</span><span class='line'>NumCpuPkgs           : 2
+</span><span class='line'>NumCpuCores          : 12
+</span><span class='line'>NumCpuThreads        : 24
+</span><span class='line'>NumNics              : 7
+</span><span class='line'>NumHBAs              : 3
+</span><span class='line'>DynamicType          :
+</span><span class='line'>DynamicProperty      :</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/shellti-qu-ri-zhi-zhong-sqljiao-ben/">shell提取日志中SQL脚本</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T08:58:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>首先，贴出日志中记录的原始数据</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[551067620][SQLProc_4][ERROR] 2012-08-01 00:00:00,491 method:com.jsgps.taxi.dbserver.SQLProc.run(SQLProc.java:104) 批处理执行错误 SQL：Insert into ******************(VT_ID,VT_VEHICL
+</span><span class='line'>E ,VT_DATE ,VT_LONG ,VT_LAT ,VT_STATE,VT_SPEED ,VT_DIR,VC_ACC ,VC_LOCK, VC_SYSDATE,vt_enclat,vt_enclon,YC_UNIQUENO) VALUES (VEHICLETRACEID.NEXTVAL, ***********,to_date('201207312
+</span><span class='line'>35953','yyyymmddhh24miss'),1.11036653E8,3.8133295E7,7,0,0,1,0,SYSDATE,38.1339830186632,111.042938368056, '********************' )
+</span><span class='line'>java.sql.BatchUpdateException: 批处理中出现错误: ORA-00942: 表或视图不存在
 </span><span class='line'>
-</span><span class='line'>__u16 code; //要模拟成什么按键
-</span><span class='line'>
-</span><span class='line'>__s32 value;//是按下还是释放
-</span><span class='line'>
-</span><span class='line'>};</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>        at oracle.jdbc.dbaccess.DBError.throwBatchUpdateException(DBError.java:572)
+</span><span class='line'>        at oracle.jdbc.dbaccess.DBError.throwBatchUpdateException(DBError.java:627)
+</span><span class='line'>        at oracle.jdbc.driver.OracleStatement.executeBatch(OracleStatement.java:7101)
+</span><span class='line'>        at com.mchange.v2.c3p0.impl.NewProxyStatement.executeBatch(NewProxyStatement.java:743)
+</span><span class='line'>        at com.jsgps.taxi.dbserver.SQLProc.run(SQLProc.java:93)
+</span><span class='line'>        at java.lang.Thread.run(Unknown Source)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>处理脚本</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat *  |awk -F'：' '{print $2}'| sed 's/ )/ );/g' |sed 's/0)/0);/g'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>处置后结果</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Insert into ****************(VT_ID,VT_VEHICLE ,VT_DATE ,VT_LONG ,VT_LAT ,VT_SPEED ,VT_DIR,VC_ACC ,VC_LOCK, VC_LOCK2, VC_LOCK3, vt_enclat,vt_enclon,VC_SYSDATE, YC_UNIQUENO) VALUES (VEHICLETRACEID.NEXTVAL, *************,to_date('20120731235904','yyyymmddhh24miss'),121097185,28873533,0,50,1,0,0,0,28.8707400173611,121.101614312066,SYSDATE, '*****************' );</span></code></pre></td></tr></table></div></figure>
+
 
 
 
@@ -435,7 +575,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/powershell-huo-qu-xu-ni-ji-zhuang-tai/">POWERSHELL 获取虚拟机状态</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/powerclihuo-qu-zhu-ji-cpu/">PowerCLI获取主机CPU</a></h1>
   
   
 
@@ -447,8 +587,8 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T15:33:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T08:57:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
@@ -549,7 +689,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/powercli-xu-ni-ji-jian-dan-zhuang-tai-bao-gao/">POWERCLI 虚拟机简单状态报告</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/29/shellzhu-yi-dian/">Shell注意点</a></h1>
   
   
 
@@ -561,57 +701,21 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T15:17:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-29T08:56:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$vms = get-vm|where {$_.name -like "XG*"}
-</span><span class='line'>$metrics = "cpu.usagemhz.average","mem.usage.average","cpu.usagemhz.minimum","mem.usage.minimum","cpu.usagemhz.maximum","mem.usage.maximum"
-</span><span class='line'>$start = Get-Date -Hour 7 -Minute 0 -Second 0 -Day 7 -Month 8 -Year 2012
-</span><span class='line'>$finish = Get-Date -Hour 11 -Minute 0 -Second 0 -Day 9 -Month 8 -Year 2012
-</span><span class='line'>Get-Stat -Entity ($vms) -Stat $metrics -Start $start -Finish $finish |
-</span><span class='line'>Group-Object -Property EntityId,Timestamp | %{
-</span><span class='line'>  New-Object PSObject -Property @{
-</span><span class='line'>    VMName = $_.Group[0].Entity.Name
-</span><span class='line'>    Date = $_.Group[0].Timestamp.ToLongDateString()
-</span><span class='line'>    Time = $_.Group[0].Timestamp.ToLongTimeString()
-</span><span class='line'>    MemMax = $_.Group | where {$_.MetricId -eq "mem.usage.maximum"} | Select -ExpandProperty Value
-</span><span class='line'>    MemAvg = $_.Group | where {$_.MetricId -eq "mem.usage.average"} | Select -ExpandProperty Value
-</span><span class='line'>    MemMin = $_.Group | where {$_.MetricId -eq "mem.usage.minimum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuMax = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.maximum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuMin = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.minimum"} | Select -ExpandProperty Value
-</span><span class='line'>    CpuAvg = $_.Group | where {$_.MetricId -eq "cpu.usagemhz.average"} | Select -ExpandProperty Value
-</span><span class='line'>    NetMax = $_.Group | where {$_.MetricId -eq "net.usage.maximum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>    NetMin = $_.Group | where {$_.MetricId -eq "net.usage.minimum" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>    NetAvg = $_.Group | where {$_.MetricId -eq "net.usage.average" -and $_.Instance -eq ""} | Select -ExpandProperty Value
-</span><span class='line'>  }
-</span><span class='line'>  } |Export-Csv D:\vmreport.csv -NoTypeInformation -UseCulture</span></code></pre></td></tr></table></div></figure>
+    <p>1.默认情况下，未定义的变量展开为null，即为空，所以在使用变量时要尤其小心，如下的语句可能会导致灾难</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rm -rf /$abc</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果此时变量abc取不到值，后果不堪设想。</p>
 
   
   
@@ -629,7 +733,7 @@ Processing triggers for man-db ... &hellip;">
 
 	<article class="post"><header>
   
-  <h1 class="title"><a href="/blog/2013/08/19/shell-plus-pi-chu-jiao-ben-kua-ping-tai-ri-zhi-shai-xuan-cha-ru-shu-ju-ku/">Shell +批出脚本 跨平台 日志筛选 插入数据库</a></h1>
+  <h1 class="title"><a href="/blog/2013/08/23/nginx-plus-keepalive-webji-qun/">Nginx+keepalive Web集群</a></h1>
   
   
 
@@ -641,21 +745,15 @@ Processing triggers for man-db ... &hellip;">
 
 
 	
-		<time datetime="2013-08-19T14:31:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
+		<time datetime="2013-08-23T16:45:00+08:00">
+			<span class="day">23</span><span class="month">Aug</span>
 		</time>
 	
 
 </header>
 <div class="entry-content">
   
-    <p>最近平台某个功能无法实现了，在中间件里面查看日志，发现有报错日志，将脚本单独提出来执行，发现数据的精度超出字段的定义，数据库为mysql，没有数据库表字典无法确定该字段含义，且修改数据库有风险，所以选择折中方案。</p>
-
-<pre><code>中间件运行在windows平台下，数据库在linux下，为了锻炼批处理和shell的能力，选择一个比较复杂的方案：
-1.在中间件服务器上面运行批处理，判断文件的日期，将特定日期的日志复制到共享文件夹
-2.在linux服务器上面运行shell脚本，每隔10S从共享文件夹中获取数据，并且截取字符串就行二次拼接，将语句就行存储，同时往数据库里面插入数据。
-日志文件如下：
-</code></pre>
+    <p>nginx安装</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -667,412 +765,17 @@ Processing triggers for man-db ... &hellip;">
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>2013-05-02 13:12:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:12:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:13:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:13:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:14:17: CADODatabase::ExecuteSQL Fail,_strSql:call TF_PhotoIndex_ADD( 2382430263,80,0,'2013-5-2 13:13:50',1948.386880,671.940920,1,2,1,22,'289723281_604_0_24.jpg' );
-</span><span class='line'>2013-05-02 13:14:27: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:14:58: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:15:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:15:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:16:28: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:16:57: ExcuteStoByConn , _pDB-&gt;IsEOF()
-</span><span class='line'>2013-05-02 13:17:28: ExcuteStoByConn , _pDB-&gt;IsEOF()</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
+</span><span class='line'>useradd -g www www
+</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
+</span><span class='line'>cd pcre-7.8/  
+</span><span class='line'>./configure  
+</span><span class='line'>make && make install 
+</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
+</span><span class='line'>cd nginx-0.7.51/  
+</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
+</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
 
-
-<pre><code> 下面为具体代码：
-     批处理echo.bat
-</code></pre>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@echo off
-</span><span class='line'>setlocal
-</span><span class='line'>cls
-</span><span class='line'>color f0
-</span><span class='line'>mode con: cols=20 lines=5
-</span><span class='line'>title Plugin
-</span><span class='line'>@echo off&&setlocal enabledelayedexpansion
-</span><span class='line'>:en
-</span><span class='line'>for /f "delims=" %%i in ('dir /a-d /b *.log') do (
-</span><span class='line'>for /f "tokens=1 delims=:" %%t in ('time /T') do set houre=%%t
-</span><span class='line'>set timefile=DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!.log
-</span><span class='line'>set filename=%%i
-</span><span class='line'>if "!filename!"=="!timefile!" ( 
-</span><span class='line'>set size=%%~zi
-</span><span class='line'>copy %%i z:\DBExcp%date:~0,4%%date:~5,2%%date:~8,2%-!houre!-%time:~3,2%-%time:~6,2%.log )else echo NO
-</span><span class='line'>)
-</span><span class='line'>ping -n 20 127.0.0.1&gt;nul
-</span><span class='line'>goto en</span></code></pre></td></tr></table></div></figure>
-
-
-<p>linux下挂载共享文件夹</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mount //10.10.3.215/log_bak /mnt/log_bak/ -o username=administrator,password=****************</span></code></pre></td></tr></table></div></figure>
-
-
-<p>记得需要安装文件系统包</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>683 sudo apt-get install nfs-common
-</span><span class='line'>737 sudo apt-get install smbfs</span></code></pre></td></tr></table></div></figure>
-
-
-<p>linux下循环运行脚本</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>root@ubuntu:~/22# more ADD_tf_photo_index.sh 
-</span><span class='line'>#!/bin/sh
-</span><span class='line'>
-</span><span class='line'>while true
-</span><span class='line'>
-</span><span class='line'>do
-</span><span class='line'>
-</span><span class='line'>rm -rf /root/22/*.log
-</span><span class='line'>
-</span><span class='line'>mv /mnt/log_bak/*.log /root/22/
-</span><span class='line'>
-</span><span class='line'>cat /root/22/*.log|grep TF_PhotoIndex_ADD|awk -F '(' '{printf $2 "\n"}'&gt;&gt;/root/22/1.txt
-</span><span class='line'>
-</span><span class='line'>while read line
-</span><span class='line'>do
-</span><span class='line'>echo $line|awk -F ',' 'BEGIN{OFS=","}{$5=0;$6=0}END{print $0 "\n"}'&gt;&gt;/root/22/some
-</span><span class='line'>done &lt; /root/22/1.txt
-</span><span class='line'>
-</span><span class='line'>rm -rf 1.txt
-</span><span class='line'>
-</span><span class='line'>sed '/^ *$/d' /root/22/some &gt;&gt;two
-</span><span class='line'>
-</span><span class='line'>echo "use txserver;"&gt;&gt;sql
-</span><span class='line'>echo "use txserver;"&gt;&gt;sql0
-</span><span class='line'>
-</span><span class='line'>while read line_two
-</span><span class='line'>do
-</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql
-</span><span class='line'>echo "call TF_PhotoIndex_ADD( $line_two"&gt;&gt;sql0
-</span><span class='line'>done &lt; /root/22/two
-</span><span class='line'>
-</span><span class='line'>mysql -h10.10.3.6 -uroot -p********* &lt;/root/22/sql0
-</span><span class='line'>rm -rf some two sql0
-</span><span class='line'>sleep 10s
-</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/mysql-error-1289-hy000/">Mysql ERROR 1289 (HY000)</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:30:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>在安装mysql 5.1.68的时候，导入数据的时候报一下错误：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ERROR 1289 (HY000): The 'partitioning' feature is disabled; you need MySQL built with '--with-partition' to have it working</span></code></pre></td></tr></table></div></figure>
-
-
-<p>同时该业务库还是需要支持GBK的，所以在源码安装configure的时候需要加上编码和分区表的选项，我在网上看帖子也有用</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>--with-plugins=max</span></code></pre></td></tr></table></div></figure>
-
-
-<p>自己装的时候没有用，用的一下选项</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./configure --prefix=/usr/local/mysql  --datadir=/videodata/mysqldata/data --with-partition --with-extra-charsets=all  --with-charset=gbk --with-charset=utf8</span></code></pre></td></tr></table></div></figure>
-
-
-<p>会报一下警告，但是MAKE之后报错的脚本已经插到库里面了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>configure: WARNING: Unrecognized options:</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/openstack-network-flatdhcp-can-not-ping-host/">[Openstack]Network FlatDHCP Can Not Ping Host</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:29:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>12.10: adjust /etc/rc.local to add a firewall rule for use with FlatDHCPManager:
-</span><span class='line'>
-</span><span class='line'>adjust /etc/rc.local to have (before the call to exit):
-</span><span class='line'>
-</span><span class='line'>/sbin/iptables -A POSTROUTING -t mangle -p udp --dport 68 -j CHECKSUM --checksum-fill
-</span><span class='line'>make /etc/rc.local executable:
-</span><span class='line'>
-</span><span class='line'>$ sudo chmod 755 /etc/rc.local
-</span><span class='line'>
-</span><span class='line'>Note: run the iptables command manually before trying to start guests</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/openstack-critical-nova/">[Openstack]CRITICAL Nova [-]</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:28:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>/var/log/nova/nova-computer.log</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Cannot get interface MTU on 'br100': No such device</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在nova.conf中添加如下节点，让实例自动启动</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>--start_guests_on_host_boot=true
-</span><span class='line'>--resume_guests_state_on_host_boot=true</span></code></pre></td></tr></table></div></figure>
-
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/19/svn-tian-jia-xin-yong-hu-jiao-ben/">Svn 添加新用户脚本</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-19T14:26:00+08:00">
-			<span class="day">19</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#! /bin/sh
-</span><span class='line'>date
-</span><span class='line'>echo '*******************************************************************'
-</span><span class='line'>echo 'Svn add new user'
-</span><span class='line'>echo 'zhuhuijunzhj@126.com'
-</span><span class='line'>echo '*******************************************************************'
-</span><span class='line'>for ID in $(cat UserList)
-</span><span class='line'>do
-</span><span class='line'>echo User:@$ID@ is about to be created ......
-</span><span class='line'>echo ' '
-</span><span class='line'>svnadmin create --fs-type fsfs /etc/svn/$ID 
-</span><span class='line'>echo Configuration directory permissions .....
-</span><span class='line'>chown -R www-data:subversion /etc/svn/$ID
-</span><span class='line'>chmod -R g+rws /etc/svn/$ID
-</span><span class='line'>PASS=$(sudo cat /dev/urandom | sed 's/[^a-zA-Z0-9]//g' | strings -n 6 | head -n 1)
-</span><span class='line'>echo -n $ID &gt;&gt;1
-</span><span class='line'>echo " $PASS" &gt;&gt;1
-</span><span class='line'>echo ' '
-</span><span class='line'>echo Add User Information ......
-</span><span class='line'>htpasswd -b /etc/subversion/dav_svn.passwd $ID $PASS
-</span><span class='line'>echo ' '
-</span><span class='line'>echo "[$ID:/]" &gt;&gt;/etc/subversion/dav_svn.authz
-</span><span class='line'>echo "$ID = rw" &gt;&gt;/etc/subversion/dav_svn.authz
-</span><span class='line'>echo "zhuhuijun = rw" &gt;&gt;/etc/subversion/dav_svn.authz
-</span><span class='line'>echo "* =" &gt;&gt;/etc/subversion/dav_svn.authz
-</span><span class='line'>done</span></code></pre></td></tr></table></div></figure>
 
 
   

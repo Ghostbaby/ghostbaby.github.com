@@ -1,0 +1,356 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患： 由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。 域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？ &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/ru-he-fang-e-yi-jie-xi-%2Cjin-zhi-yong-ipfang-wen-wang-zhan-de-apacheshe-zhi-%3F/">如何防恶意解析，禁止用IP访问网站的Apache设置？</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T14:19:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>一般来说，网站可以用域名和IP来访问。你的网站可以通过IP直接访问，本来这没什么问题，但是会有些隐患：</p>
+
+<p>由于搜索引擎也会收录你的IP地址的页面，所以同一个页面搜索引擎会重复收录，造成页面的权重不如单个收录高。</p>
+
+<p>域名恶意指向的可能。还记得去年还是前年的 google.com.sb 事件吗？google.com.sb 这个域名被恶意指向了百度，后来证实了 google.com.sb 这个域名为第三者恶意指向的，并不是Google所为。当然这只是个玩笑，但是如果被人恶意用别的域名解析到你的IP的话，那么你的网站就能通过别人的域名来访问了。接下来会发生什么？假如那域名是不友善的域名，比如曾经指向非法网站，容易引发搜索引擎惩罚，连带IP受到牵连。即使域名没什么问题，但流量也会被劫持到别的域名，从而遭到广告联盟的封杀。</p>
+
+<p>如何解决这个问题？最直接的方法是让用户只能通过域名来访问网站，而不能通过IP来直接访问。这个可以修改Apache配置文件httpd.conf来实现。下面是小站的实现：</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/yong-nginxfu-zai-jun-heng-openstackdui-xiang-cun-chu-swift/">用Nginx负载均衡Openstack对象存储swift</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T14:15:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>此文为用Nginx实现负载均衡Openstack对象存储swift多代理的配置</p>
+
+<p>1、下载Nginx</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cd</span> <span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">wget</span> <span class="o">-</span><span class="nx">S</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.2.6.tar.gz</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2、创建用户</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">useradd</span> <span class="o">-</span><span class="nx">c</span> <span class="s2">&quot;Nginx User&quot;</span> <span class="o">-</span><span class="nx">s</span> <span class="o">/</span><span class="nx">sbin</span><span class="o">/</span><span class="nx">nologin</span> <span class="o">-</span><span class="nx">r</span> <span class="o">-</span><span class="nx">d</span> <span class="o">/</span><span class="kd">var</span><span class="err">/lib/nginx nginx </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3、安装Nginx</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="p">.</span><span class="nx">tar</span><span class="p">.</span><span class="nx">gz</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">cd</span> <span class="nx">nginx</span><span class="o">-</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/pythonyong-cx-oraclemo-kuai-lian-jie-shu-ju-ku/">python用cx_Oracle模块连接数据库</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T13:45:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>在的时候可能会报这些错误</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ImportError</span><span class="o">:</span> <span class="nx">libclntsh</span><span class="p">.</span><span class="nx">so</span><span class="p">.</span><span class="mf">11.1</span><span class="o">:</span> <span class="nx">cannot</span> <span class="nx">open</span> <span class="nx">shared</span> <span class="nx">object</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">such</span> <span class="nx">file</span> <span class="nx">or</span> <span class="nx">directory</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么需要在LD_LIBRARY_PATH中指定那些库的所在，典型是在下面</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nx">$ORACLE_HOME</span><span class="o">/</span><span class="nx">lib</span><span class="o">:</span><span class="err">/usr/lib:/usr/local/lib</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在的时候可能会报这些错误</p>
+
+<figure class='code'><figcaption><span>shell</span><a href='http://foo.url/foo.js'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">cx_Oracle</span><span class="p">.</span><span class="nx">InterfaceError</span><span class="o">:</span> <span class="nx">Unable</span> <span class="nx">to</span> <span class="nx">acquire</span> <span class="nx">Oracle</span> <span class="nx">environment</span> <span class="nx">handle</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下载\instantclient_10_2</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/19/proxmoxan-zhuang-ji-pi-liang-bu-shu-jiao-ben/">PROXMOX安装 及批量部署脚本</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-19T08:35:00+08:00">
+			<span class="day">19</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>OS安装没有什么好讲的，主要说下，系统装完之后的一些注意点。</p>
+
+<p>1.在安装系统的时候，服务器接显示屏的时候，不要用视频延长线，用显示器的自带的视频线，系统安装完毕之后，重启过程中，分辨率有一个调整的过程，从低分辨率跳到高分辨率，老视频线可能无法自适应，就会出现黑屏的现象，没有办法分辨系统安装准确与否。这边有人要问了，系统安装的时候不是配置了IP地址吗，只要配置准确，就直接可以SSH连进系统了吗？看第二个注意点。</p>
+
+<p>2.在VM上安装安装的时候不会出现我下面说的问题，在物理服务器的时钟有可能不是当前时间，安装完系统之后，第一次重启服务器，在加载内核文件的时候，会报错时间戳，系统时间早于文件创建时间，系统进入READ-ONLY模式，目前这种问题出现在HP服务器，PVE2.0版本上，其他品牌服务器有待验证。在read-only模式下，网卡是启动不了的，所以SSH也没有打开，如果同时出现第一个问题，很难排查。所以第一个，第二个问题上面一起说下。</p>
+
+<p>3.PROXMOX控制台的console功能是基于JAVA开发的，在第一次进入控制台的时候，记得安装需要的插件，平台会提醒你安装的。
+PROXMOX做集群之后，登陆主控机的控制台可以管理集群下所有节点下虚拟机，反之在节点控制台上只能管理该节点下的终端。</p>
+
+<p>4.proxmox官方是没有提供克隆功能的，或者将批量创建虚拟机，下面贴出目前我们用的批量创建的脚本。</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/16/puppet-svn-geng-xin-fa-bu-ce-shi/">Puppet Svn 更新发布测试</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-16T14:52:00+08:00">
+			<span class="day">16</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>【导读】</p>
+
+<p>puppet中文自动化群里有同学问，puppet如何配合svn，实现web的自动更新，大家知道，svn里有个钩子(hook)，</p>
+
+<p>里面有很多模板，大家有兴趣可以仔细看下：<a href="http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0">http://www.kokkowon.com/archives/987%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0</a></p>
+
+<p>有介绍，毕竟有部分同学还不知道hooks是干吗用的，了解svn的钩子后，</p>
+
+<p>就会明白上面的需求只需要在commit代码的时候，执行post-commit这个钩子，就可以</p>
+
+<p>实现，知道原理后，sky就在虚拟机里测试了一把，如果大家感兴趣，不妨一起试验下。</p>
+
+<p>[基础]</p>
+
+<p>了解svn 的工作原理，当然要熟悉操作svn 的基本命令，比如 svn co ,svn up,svn ci 等,当</p>
+
+<p>然还有puppet了，熟悉操作puppet也是不可少的。关于puppet 中文资料，可以参阅本站</p>
+
+<p>栏目。</p>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
+
+
+<nav id="pagenavi">
+	<a href="/blog/page/4/" class="prev alignleft">Prev</a>
+	
+ <div class="clearfix"></div>
+</nav>
+</div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>

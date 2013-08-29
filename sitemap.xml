@@ -141,8 +141,110 @@
         <lastmod>2013-08-23T16:55:28+08:00</lastmod>
     </url>
     <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/shellzhu-yi-dian/</loc>
+        <lastmod>2013-08-29T08:57:36+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/powerclihuo-qu-zhu-ji-cpu/</loc>
+        <lastmod>2013-08-29T08:58:17+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/shellti-qu-ri-zhi-zhong-sqljiao-ben/</loc>
+        <lastmod>2013-08-29T09:00:06+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/powerclihuo-qu-esxizhu-ji-de-ying-jian-pei-zhi-xin-xi/
+        </loc>
+        <lastmod>2013-08-29T09:01:04+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/powerclizhua-qu-xu-ni-ji-lie-biao-bing-shu-chu-wei-csvge-shi/
+        </loc>
+        <lastmod>2013-08-29T09:02:32+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/sshtong-dao-pi-liang-guan-li-zhu-ji/</loc>
+        <lastmod>2013-08-29T09:05:25+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/powercli-pi-liang-chuang-jian-xu-ni-ji/
+        </loc>
+        <lastmod>2013-08-29T09:06:47+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/vmware-vsphere-powercli-yin-wei-zai-ci-xi-tong-zhong-jin-zhi-zhi-xing-jiao-ben/
+        </loc>
+        <lastmod>2013-08-29T09:07:23+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/linuxxiu-gai-snmpde-mo-ren-jian-ting-duan-kou/
+        </loc>
+        <lastmod>2013-08-29T09:07:58+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/shellbi-jiao-liang-ge-wen-dang-%2Cshu-chu-bu-tong/
+        </loc>
+        <lastmod>2013-08-29T09:11:24+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/linuxji-chu-%3Arang-historyji-lu-ming-ling-de-li-shi-zhi-xing-shi-jian/
+        </loc>
+        <lastmod>2013-08-29T09:15:23+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/centosri-chang-gong-zuo-gu-zhang-pai-chu/
+        </loc>
+        <lastmod>2013-08-29T09:17:46+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/centos-64bitmi-ma-zheng-que-que-wu-fa-deng-lu-init-3/
+        </loc>
+        <lastmod>2013-08-29T09:18:19+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/kai-qi-jvmde-snmp/</loc>
+        <lastmod>2013-08-29T09:19:42+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/centosxia-diao-zheng-lvmfen-qu-da-xiao/
+        </loc>
+        <lastmod>2013-08-29T09:23:53+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://Ghostbaby.github.io/blog/2013/08/29/pxean-zhuang-centos-6/</loc>
+        <lastmod>2013-08-29T09:25:24+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/pi-chu-li-jiao-ben-windowsxia-%2Cportmapwu-xian-yun-xing-jiao-ben/
+        </loc>
+        <lastmod>2013-08-29T09:33:06+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/linuxfu-wu-qi-an-quan-chu-shi-hua-shelljiao-ben/
+        </loc>
+        <lastmod>2013-08-29T09:35:55+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://Ghostbaby.github.io/blog/2013/08/29/yong-shelljiao-ben-lai-fang-zhi-sshhe-vsftpdbao-li-po-jie/
+        </loc>
+        <lastmod>2013-08-29T09:36:50+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://Ghostbaby.github.io/</loc>
-        <lastmod>2013-08-23T16:55:28+08:00</lastmod>
+        <lastmod>2013-08-29T09:36:50+08:00</lastmod>
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/robots.txt</loc>
@@ -150,6 +252,6 @@
     </url>
     <url>
         <loc>http://Ghostbaby.github.io/blog/archives/</loc>
-        <lastmod>2013-08-23T16:55:28+08:00</lastmod>
+        <lastmod>2013-08-29T09:36:50+08:00</lastmod>
     </url>
 </urlset>

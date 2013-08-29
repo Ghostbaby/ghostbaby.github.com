@@ -1,0 +1,139 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>VMware vSphere PowerCLI 因为在此系统中禁止执行脚本 | GhostBaby`s Area</title>
+	<meta name="author" content="GhostBaby">
+
+	
+	<meta name="description" content="VMware vSphere PowerCLI 因为在此系统中禁止执行脚本。有关详细信息，请参阅 &ldquo;get-help about_signi
+打开 VMware vSphere PowerCLI 出现
+无法加载文件 C:\Program Files (x86)\VMware\ &hellip;">
+	
+
+	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	
+
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><nav><ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul></nav>
+</header>
+	<div id="content" class="inner"><article class="post"><header>
+  
+  <h1 class="title">VMware vSphere PowerCLI 因为在此系统中禁止执行脚本</h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:06:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>VMware vSphere PowerCLI 因为在此系统中禁止执行脚本。有关详细信息，请参阅 &ldquo;get-help about_signi
+打开 VMware vSphere PowerCLI 出现
+无法加载文件 C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Scripts\Initialize-PowerCLIEnvironment.ps1，因为在此系统中禁止执行脚本。有关详细信息，请参阅 &#8220;get-help about_signing&#8221;。所在位置 行:1 字符: 2
++ . &lt;&lt;&lt;&lt;  &#8220;C:\Program Files (x86)\VMware\Infrastructure\vSphere PowerCLI\Script
+s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
+
+<pre><code>+ CategoryInfo          : NotSpecified: (:) [], PSSecurityException
++ FullyQualifiedErrorId : RuntimeException
+</code></pre>
+
+<p>执行：get-help about_signing 命令</p>
+
+<p>执行：get-executionpolicy 命令查看 策略
+显示为:  Restricted    该策略不允许任何脚本运行。</p>
+
+<p>执行： set-executionpolicy remotesigned  修改执行策略。</p>
+
+<p>输入： y</p>
+
+<p>退出在打开时候，显示正常</p>
+
+    
+      <div class="sharing">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+	<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4daee9911f9dfcb4"></script>
+</div>
+    
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article></div>
+	<footer id="footer" class="inner"><div class="social alignright">
+	
+	
+	
+	
+	
+	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+</div>
+<p>&copy; 2013 GhostBaby</p>
+<div class="clearfix"></div></footer>
+	<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('.entry-content').each(function(i){
+			var _i = i;
+			$(this).find('img').each(function(){
+				var alt = $(this).attr('alt');
+
+				if (alt == '' || typeof alt == 'undefined'){
+					$(this).wrap('<a href="'+$(this).attr('src')+'" class="fancybox" rel="gallery'+_i+'" />');
+				} else {
+					$(this).after('<span class="caption">'+alt+'</span>').wrap('<a href="'+$(this).attr('src')+'" class="fancybox" title="'+alt+'" rel="gallery'+_i+'" />');
+				}
+			});
+		});
+		$('.fancybox').fancybox();
+	})(jQuery);
+</script>
+<div id="phasebeam">
+	<canvas></canvas>
+	<canvas></canvas>
+	<canvas></canvas>
+</div>
+<script src="/javascripts/phasebeam.js"></script>
+
+
+
+
+</body>
+</html>
