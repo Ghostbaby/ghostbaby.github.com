@@ -7,7 +7,8 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="snmpd默认在udp161上监听SNMP请求，处于安全考虑，我们可能希望改变端口，可以通过给snmpd指定监听端口。 修改snmp启动配置文件 /etc/init.d/snmpd 修改前 OPTIONS=&ldquo;-Lsd -Lf /dev/null -p /var/run/snmpd. &hellip;">
+	<meta name="description" content="今天，同事想找出短信分发机和平台注册SIM卡的差距，将两个平台的SIM卡分别存到两个文件，本来说是想再数据库里面，通过数据库的函数来做比较，正好最近在学SHELL，想用shell写个脚本来实现。 以下为几个不同实现方法。 方法一：使用grep 1
+grep -v -f file1 file2 &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -28,6 +29,94 @@
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/shellbi-jiao-liang-ge-wen-dang-%2Cshu-chu-bu-tong/">Shell比较两个文档，输出不同</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:08:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>今天，同事想找出短信分发机和平台注册SIM卡的差距，将两个平台的SIM卡分别存到两个文件，本来说是想再数据库里面，通过数据库的函数来做比较，正好最近在学SHELL，想用shell写个脚本来实现。</p>
+
+<pre><code>    以下为几个不同实现方法。
+</code></pre>
+
+<p>方法一：使用grep</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>grep -v -f file1 file2 && grep -v -f file2 file1 </span></code></pre></td></tr></table></div></figure>
+
+
+<p>grep命令的详细使用方法，可以参考man，这里有一个简单实用的介绍：<a href="http://linux.ccidnet.com/art/3067/20070313/1035613_1.html%E3%80%82">http://linux.ccidnet.com/art/3067/20070313/1035613_1.html%E3%80%82</a>
+ 在方法一中，用到了两个参数。参数-v，表示invert match，即反向匹配，输出没有匹配上的项。参数-f，表示从文件中读取匹配模板(pattern)。方法一中的前一部分，在文件file1中匹配模板，来反向匹配文件file2中的内容，即输出文件file2中，在file1中没有的内容。后面的一部分同理可得，输出文件file1中，在file2中没有的内容。</p>
+
+<p> 2.方法二：实用comm</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>comm -3 file1 file2</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 这个方法看起来最简单。命令comm的功能就是，逐行比较两个排好序的文件，默认输出有三列：只在file1中有的行、只在file2中有的行、在file1和file2中共有的行。有参数-1 -2 -3，分别来抑制输出对应的列。例如在我们的方法二中，实用-3参数，不输出file1和file2中共有的部分。即能达到我们本文的目的。</p>
+
+<p>3.方法三：使用awk</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>awk '{print NR, $0}' file1 file2 |sort -k2|uniq -u -f 1|sort -k1|awk '{print $2}'
+</span><span class='line'>或者：
+</span><span class='line'>awk '{print $0}' file1 file2 |sort|uniq -u</span></code></pre></td></tr></table></div></figure>
+
+
+<p>awk命令的使用，听牛人说可谓博大精深，我也没有太搞清楚。这里只是使用了一些简单的功能。下面以我自己的理解来解释一下上面的shell代码。awk就是文本的解释器和过滤器。awk把每一行看成是一个记录(record)，每个记录使用分隔符(默认是空格)把每条记录分成若干域。awk内置参数$0表示整行，$1、$2&hellip;分别表示各域，内置参数NR，表示记录的计数，awk &lsquo;{print NR, $0}&rsquo; file1 file2表示依次读取file1 file2，打印出每行，并且在前面添加行号。
+ 命令sort，就是对行进行排序，参数-k表示根据各行的第几个参数关键字开进行排序，这里的-k2表示根据第二个关键字开始进行排序。
+ 命令uniq，进行报告或者忽略重复的行，参数-u，表示只是打印出唯一的行(unique lines)，-f表示忽略的每行的前n个域的比较。</p>
+
+<p>4.方法四：使用for、grep</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>for i in `cat new.ods`;do cat old.ods|grep $i &gt; /dev/null ||echo $i ;done;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>找出文件new里面有得old里面不存在的</p>
+
+<p>总的来说，几个方法我都使用了，前面三个都是找出两边所有不同的，第一个grep效率低点，最高的还是第四个，比较好用，筛选出来的数据还可以反复验证下，比较好用。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>comm -12 fileA fileB</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比较文件，输出两个文件相同数据。</p>
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -716,67 +805,6 @@ s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
 
 
 <p>如果此时变量abc取不到值，后果不堪设想。</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/23/nginx-plus-keepalive-webji-qun/">Nginx+keepalive Web集群</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-23T16:45:00+08:00">
-			<span class="day">23</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>nginx安装</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
-</span><span class='line'>useradd -g www www
-</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
-</span><span class='line'>cd pcre-7.8/  
-</span><span class='line'>./configure  
-</span><span class='line'>make && make install 
-</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
-</span><span class='line'>cd nginx-0.7.51/  
-</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
-</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
-
-
 
   
   

@@ -4,7 +4,7 @@
   <title><![CDATA[GhostBaby`s Area]]></title>
   <link href="http://Ghostbaby.github.io/atom.xml" rel="self"/>
   <link href="http://Ghostbaby.github.io/"/>
-  <updated>2013-08-29T12:05:49+08:00</updated>
+  <updated>2013-08-30T14:53:50+08:00</updated>
   <id>http://Ghostbaby.github.io/</id>
   <author>
     <name><![CDATA[GhostBaby]]></name>
@@ -12,6 +12,97 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Svn limit update size]]></title>
+    <link href="http://Ghostbaby.github.io/blog/2013/08/30/svn-limit-update-size/"/>
+    <updated>2013-08-30T14:50:00+08:00</updated>
+    <id>http://Ghostbaby.github.io/blog/2013/08/30/svn-limit-update-size</id>
+    <content type="html"><![CDATA[<p>Need hooks</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash
+</span><span class='line'>REPOS="$1"
+</span><span class='line'>TXN="$2"
+</span><span class='line'>RES="OK"
+</span><span class='line'>MAX_SIZE=5120000
+</span><span class='line'>FILTER='\.(zip|rar|o|obj|tar|gz)$'
+</span><span class='line'> 
+</span><span class='line'># Make sure that the log message contains some text.
+</span><span class='line'>SVNLOOK=/usr/bin/svnlook
+</span><span class='line'>#SVNLOOK=/opt/CollabNet_Subversion/bin/svnlook
+</span><span class='line'>
+</span><span class='line'>$SVNLOOK log -t "$TXN" "$REPOS" | egrep  "[^[:space:]]+" &gt;/dev/null || unset RES 
+</span><span class='line'>if [ "$RES" != "OK" ]
+</span><span class='line'>then
+</span><span class='line'>echo "You must input some comments for you commit" &gt;&2
+</span><span class='line'>exit 1
+</span><span class='line'>fi
+</span><span class='line'>
+</span><span class='line'>files=$($SVNLOOK changed -t $TXN $REPOS |awk '{print $2}')
+</span><span class='line'>
+</span><span class='line'>for f in $files
+</span><span class='line'>do
+</span><span class='line'>#check file type
+</span><span class='line'>if echo $f|tr A-Z a-z|grep -Eq $FILTER
+</span><span class='line'>then
+</span><span class='line'>echo "File $f is not allow ($FILTER) file" &gt;&2
+</span><span class='line'>exit 1
+</span><span class='line'>fi
+</span><span class='line'>
+</span><span class='line'>#check file size
+</span><span class='line'>filesize=$($SVNLOOK cat -t $TXN $REPOS $f|wc -c)
+</span><span class='line'>if [ "$filesize" -gt "$MAX_SIZE" ]
+</span><span class='line'>then
+</span><span class='line'>echo "File $f is too large(must &lt;=$MAX_SIZE)" &gt;&2
+</span><span class='line'>exit 1
+</span><span class='line'>fi
+</span><span class='line'>done
+</span><span class='line'>
+</span><span class='line'># All checks passed, so allow the commit.
+</span><span class='line'>exit 0</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[用SHELL脚本来防止SSH和vsftpd暴力破解]]></title>
@@ -1734,507 +1825,6 @@ s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
 
 
 <p>如果此时变量abc取不到值，后果不堪设想。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Nginx+keepalive web集群]]></title>
-    <link href="http://Ghostbaby.github.io/blog/2013/08/23/nginx-plus-keepalive-webji-qun/"/>
-    <updated>2013-08-23T16:45:00+08:00</updated>
-    <id>http://Ghostbaby.github.io/blog/2013/08/23/nginx-plus-keepalive-webji-qun</id>
-    <content type="html"><![CDATA[<p>nginx安装</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>groupadd www   
-</span><span class='line'>useradd -g www www
-</span><span class='line'>tar zxvf pcre-7.8.tar.gz  
-</span><span class='line'>cd pcre-7.8/  
-</span><span class='line'>./configure  
-</span><span class='line'>make && make install 
-</span><span class='line'>tar zxvf nginx-0.7.51.tar.gz  
-</span><span class='line'>cd nginx-0.7.51/  
-</span><span class='line'>./configure --user=www --group=www --prefix=/usr/local/webserver/nginx --with-http_stub_status_module --with-http_ssl_module  
-</span><span class='line'>make && make install</span></code></pre></td></tr></table></div></figure>
-
-
-<!--more-->
-
-
-<p>编辑vim /usr/local/webserver/nginx/conf/nginx.conf</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>user www www;  
-</span><span class='line'>worker_processes 8;  
-</span><span class='line'>
-</span><span class='line'>pid /usr/local/webserver/nginx/logs/nginx.pid;  
-</span><span class='line'>worker_rlimit_nofile 65535;  
-</span><span class='line'>
-</span><span class='line'>events  
-</span><span class='line'>{  
-</span><span class='line'>use epoll;  
-</span><span class='line'>worker_connections 65535;  
-</span><span class='line'>}  
-</span><span class='line'>http{  
-</span><span class='line'>include       mime.types;  
-</span><span class='line'>default_type application/octet-stream;  
-</span><span class='line'>server_names_hash_bucket_size 128;  
-</span><span class='line'>client_header_buffer_size 32k;  
-</span><span class='line'>large_client_header_buffers 4 32k;  
-</span><span class='line'>client_max_body_size 8m;  
-</span><span class='line'>sendfile on;  
-</span><span class='line'>tcp_nopush     on;  
-</span><span class='line'>keepalive_timeout 60;  
-</span><span class='line'>tcp_nodelay on;  
-</span><span class='line'>fastcgi_connect_timeout 300;  
-</span><span class='line'>fastcgi_send_timeout 300;  
-</span><span class='line'>fastcgi_read_timeout 300;  
-</span><span class='line'>fastcgi_buffer_size 64k;  
-</span><span class='line'>fastcgi_buffers 4 64k;  
-</span><span class='line'>fastcgi_busy_buffers_size 128k;  
-</span><span class='line'>fastcgi_temp_file_write_size 128k;  
-</span><span class='line'>gzip on;  
-</span><span class='line'>gzip_min_length 1k;  
-</span><span class='line'>gzip_buffers     4 16k;  
-</span><span class='line'>gzip_http_version 1.0;  
-</span><span class='line'>gzip_comp_level 2;  
-</span><span class='line'>gzip_types       text/plain application/x-javascript text/css application/xml;  
-</span><span class='line'>gzip_vary on;  
-</span><span class='line'>
-</span><span class='line'>upstream backend  
-</span><span class='line'>{  
-</span><span class='line'>server 192.168.75.240:80;  
-</span><span class='line'>server 192.168.0.115:80;  
-</span><span class='line'>}  
-</span><span class='line'>server {  
-</span><span class='line'>listen 80;  
-</span><span class='line'>#server_name www.yuhongchun027.com;  
-</span><span class='line'>location / {  
-</span><span class='line'>root /var/www ;  
-</span><span class='line'>index index.jsp index.htm index.html;  
-</span><span class='line'>proxy_redirect off;  
-</span><span class='line'>proxy_set_header Host $host;  
-</span><span class='line'>proxy_set_header X-Real-IP $remote_addr;  
-</span><span class='line'>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
-</span><span class='line'>proxy_pass http://backend;  
-</span><span class='line'>}  
-</span><span class='line'>
-</span><span class='line'>location /nginx {  
-</span><span class='line'>access_log on;  
-</span><span class='line'>auth_basic "NginxStatus";  
-</span><span class='line'>auth_basic_user_file /usr/local/nginx/htpasswd;  
-</span><span class='line'>}  
-</span><span class='line'>
-</span><span class='line'>log_format access '$remote_addr - $remote_user [$time_local] "$request" '  
-</span><span class='line'>'$status $body_bytes_sent "$http_referer" '  
-</span><span class='line'>'"$http_user_agent" $http_x_forwarded_for';  
-</span><span class='line'>access_log /var/log/access.log access;  
-</span><span class='line'>
-</span><span class='line'>}  
-</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
-
-
-<p>新建nginx启动文件，/etc/rc.d/init.d/nginx</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
-</span><span class='line'># nginx Startup script for the Nginx HTTP Server 
-</span><span class='line'># it is v.1.3.0 version. 
-</span><span class='line'># chkconfig: - 85 15 
-</span><span class='line'># description: Nginx is a high-performance web and proxy server. 
-</span><span class='line'>#              It has a lot of features, but it's not for everyone. 
-</span><span class='line'># processname: nginx 
-</span><span class='line'># pidfile: /var/run/nginx.pid 
-</span><span class='line'># config: /usr/local/webserver/nginx/conf/nginx.conf 
-</span><span class='line'>nginxd=/usr/local/webserver/nginx/sbin/nginx 
-</span><span class='line'>nginx_config=/usr/local/webserver/nginx/conf/nginx.conf 
-</span><span class='line'>nginx_pid=/usr/local/webserver/nginx/logs/nginx.pid 
-</span><span class='line'>RETVAL=0 
-</span><span class='line'>prog="nginx" 
-</span><span class='line'># Source function library. 
-</span><span class='line'>.  /etc/rc.d/init.d/functions 
-</span><span class='line'># Source networking configuration. 
-</span><span class='line'>.  /etc/sysconfig/network 
-</span><span class='line'># Check that networking is up. 
-</span><span class='line'>[ ${NETWORKING} = "no" ] && exit 0 
-</span><span class='line'>[ -x $nginxd ] || exit 0 
-</span><span class='line'># Start nginx daemons functions. 
-</span><span class='line'>start() { 
-</span><span class='line'>if [ -e $nginx_pid ];then 
-</span><span class='line'>   echo "nginx already running...." 
-</span><span class='line'>   exit 1 
-</span><span class='line'>fi 
-</span><span class='line'>   echo -n [        DISCUZ_CODE_3        ]quot;Starting $prog: " 
-</span><span class='line'>   daemon $nginxd -c ${nginx_config} 
-</span><span class='line'>   RETVAL=$? 
-</span><span class='line'>   echo 
-</span><span class='line'>   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx 
-</span><span class='line'>   return $RETVAL 
-</span><span class='line'>} 
-</span><span class='line'># Stop nginx daemons functions. 
-</span><span class='line'>stop() { 
-</span><span class='line'>        echo -n [        DISCUZ_CODE_3        ]quot;Stopping $prog: " 
-</span><span class='line'>        killproc $nginxd 
-</span><span class='line'>        RETVAL=$? 
-</span><span class='line'>        echo 
-</span><span class='line'>        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/nginx /usr/local/webserver/nginx/logs/nginx.pid 
-</span><span class='line'>} 
-</span><span class='line'>reload() { 
-</span><span class='line'>    echo -n [        DISCUZ_CODE_3        ]quot;Reloading $prog: " 
-</span><span class='line'>    #kill -HUP `cat ${nginx_pid}` 
-</span><span class='line'>    killproc $nginxd -HUP 
-</span><span class='line'>    RETVAL=$? 
-</span><span class='line'>    echo 
-</span><span class='line'>} 
-</span><span class='line'># See how we were called. 
-</span><span class='line'>case "$1" in 
-</span><span class='line'>start) 
-</span><span class='line'>        start 
-</span><span class='line'>        ;; 
-</span><span class='line'>stop) 
-</span><span class='line'>        stop 
-</span><span class='line'>        ;; 
-</span><span class='line'>reload) 
-</span><span class='line'>        reload 
-</span><span class='line'>        ;; 
-</span><span class='line'>restart) 
-</span><span class='line'>        stop 
-</span><span class='line'>        start 
-</span><span class='line'>        ;; 
-</span><span class='line'>
-</span><span class='line'>status) 
-</span><span class='line'>        status $prog 
-</span><span class='line'>        RETVAL=$? 
-</span><span class='line'>        ;; 
-</span><span class='line'>*) 
-</span><span class='line'>        echo [        DISCUZ_CODE_3        ]quot;Usage: $prog {start|stop|restart|reload|status|help}" 
-</span><span class='line'>        exit 1 
-</span><span class='line'>esac 
-</span><span class='line'>exit $RETVAL</span></code></pre></td></tr></table></div></figure>
-
-
-<p>安装keepalived，并将其做成服务模式，方便以后调试。
-装popt先</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>wget http://www.keepalived.org/software/keepalived-1.1.15.tar.gz  
-</span><span class='line'>#tar zxvf keepalived-1.1.15.tar.gz  
-</span><span class='line'>#cd keepalived-1.1.15  
-</span><span class='line'>#./configure --prefix=/usr/local/keepalived  
-</span><span class='line'>#make   
-</span><span class='line'>#make install  
-</span><span class='line'>#cp /usr/local/keepalived/sbin/keepalived /usr/sbin/  
-</span><span class='line'>#cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/  
-</span><span class='line'>#cp /usr/local/keepalived/etc/rc.d/init.d/keepalived /etc/init.d/  
-</span><span class='line'>#mkdir /etc/keepalived  
-</span><span class='line'>#cd /etc/keepalived/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>vim keepalived.conf<br/>
-master</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
-</span><span class='line'>global_defs {  
-</span><span class='line'>   notification_email {  
-</span><span class='line'>   13912979683@139.com
-</span><span class='line'>        }  
-</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
-</span><span class='line'>   smtp_server 127.0.0.1  
-</span><span class='line'>   smtp_connect_timeout 30  
-</span><span class='line'>   router_id LVS_DEVEL  
-</span><span class='line'>}  
-</span><span class='line'>vrrp_instance VI_1 {  
-</span><span class='line'>    state MASTER  
-</span><span class='line'>    interface eth1  
-</span><span class='line'>    virtual_router_id 60 
-</span><span class='line'>    mcast_src_ip 192.168.75.223     
-</span><span class='line'>    priority 100  
-</span><span class='line'>    advert_int 1  
-</span><span class='line'>    authentication {  
-</span><span class='line'>        auth_type PASS  
-</span><span class='line'>        auth_pass chtopnet  
-</span><span class='line'>    }  
-</span><span class='line'>    virtual_ipaddress {  
-</span><span class='line'>        192.168.75.242                     
-</span><span class='line'>    }  
-</span><span class='line'>}  </span></code></pre></td></tr></table></div></figure>
-
-
-<p>bakup</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>! Configuration File for keepalived  
-</span><span class='line'>global_defs {  
-</span><span class='line'>   notification_email {  
-</span><span class='line'>   yuhongchun027@163.com  
-</span><span class='line'>        }  
-</span><span class='line'>   notification_email_from keepalived@chtopnet.com  
-</span><span class='line'>   smtp_server 127.0.0.1  
-</span><span class='line'>   smtp_connect_timeout 30  
-</span><span class='line'>   router_id LVS_DEVEL  
-</span><span class='line'>}  
-</span><span class='line'>vrrp_instance VI_1 {  
-</span><span class='line'>    state BACKUP  
-</span><span class='line'>    interface eth1  
-</span><span class='line'>    virtual_router_id 50  
-</span><span class='line'>    mcast_src_ip 192.168.75.223              
-</span><span class='line'>    priority 100 
-</span><span class='line'>    advert_int 1  
-</span><span class='line'>    authentication {  
-</span><span class='line'>        auth_type PASS  
-</span><span class='line'>        auth_pass chtopnet  
-</span><span class='line'>    }  
-</span><span class='line'>    virtual_ipaddress {  
-</span><span class='line'>        192.168.75.242  
-</span><span class='line'>    }  
-</span><span class='line'>} </span></code></pre></td></tr></table></div></figure>
-
-
-<p>最后一个脚本是用来保证nginx无法恢复，关闭keepalive，切换到bakup</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/bash 
-</span><span class='line'>while  : 
-</span><span class='line'>do 
-</span><span class='line'>nginxpid=`ps -C nginx --no-header | wc -l` 
-</span><span class='line'>if [ $nginxpid -eq 0 ];then 
-</span><span class='line'>  /usr/local/nginx/sbin/nginx 
-</span><span class='line'>  sleep 5 
-</span><span class='line'>  nginxpid=`ps -C nginx --no-header | wc -l` 
-</span><span class='line'>  echo $nginxpid 
-</span><span class='line'>    if [ $nginxpid -eq 0 ];then 
-</span><span class='line'>/etc/init.d/keepalived stop 
-</span><span class='line'>   fi 
-</span><span class='line'>fi 
-</span><span class='line'>sleep 5 
-</span><span class='line'>done </span></code></pre></td></tr></table></div></figure>
-
-
-<p> 我稍为解释一下，这是一个无限循环的脚本，放在主Nginx机器上（因为目前主要是由它提供服务），每隔5秒执行一次，用ps -C 命令来收集nginx的PID值到底是否为0，如果是0的话（即Nginx进程死掉了），尝试启动nginx进程；如果继续为0，即nginx启动失改，则关闭本机的Keeplaived进程，VIP地址则会由备机接管，当然了，整个网站就会由备机的Nginx来提供服务了，这样保证Nginx进程的高可用。</p>
-
-<pre><code> 正确写法为nohup/bin/bash /root/nginx_pid.sh &amp;,附带下注释:如果你正在运行一个进程，而且你觉得在退出帐户时该进程还不会结束，那么可以使用nohup命令。该命令可以在你退出root帐户之后继续运行相应的进程。nohup就是不挂起的意思( no hang up)。
-</code></pre>
 ]]></content>
   </entry>
   
