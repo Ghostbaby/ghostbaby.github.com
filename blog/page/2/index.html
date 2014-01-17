@@ -7,8 +7,9 @@
 	<meta name="author" content="GhostBaby">
 
 	
-	<meta name="description" content="今天，同事想找出短信分发机和平台注册SIM卡的差距，将两个平台的SIM卡分别存到两个文件，本来说是想再数据库里面，通过数据库的函数来做比较，正好最近在学SHELL，想用shell写个脚本来实现。 以下为几个不同实现方法。 方法一：使用grep 1
-grep -v -f file1 file2 &hellip;">
+	<meta name="description" content="缺省情况，我们在Linux查看历史记录命令，后面是无任何执行时间显示的 1
+history 那么如果想要用到记录命令的执行时间，可以这么操作： 编辑/etc/bashrc，添加以下内容 1
+vim /etc/bashrc 让系统记录每条历史命令的执行时间。注意最后的&#8221;号前面要放个空格 &hellip;">
 	
 
 	<link href="/atom.xml" rel="alternate" title="GhostBaby`s Area" type="application/atom+xml">
@@ -29,6 +30,80 @@ grep -v -f file1 file2 &hellip;">
 </ul></nav>
 </header>
 	<div id="content" class="inner">
+
+
+	<article class="post"><header>
+  
+  <h1 class="title"><a href="/blog/2013/08/29/linuxji-chu-%3Arang-historyji-lu-ming-ling-de-li-shi-zhi-xing-shi-jian/">Linux基础：让history记录命令的历史执行时间</a></h1>
+  
+  
+
+
+
+
+
+
+
+
+	
+		<time datetime="2013-08-29T09:12:00+08:00">
+			<span class="day">29</span><span class="month">Aug</span>
+		</time>
+	
+
+</header>
+<div class="entry-content">
+  
+    <p>缺省情况，我们在Linux查看历史记录命令，后面是无任何执行时间显示的</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>history</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么如果想要用到记录命令的执行时间，可以这么操作：</p>
+
+<h1>编辑/etc/bashrc，添加以下内容</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/bashrc</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>让系统记录每条历史命令的执行时间。注意最后的&#8221;号前面要放个空格</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISTTIMEFORMAT="%Y-%m-%d_%H:%M:%S "</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>设置保存历史命令的文件大小</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISFILESIZE=1000000</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>保存历史命令条数</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export HISTSIZE=2000</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>执行下面的命令使配置立即生效</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>source /etc/bashrc</span></code></pre></td></tr></table></div></figure>
+
+
+  
+  
+  <footer class="meta">
+    
+
+
+
+    
+  </footer>
+  
+</div>
+</article>
 
 
 	<article class="post"><header>
@@ -776,50 +851,6 @@ s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
 </article>
 
 
-	<article class="post"><header>
-  
-  <h1 class="title"><a href="/blog/2013/08/29/shellzhu-yi-dian/">Shell注意点</a></h1>
-  
-  
-
-
-
-
-
-
-
-
-	
-		<time datetime="2013-08-29T08:56:00+08:00">
-			<span class="day">29</span><span class="month">Aug</span>
-		</time>
-	
-
-</header>
-<div class="entry-content">
-  
-    <p>1.默认情况下，未定义的变量展开为null，即为空，所以在使用变量时要尤其小心，如下的语句可能会导致灾难</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>rm -rf /$abc</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果此时变量abc取不到值，后果不堪设想。</p>
-
-  
-  
-  <footer class="meta">
-    
-
-
-
-    
-  </footer>
-  
-</div>
-</article>
-
-
 <nav id="pagenavi">
 	<a href="/" class="prev alignleft">Prev</a>
 	<a href="/blog/page/3/" class="next alignright">Next</a>
@@ -834,7 +865,7 @@ s\Initialize-PowerCLIEnvironment.ps1&rdquo;</p>
 	
 	<a class="rss" href="/atom.xml" title="RSS">RSS</a>
 </div>
-<p>&copy; 2013 GhostBaby</p>
+<p>&copy; 2014 GhostBaby</p>
 <div class="clearfix"></div></footer>
 	<script src="/javascripts/jquery.fancybox.pack.js"></script>
 <script type="text/javascript">
